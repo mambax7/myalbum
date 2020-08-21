@@ -300,7 +300,7 @@ function myalbum_get_sub_categories($parent_id, $cattree)
                 'cid'              => $child->getVar('cid'),
                 'title'            => $child->getVar('title'),
                 'weight'           => $child->getVar('weight'),
-                'photo_small_sum'  => myalbum_get_photo_small_sum_from_cat($child->getVar('cid'), $criteria),
+                'photo_small_sum'  => Utility::getCategoryCount($child->getVar('cid'), $criteria),
                 'number_of_subcat' => count($GLOBALS['cattree']->getFirstChild($child->getVar('cid'))),
             ];
         }
@@ -323,7 +323,7 @@ function myalbum_get_sub_categories($parent_id, $cattree)
         $ret[] = [
             'cid'             => $cid,
             'imgurl'          => $GLOBALS['myts']->htmlSpecialChars($imgurl),
-            'photo_small_sum' => myalbum_get_photo_small_sum_from_cat($cid, $criteria),
+            'photo_small_sum' => Utility::getCategoryCount($cid, $criteria),
             'photo_total_sum' => $photo_total_sum,
             'title'           => $title,
             'weight'          => $weight,
