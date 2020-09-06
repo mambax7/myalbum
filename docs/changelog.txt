@@ -1,3 +1,7 @@
+<h5>3.9 Beta 2   [2020-08-21]</h5>  Dev: XOOPS 2.5.11, PHP 8.0 Beta 1
+<hr>
+- fix: function move to Utility (mamba)
+
 <h5>3.9 Beta 1   [2020-08-21]</h5>  Dev: XOOPS 2.5.11, PHP 8.0 Beta 1
 <hr>
 - namespaces (mamba)
@@ -6,8 +10,8 @@
 - PHP8 bitwise operators (mamba)
 - PHP8 Smarty adjustments (mamba)
 - qualifier import (mamba)
-- redundant 'else' keyword
-- replaced MediaUploader with XoopsMediaUploader-
+- redundant 'else' keyword (mamba)
+- replaced MediaUploader with XoopsMediaUploader (mamba)
 
 3.08 Beta 1            NOT RELEASED
 =================================

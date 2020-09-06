@@ -27,6 +27,7 @@ require_once __DIR__ . '/preloads/autoloader.php';
 
 $moduleDirName      = basename(__DIR__);
 $moduleDirNameUpper = mb_strtoupper($moduleDirName);
+$helper = Helper::getInstance();
 
 if (preg_match('/^myalbum(\d*)$/', $moduleDirName, $regs)) {
     $myalbum_number = $regs[1];
@@ -38,7 +39,7 @@ $_SESSION['myalbum_mydirname'] = $moduleDirName;
 // ------------------- Informations ------------------- //
 $modversion = [
     'version'             => 3.09,
-    'module_status'       => 'Beta 1',
+    'module_status'       => 'Beta 2',
     'release_date'        => '2020/08/12', //yyyy/mm/dd
     //    'release'             => '2015-04-04',
     'name'                => _ALBM_MYALBUM_NAME . $myalbum_number,
@@ -192,9 +193,9 @@ $modversion['blocks'][] = [
 // Menu
 $modversion['hasMain'] = 1;
 $subcount              = 1;
-// Ajout black_beard alias MONTUY337513
+// Adding black_beard alias MONTUY337513
 $GLOBALS['global_perms'] = 0;
-// Fin de l'ajout
+// End of addition
 require_once __DIR__ . '/include/get_perms.php';
 if ((int)$GLOBALS['global_perms'] & 1) { // GPERM_INSERTABLE
     $modversion['sub'][$subcount]['name']  = _ALBM_TEXT_SMNAME1;
@@ -202,12 +203,14 @@ if ((int)$GLOBALS['global_perms'] & 1) { // GPERM_INSERTABLE
     $modversion['sub'][$subcount]['name']  = _ALBM_TEXT_SMNAME4;
     $modversion['sub'][$subcount++]['url'] = 'viewcat.php?uid=' . (is_object($GLOBALS['xoopsUser']) ? $GLOBALS['xoopsUser']->getVar('uid') : -1);
 }
+
 $modversion['sub'][$subcount]['name']  = _ALBM_TEXT_SMNAME2;
 $modversion['sub'][$subcount++]['url'] = 'topten.php?hit=1';
 if ((int)$GLOBALS['global_perms'] & 256) { // GPERM_RATEVIEW
     $modversion['sub'][$subcount]['name']  = _ALBM_TEXT_SMNAME3;
     $modversion['sub'][$subcount++]['url'] = 'topten.php?rate=1';
 }
+
 if (isset($myalbum_catonsubmenu) && $myalbum_catonsubmenu) {
     $criteria = new \Criteria('pid', 0);
     $catHandler = $helper->getHandler('Category');

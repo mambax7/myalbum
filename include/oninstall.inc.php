@@ -9,9 +9,7 @@ use XoopsModules\Myalbum\{
 $moduleDirName = $_SESSION['myalbum_mydirname'];
 require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/language/english/myalbum_constants.php";
 
-eval(
-    '
-function xoops_module_install_' . $moduleDirName . '( $module )
+eval('function xoops_module_install_' . $moduleDirName . '( $module )
 {
     $modid = $module->getVar(\'mid\') ;
     $grouppermHandler = xoops_getHandler(\'groupperm\');
@@ -42,12 +40,7 @@ function xoops_module_install_' . $moduleDirName . '( $module )
     foreach (array_keys($uploadFolders) as $i) {
         Utility::createFolder($uploadFolders[$i]);
     }
-
-
-}
-
-'
-);
+}');
 
 /*
 function xoops_module_install_myalbum(\XoopsModule $xoopsModule)
@@ -74,3 +67,5 @@ function xoops_module_install_myalbum(\XoopsModule $xoopsModule)
 
 }
 */
+
+?>
