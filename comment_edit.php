@@ -17,5 +17,5 @@
  * @author       XOOPS Development Team
  */
 require_once dirname(__DIR__, 2) . '/mainfile.php';
-require_once __DIR__ . '/include/read_configs.php';
+require __DIR__ . '/include/read_configs.php';
 require_once XOOPS_ROOT_PATH . '/include/comment_edit.php';

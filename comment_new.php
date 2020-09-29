@@ -24,7 +24,7 @@ use XoopsModules\Myalbum\{
 /** @var Helper $helper */
 
 require_once dirname(__DIR__, 2) . '/mainfile.php';
-require_once __DIR__ . '/include/read_configs.php';
+require __DIR__ . '/include/read_configs.php';
 
 $helper = Helper::getInstance();
 
