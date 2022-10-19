@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Request;
@@ -13,22 +13,19 @@ use XoopsModules\Myalbum\{
     Utility
 };
 use XoopsModules\Tag\FormTag;
+
 //use XoopsModules\Tag\Helper; TODO
 
-
-
-
 /** @var Helper $helper */
-/** @var  PhotosHandler $photosHandler */
-/** @var  TextHandler $textHandler */
-
+/** @var PhotosHandler $photosHandler */
+/** @var TextHandler $textHandler */
 
 require_once __DIR__ . '/header.php';
 
 $lid = Request::getInt('lid', 0, 'GET');
 
 $photosHandler = $helper->getHandler('Photos');
-$textHandler = $helper->getHandler('Text');
+$textHandler   = $helper->getHandler('Text');
 if (!$photo_obj = $photosHandler->get($lid)) {
     $helper->redirect('index.php', 2, _ALBM_NOMATCH);
 }
@@ -49,7 +46,7 @@ if (!empty($_POST['do_delete'])) {
     }
 
     // anti-CSRF
-        $xsecurity = new \XoopsSecurity();
+    $xsecurity = new \XoopsSecurity();
     if (!$xsecurity->checkReferer()) {
         exit('XOOPS_URL is not included in your REFERER');
     }
@@ -74,7 +71,7 @@ if (!empty($_POST['conf_delete'])) {
     require_once $GLOBALS['xoops']->path('header.php');
 
     $ext = $photo_obj->getVar('ext');
-    if (!in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+    if (!\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
         $ext = 'gif';
     }
 
@@ -90,14 +87,14 @@ if (!empty($_POST['conf_delete'])) {
     </div>
     \n";
 
-    require $GLOBALS['xoops']->path('footer.php');
+    require_once $GLOBALS['xoops']->path('footer.php');
     exit;
 }
 
 // Do Modify
 if (!empty($_POST['submit'])) {
     // anti-CSRF
-        $xsecurity = new \XoopsSecurity();
+    $xsecurity = new \XoopsSecurity();
     if (!$xsecurity->checkReferer()) {
         exit('XOOPS_URL is not included in your REFERER');
     }
@@ -117,12 +114,10 @@ if (!empty($_POST['submit'])) {
             } else {
                 $valid = 1;
             }
+        } elseif (0 == $valid) {
+            $valid = 1;
         } else {
-            if (0 == $valid) {
-                $valid = 1;
-            } else {
-                $valid = 2;
-            }
+            $valid = 2;
         }
     } else {
         $valid = 2;
@@ -140,7 +135,14 @@ if (!empty($_POST['submit'])) {
     // Check if file uploaded
     if ('' != $_FILES[$field]['tmp_name'] && 'none' !== $_FILES[$field]['tmp_name']) {
         if ($GLOBALS['myalbumModuleConfig']['myalbum_canresize']) {
-            $uploader = new MediaUploader($GLOBALS['photos_dir'], explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']), $GLOBALS['myalbumModuleConfig']['myalbum_fsize'], null, null, explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts']));
+            $uploader = new MediaUploader(
+                $GLOBALS['photos_dir'],
+                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']),
+                $GLOBALS['myalbumModuleConfig']['myalbum_fsize'],
+                null,
+                null,
+                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts'])
+            );
         } else {
             $uploader = new MediaUploader(
                 $GLOBALS['photos_dir'],
@@ -165,13 +167,14 @@ if (!empty($_POST['submit'])) {
                 $_POST['title'] = $uploader->getMediaName();
             }
 
-            $title     = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
-            $desc_text = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
+            $title     = Request::getString('title', '', 'POST');
+            $desc_text = Request::getText('desc_text', '', 'POST');
             $date      = time();
             $tmp_name  = $uploader->getSavedFileName();
-            $ext       = mb_substr(mb_strrchr($tmp_name, '.'), 1);
+            $ext       = mb_substr(\mb_strrchr($tmp_name, '.'), 1);
 
-           Utility::editPhoto($GLOBALS['photos_dir'] . "/$tmp_name", $GLOBALS['photos_dir'] . "/$lid.$ext");
+            Utility::editPhoto($GLOBALS['photos_dir'] . "/$tmp_name", $GLOBALS['photos_dir'] . "/$lid.$ext");
+            /** @var array $dim */
             $dim = getimagesize($GLOBALS['photos_dir'] . "/$lid.$ext");
             if (!$dim) {
                 $dim = [0, 0];
@@ -181,12 +184,12 @@ if (!empty($_POST['submit'])) {
                 redirect_header('editphoto.php?lid=$lid', 10, _ALBM_FILEERROR);
             }
 
-           Utility::updatePhoto($lid, $cid, $title, $desc_text, $valid, $ext, $dim[0], $dim[1]);
+            Utility::updatePhoto($lid, $cid, $title, $desc_text, $valid, $ext, $dim[0], $dim[1]);
             exit;
         }
         $uploader->getErrors(true);
         require_once $GLOBALS['xoops']->path('header.php');
-        echo "<p><strong>::Errors occured::</strong></p>\n";
+        echo "<p><strong>::Errors occurred::</strong></p>\n";
         echo $uploader->getErrors(true);
         require_once $GLOBALS['xoops']->path('footer.php');
         exit;
@@ -195,16 +198,17 @@ if (!empty($_POST['submit'])) {
     if ('' === trim($_POST['title'])) {
         $_POST['title'] = 'no title';
     }
-    $title     = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
-    $desc_text = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
+    $title     = Request::getString('title', '', 'POST');
+    $desc_text = Request::getText('desc_text', '', 'POST');
     $cid       = Request::getInt('cid', 0, 'POST');
     $ext       = $_POST['ext'];
-    if ($GLOBALS['myalbumModuleConfig']['tag']) {
+    if ($helper->getConfig('tag')) {
         /** @var \XoopsModules\Tag\TagHandler $tagHandler */
-        $tagHandler = Helper::getInstance()->getHandler('Tag'); // xoops_getModuleHandler('tag', 'tag');
+        $tagHandler = Helper::getInstance()
+                            ->getHandler('Tag'); // xoops_getModuleHandler('tag', 'tag');
         $tagHandler->updateByItem($_POST['tags'], $lid, $GLOBALS['myalbumModule']->getVar('dirname'), $cid);
     }
-   Utility::updatePhoto($lid, $cid, $title, $desc_text, $valid);
+    Utility::updatePhoto($lid, $cid, $title, $desc_text, $valid);
     exit;
 }
 if (!mb_strpos($photo_obj->getEditURL(), $_SERVER['REQUEST_URI'])) {
@@ -236,7 +240,7 @@ $title_text = new \XoopsFormText(_ALBM_PHOTOTITLE, 'title', 50, 255, $photo_obj-
 $cat_select = new \XoopsFormLabel('', $GLOBALS['cattree']->makeSelBox('cid', 'title', '-', $photo_obj->getVar('cid')));
 
 $cat_link = new \XoopsFormLabel("<a href='javascript:location.href=\"" . XOOPS_URL . '/modules/' . $moduleDirName . "/viewcat.php?cid=\"+document.uploadphoto.cid.value;'>" . _GO . '</a>');
-$catTray = new \XoopsFormElementTray(_ALBM_PHOTOCAT, '&nbsp;');
+$catTray  = new \XoopsFormElementTray(_ALBM_PHOTOCAT, '&nbsp;');
 $catTray->addElement($cat_select);
 $catTray->addElement($cat_link);
 
@@ -248,7 +252,7 @@ $html_configs['rows']   = 35;
 $html_configs['cols']   = 60;
 $html_configs['width']  = '100%';
 $html_configs['height'] = '400px';
-$html_configs['editor'] = $GLOBALS['myalbumModuleConfig']['editor'];
+$html_configs['editor'] = $helper->getConfig('editor');
 $desc_tarea             = new \XoopsFormEditor(_ALBM_PHOTODESC, $html_configs['name'], $html_configs);
 
 $file_form = new \XoopsFormFile(_ALBM_SELECTFILE, 'photofile', $myalbum_fsize);
@@ -272,7 +276,7 @@ $valid_box->addOption('1', '&nbsp;');
 $submit_button  = new \XoopsFormButton('', 'submit', _SUBMIT, 'submit');
 $preview_button = new \XoopsFormButton('', 'preview', _PREVIEW, 'submit');
 $reset_button   = new \XoopsFormButton('', 'reset', _CANCEL, 'reset');
-$submitTray    = new \XoopsFormElementTray('');
+$submitTray     = new \XoopsFormElementTray('');
 $submitTray->addElement($preview_button);
 $submitTray->addElement($submit_button);
 $submitTray->addElement($reset_button);
@@ -285,7 +289,7 @@ $form->addElement($title_text);
 $form->addElement($desc_tarea);
 $form->addElement($catTray);
 $form->addElement($file_form);
-if ($GLOBALS['myalbumModuleConfig']['tag']) {
+if ($helper->getConfig('tag')) {
     $form->addElement(new FormTag('tags', 35, 255, $lid));
 }
 if ($myalbum_canrotate) {

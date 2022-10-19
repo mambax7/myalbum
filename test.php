@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 $global_perms = 0;
 for ($n = 0; $n < 270; ++$n) {

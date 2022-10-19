@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Request;
@@ -9,11 +9,13 @@ use XoopsModules\Myalbum\{
     CategoryHandler,
     Forms,
     Helper,
+    MediaUploader,
     PhotosHandler,
     Preview,
     TextHandler,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var CategoryHandler $catHandler */
 /** @var PhotosHandler $photosHandler */
@@ -24,9 +26,9 @@ use XoopsModules\Myalbum\{
 $lid = '';
 require_once __DIR__ . '/header.php';
 
-$catHandler = $helper->getHandler('Category');
+$catHandler    = $helper->getHandler('Category');
 $photosHandler = $helper->getHandler('Photos');
-$textHandler = $helper->getHandler('Text');
+$textHandler   = $helper->getHandler('Text');
 
 // GET variables
 $caller = Request::getString('caller', '', 'GET');
@@ -40,7 +42,7 @@ if (!($global_perms & GPERM_INSERTABLE)) {
 // check Categories exist
 $count = $catHandler->getCount();
 if ($count < 1) {
-//    redirect_header(XOOPS_URL . "/modules/$moduleDirName/", 2, _ALBM_MUSTADDCATFIRST);
+    //    redirect_header(XOOPS_URL . "/modules/$moduleDirName/", 2, _ALBM_MUSTADDCATFIRST);
     $helper->redirect('index.php', 2, _ALBM_MUSTADDCATFIRST);
 }
 
@@ -98,7 +100,7 @@ if ($myalbum_makethumb && !is_writable($thumbs_dir)) {
 
 if (!empty($_POST['submit'])) {
     // anti-CSRF
-        $xsecurity = new \XoopsSecurity();
+    $xsecurity = new \XoopsSecurity();
     if (!$xsecurity->checkReferer()) {
         exit('XOOPS_URL is not included in your REFERER');
     }
@@ -128,13 +130,11 @@ if (!empty($_POST['submit'])) {
 
         if ('' != $preview_name && is_readable("$photos_dir/$preview_name")) {
             $tmp_name = $preview_name;
+        } elseif (empty($myalbum_allownoimage)) {
+            redirect_header('submit.php', 2, _ALBM_NOIMAGESPECIFIED);
         } else {
-            if (empty($myalbum_allownoimage)) {
-                redirect_header('submit.php', 2, _ALBM_NOIMAGESPECIFIED);
-            } else {
-                @copy("$mod_path/assets/images/pixel_trans.gif", "$photos_dir/pixel_trans.gif");
-                $tmp_name = 'pixel_trans.gif';
-            }
+            @copy("$mod_path/assets/images/pixel_trans.gif", "$photos_dir/pixel_trans.gif");
+            $tmp_name = 'pixel_trans.gif';
         }
     } elseif ('' == $_FILES[$field]['tmp_name']) {
         // Fail to upload (wrong file name etc.)
@@ -178,9 +178,10 @@ if (!empty($_POST['submit'])) {
         redirect_header('submit.php', 2, _ALBM_FILEREADERROR);
     }
 
-    $title     = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
-    $desc_text = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
+    $title     = Request::getString('title', '', 'POST');
+    $desc_text = Request::getText('desc_text', '', 'POST');
     $date      = time();
+    /** @var array $fileparts */
     $fileparts = explode('.', $tmp_name);
     $ext       = $fileparts[count($fileparts) - 1];
     $status    = ($global_perms & GPERM_SUPERINSERT) ? 1 : 0;
@@ -199,10 +200,12 @@ if (!empty($_POST['submit'])) {
     $newid     = $photosHandler->insert($photo_obj, true);
     $photo_obj = $photosHandler->get($newid);
 
-    if ($GLOBALS['myalbumModuleConfig']['tag']) {
-        /** @var TagTagHandler $tagHandler */
-        $tagHandler = Helper::getInstance()->getHandler('Tag'); // xoops_getModuleHandler('tag', 'tag');
-        $tagHandler->updateByItem($_POST['tags'], $newid, $GLOBALS['myalbumModule']->getVar('dirname'), $cid);
+    $helper = Helper::getInstance();
+    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\TagHandler::class) && xoops_isActiveModule('tag')) {
+        /** @var \XoopsModules\Tag\TagHandler $tagHandler */
+        $tagHandler = \XoopsModules\Tag\Helper::getInstance()
+                                              ->getHandler('Tag');
+        $tagHandler->updateByItem($_POST['tags'], $newid, $helper->getDirname(), $cid);
     }
 
     Utility::editPhoto($GLOBALS['photos_dir'] . "/$tmp_name", $GLOBALS['photos_dir'] . "/$newid.$ext");
@@ -212,7 +215,8 @@ if (!empty($_POST['submit'])) {
     @$photosHandler->insert($photo_obj, true);
 
     if (!Utility::createThumb($GLOBALS['photos_dir'] . "/$newid.$ext", $newid, $ext)) {
-        $xoopsDB->query("DELETE FROM $table_photos WHERE lid=$newid");
+        $sql =
+            $xoopsDB->query("DELETE FROM $table_photos WHERE lid=$newid");
         redirect_header('submit.php', 2, _ALBM_FILEREADERROR);
     }
 
@@ -222,7 +226,8 @@ if (!empty($_POST['submit'])) {
     @$textHandler->insert($text, true);
 
     // Update User's Posts (Should be modified when need admission.)
-    $xoopsDB->query('UPDATE ' . $xoopsDB->prefix('users') . " SET posts=posts+'$myalbum_addposts' WHERE uid='$submitter'");
+    $sql =
+        $xoopsDB->query('UPDATE ' . $xoopsDB->prefix('users') . " SET posts=posts+'$myalbum_addposts' WHERE uid='$submitter'");
 
     // Trigger Notification
     if ($status) {
@@ -268,14 +273,14 @@ if ('imagemanager' === $caller) {
         <meta http-equiv='content-language' content='" . _LANGCODE . "'>
         </head><body>\n";
 } else {
-    require $GLOBALS['xoops']->path('header.php');
+    require_once $GLOBALS['xoops']->path('header.php');
     Preview::header();
 }
 
 // Preview
 if ('imagemanager' !== $caller && !empty($_POST['preview'])) {
-    $photo['description'] = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
-    $photo['title']       = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
+    $photo['description'] = Request::getText('desc_text', '', 'POST');
+    $photo['title']       = Request::getString('title', '', 'POST');
     $photo['cid']         = Request::getInt('cid', 0, 'POST');
 
     $field = $_POST['xoops_upload_file'][0];
@@ -340,11 +345,11 @@ if ('imagemanager' !== $caller && !empty($_POST['preview'])) {
     ];
 }
 
-if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
+if ($helper->getConfig('htaccess')) {
     if (Request::hasVar('cid', 'GET') && isset($_GET['title'])) {
-        $url = XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/' . $_GET['title'] . '/submit,' . $_GET['cid'] . '.html';
+        $url = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . $_GET['title'] . '/submit,' . $_GET['cid'] . '.html';
     } else {
-        $url = XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/submit.html';
+        $url = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/submit.html';
     }
     if (!mb_strpos($url, $_SERVER['REQUEST_URI'])) {
         header('HTTP/1.1 301 Moved Permanently');
@@ -361,5 +366,5 @@ if ('imagemanager' === $caller) {
     echo '</body></html>';
 } else {
     Preview::footer();
-    require $GLOBALS['xoops']->path('footer.php');
+    require_once $GLOBALS['xoops']->path('footer.php');
 }

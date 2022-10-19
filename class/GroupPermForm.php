@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
@@ -13,10 +13,8 @@ namespace XoopsModules\Myalbum;
  */
 
 /**
- * @copyright    XOOPS Project https://xoops.org/
- * @license      GNU GPL 2 or later (https://www.gnu.org/licenses/gpl-2.0.html)
- * @package
- * @since
+ * @copyright    XOOPS Project (https://xoops.org)
+ * @license      GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @author       XOOPS Development Team, Kazumi Ono (AKA onokazu)
  */
 
@@ -34,9 +32,6 @@ require_once XOOPS_ROOT_PATH . '/class/xoopsform/form.php';
  *
  * @author       Kazumi Ono    <onokazu@myweb.ne.jp>
  * @copyright    copyright (c) 2000-2003 XOOPS.org
- *
- * @package      kernel
- * @subpackage   form
  */
 class GroupPermForm extends \XoopsForm
 {
@@ -45,31 +40,31 @@ class GroupPermForm extends \XoopsForm
      *
      * @var int
      */
-    public $_modid;
+    public int $_modid;
     /**
      * Tree structure of items
      *
      * @var array
      */
-    public $_itemTree;
+    public array $_itemTree;
     /**
      * Name of permission
      *
      * @var string
      */
-    public $_permName;
+    public string $_permName;
     /**
      * Description of permission
      *
      * @var string
      */
-    public $_permDesc;
+    public string $_permDesc;
     /**
      * Appendix
      *
      * @var array ('permname'=>,'itemid'=>,'itemname'=>,'selected'=>)
      */
-    public $_appendix = [];
+    public array $_appendix = [];
 
     /**
      * Constructor
@@ -96,10 +91,8 @@ class GroupPermForm extends \XoopsForm
      * @param string $itemName
      * @param int    $itemId
      * @param int    $itemParent
-     *
-     * @access public
      */
-    public function addItem($itemId, $itemName, $itemParent = 0)
+    public function addItem(int $itemId, string $itemName, int $itemParent = 0): void
     {
         $this->_itemTree[$itemParent]['children'][] = $itemId;
         $this->_itemTree[$itemId]['parent']         = $itemParent;
@@ -110,12 +103,11 @@ class GroupPermForm extends \XoopsForm
     /**
      * Add appendix
      *
-     * @access public
      * @param $permName
      * @param $itemId
      * @param $itemName
      */
-    public function addAppendix($permName, $itemId, $itemName)
+    public function addAppendix($permName, $itemId, $itemName): void
     {
         $this->_appendix[] = [
             'permname' => $permName,
@@ -130,10 +122,8 @@ class GroupPermForm extends \XoopsForm
      *
      * @param int   $itemId
      * @param array $childIds
-     *
-     * @access private
      */
-    private function loadAllChildItemIds($itemId, &$childIds)
+    private function loadAllChildItemIds(int $itemId, array &$childIds): void
     {
         if (!empty($this->_itemTree[$itemId]['children'])) {
             $first_child = $this->_itemTree[$itemId]['children'];
@@ -153,9 +143,8 @@ class GroupPermForm extends \XoopsForm
      * Renders the form
      *
      * @return string
-     * @access public
      */
-    public function render()
+    public function render(): string
     {
         // load all child ids for javascript codes
         foreach (\array_keys($this->_itemTree) as $item_id) {
@@ -181,9 +170,9 @@ class GroupPermForm extends \XoopsForm
 
         // GIJ start
         $jstray          = new \XoopsFormElementTray(' &nbsp; ');
-        $jsuncheckbutton = new \XoopsFormButton('', 'none', _NONE, 'button');
+        $jsuncheckbutton = new \XoopsFormButton('', 'none', \_NONE, 'button');
         $jsuncheckbutton->setExtra("onclick=\"with(document.groupperm_form){for (i=0;i<length;i++) {if (elements[i].type=='checkbox') {elements[i].checked=false;}}}\"");
-        $jscheckbutton = new \XoopsFormButton('', 'all', _ALL, 'button');
+        $jscheckbutton = new \XoopsFormButton('', 'all', \_ALL, 'button');
         $jscheckbutton->setExtra("onclick=\"with(document.groupperm_form){for (i=0;i<length;i++) {if(elements[i].type=='checkbox' && (elements[i].name.indexOf('module_admin')<0 || elements[i].name.indexOf('[groups][1]')>=0)) {elements[i].checked=true;}}}\"");
         $jstray->addElement($jsuncheckbutton);
         $jstray->addElement($jscheckbutton);
@@ -191,8 +180,8 @@ class GroupPermForm extends \XoopsForm
         // GIJ end
 
         $tray = new \XoopsFormElementTray('');
-        $tray->addElement(new \XoopsFormButton('', 'reset', _CANCEL, 'reset'));
-        $tray->addElement(new \XoopsFormButton('', 'submit', _SUBMIT, 'submit'));
+        $tray->addElement(new \XoopsFormButton('', 'reset', \_CANCEL, 'reset'));
+        $tray->addElement(new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit'));
         $this->addElement($tray);
 
         $ret      = '<h4>' . $this->getTitle() . '</h4>' . $this->_permDesc . '<br>';

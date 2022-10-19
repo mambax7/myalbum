@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Module\Admin;
@@ -14,6 +14,7 @@ require_once XOOPS_ROOT_PATH . '/modules/system/constants.php';
 // To imagemanager
 if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !empty($_POST['cid'])) {
     // authority check
+    /** @var \XoopsGroupPermHandler $grouppermHandler */
     $grouppermHandler = xoops_getHandler('groupperm');
     if (!$grouppermHandler->checkRight('system_admin', XOOPS_SYSTEM_IMAGE, $xoopsUser->getGroups())) {
     }
@@ -35,7 +36,8 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
     $src_table_cat    = $xoopsDB->prefix($table_cat);
 
     // get storetype of the imgcat
-    $crs = $xoopsDB->query("SELECT imgcat_storetype,imgcat_maxsize FROM $dst_table_cat WHERE imgcat_id='$dst_cid'")
+    $sql = "SELECT imgcat_storetype,imgcat_maxsize FROM $dst_table_cat WHERE imgcat_id='$dst_cid'";
+    $crs = $xoopsDB->query($sql)
            || exit('Invalid imgcat_id.');
     [$imgcat_storetype, $imgcat_maxsize] = $xoopsDB->fetchRow($crs);
 
@@ -43,9 +45,10 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
     $mime_types = ['gif' => 'image/gif', 'png' => 'image/png', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg'];
 
     // INSERT loop
-    $srs          = $xoopsDB->query("SELECT lid,ext,title,date,`status` FROM $src_table_photos WHERE cid='$src_cid'");
+    $sql          = "SELECT lid,ext,title,date,`status` FROM $src_table_photos WHERE cid='$src_cid'";
+    $srs          = $xoopsDB->query($sql);
     $export_count = 0;
-    while (list($lid, $ext, $title, $date, $status) = $xoopsDB->fetchRow($srs)) {
+    while ([$lid, $ext, $title, $date, $status] = $xoopsDB->fetchRow($srs)) {
         $dst_node = uniqid('img', true);
         $dst_file = XOOPS_UPLOAD_PATH . "/{$dst_node}.{$ext}";
         $src_file = empty($_POST['use_thumb']) ? "$photos_dir/{$lid}.{$ext}" : "$thumbs_dir/{$lid}.{$ext}";
@@ -66,11 +69,13 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
 
         // insert into image table
         $image_display = $status ? 1 : 0;
-        $xoopsDB->query("INSERT INTO $dst_table_photos SET image_name='{$dst_node}.{$ext}',image_nicename='" . addslashes($title) . "',image_created='$date',image_mimetype='{$mime_types[$ext]}',image_display='$image_display',imgcat_id='$dst_cid'")
+        $sql           = "INSERT INTO $dst_table_photos SET image_name='{$dst_node}.{$ext}',image_nicename='" . addslashes($title) . "',image_created='$date',image_mimetype='{$mime_types[$ext]}',image_display='$image_display',imgcat_id='$dst_cid'";
+        $xoopsDB->query($sql)
         || exit('DB error: INSERT image table');
         if ($body) {
             $image_id = $xoopsDB->getInsertId();
-            $xoopsDB->query('INSERT INTO ' . $xoopsDB->prefix('imagebody') . " SET image_id='$image_id',image_body='$body'");
+            $sql      = 'INSERT INTO ' . $xoopsDB->prefix('imagebody') . " SET image_id='$image_id',image_body='$body'";
+            $xoopsDB->query($sql);
         }
 
         ++$export_count;
@@ -83,6 +88,7 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
 // Form Part
 //
 
+/** @var \XoopsGroupPermHandler $grouppermHandler */
 $grouppermHandler = xoops_getHandler('groupperm');
 if ($grouppermHandler->checkRight('system_admin', XOOPS_SYSTEM_IMAGE, $xoopsUser->getGroups())) {
     xoops_cp_header();

@@ -1,13 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
-
-
-$moduleDirName = basename(dirname(__DIR__));
+$moduleDirName = \basename(\dirname(__DIR__));
 
 eval(
-    '
-
-function b_waiting_' . $moduleDirName . '(){
+    'function b_waiting_' . $moduleDirName . '(){
     return b_waiting_myalbum_base( \'' . $moduleDirName . '\' ) ;
 }
 
@@ -23,6 +19,7 @@ if (!function_exists('b_waiting_myalbum_base')) {
     function b_waiting_myalbum_base($moduleDirName)
     {
         $xoopsDB = \XoopsDatabaseFactory::getDatabaseConnection();
+        $ret     = [];
         $block   = [];
 
         // get $mydirnumber
@@ -31,6 +28,7 @@ if (!function_exists('b_waiting_myalbum_base')) {
         }
         $mydirnumber = '' === $regs[2] ? '' : (int)$regs[2];
 
+        $sql =
         $result = $xoopsDB->query('SELECT COUNT(*) FROM ' . $xoopsDB->prefix("myalbum{$mydirnumber}_photos") . ' WHERE status=0');
         if ($result) {
             $block['adminlink'] = XOOPS_URL . "/modules/myalbum{$mydirnumber}/admin/admission.php";
@@ -38,6 +36,9 @@ if (!function_exists('b_waiting_myalbum_base')) {
             $block['lang_linkname'] = _PI_WAITING_WAITINGS;
         }
 
-        return $block;
+        $ret[] = $block;
+
+        return $ret;
     }
 }
+

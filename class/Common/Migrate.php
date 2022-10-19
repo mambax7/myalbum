@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum\Common;
 
@@ -12,7 +12,7 @@ namespace XoopsModules\Myalbum\Common;
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-use \XoopsModules\Myalbum\Common;
+use XoopsModules\Myalbum\Common;
 
 /**
  * Class Migrate synchronize existing tables with target schema
@@ -20,7 +20,7 @@ use \XoopsModules\Myalbum\Common;
  * @category  Migrate
  * @author    Richard Griffith <richard@geekwright.com>
  * @copyright 2016 XOOPS Project (https://xoops.org)
- * @license   GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
+ * @license   GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @link      https://xoops.org
  */
 class Migrate extends \Xmf\Database\Migrate
@@ -29,9 +29,7 @@ class Migrate extends \Xmf\Database\Migrate
 
     /**
      * Migrate constructor.
-     * @param Common\Configurator $configurator
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
+     * @param \XoopsModules\Myalbum\Common\Configurator|null $configurator
      */
     public function __construct(Common\Configurator $configurator = null)
     {
@@ -46,7 +44,7 @@ class Migrate extends \Xmf\Database\Migrate
     /**
      * change table prefix if needed
      */
-    private function changePrefix()
+    private function changePrefix(): void
     {
         foreach ($this->renameTables as $oldName => $newName) {
             if ($this->tableHandler->useTable($oldName) && !$this->tableHandler->useTable($newName)) {
@@ -61,12 +59,12 @@ class Migrate extends \Xmf\Database\Migrate
      * @param string $tableName  table to convert
      * @param string $columnName column with IP address
      */
-    private function convertIPAddresses($tableName, $columnName)
+    private function convertIPAddresses(string $tableName, string $columnName): void
     {
         if ($this->tableHandler->useTable($tableName)) {
             $attributes = $this->tableHandler->getColumnAttributes($tableName, $columnName);
-            if (false !== mb_strpos($attributes, ' int(')) {
-                if (false === mb_strpos($attributes, 'unsigned')) {
+            if (false !== \mb_strpos($attributes, ' int(')) {
+                if (false === \mb_strpos($attributes, 'unsigned')) {
                     $this->tableHandler->alterColumn($tableName, $columnName, " bigint(16) NOT NULL  DEFAULT '0' ");
                     $this->tableHandler->update($tableName, [$columnName => "4294967296 + $columnName"], "WHERE $columnName < 0", false);
                 }
@@ -79,7 +77,7 @@ class Migrate extends \Xmf\Database\Migrate
     /**
      * Move do* columns from newbb_posts to newbb_posts_text table
      */
-    private function moveDoColumns()
+    private function moveDoColumns(): void
     {
         $tableName    = 'newbb_posts_text';
         $srcTableName = 'newbb_posts';
@@ -103,7 +101,7 @@ class Migrate extends \Xmf\Database\Migrate
      *   table and column renames
      *   data conversions
      */
-    protected function preSyncActions()
+    protected function preSyncActions(): void
     {
         // change 'bb' table prefix to 'newbb'
         $this->changePrefix();

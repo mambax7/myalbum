@@ -1,30 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Module\Admin;
+use Xmf\Request;
 use XoopsModules\Myalbum\{
-    CategoryHandler,
-    Forms,
     Helper,
     PhotosHandler,
-    TextHandler
 };
+
 /** @var Admin $adminObject */
 /** @var Helper $helper */
-
 
 require_once __DIR__ . '/admin_header.php';
 
 // GET vars
-$pos = \Xmf\Request::getInt('pos', 0, 'GET');
-$num = \Xmf\Request::getInt('num', 10, 'GET');
-$txt = empty($_GET['txt']) ? '' : $GLOBALS['myts']->stripSlashesGPC(trim($_GET['txt']));
+$pos = Request::getInt('pos', 0, 'GET');
+$num = Request::getInt('num', 10, 'GET');
+$txt = empty($_GET['txt']) ? '' : (trim($_GET['txt']));
 
 if (!empty($_POST['action']) && 'admit' === $_POST['action'] && isset($_POST['ids']) && is_array($_POST['ids'])) {
-    /** @var  PhotosHandler $photosHandler */
+    /** @var PhotosHandler $photosHandler */
     $photosHandler = $helper->getHandler('Photos');
     @$photosHandler->setStatus($_POST['ids'], 1);
     redirect_header('admission.php', 2, _ALBM_AM_ADMITTING);
@@ -32,17 +30,17 @@ if (!empty($_POST['action']) && 'admit' === $_POST['action'] && isset($_POST['id
     // remove records
 
     // Double check for anti-CSRF
-        $xsecurity = new \XoopsSecurity();
+    $xsecurity = new \XoopsSecurity();
     if (!$xsecurity->checkReferer()) {
         exit('XOOPS_URL is not included in your REFERER');
     }
-    /** @var  PhotosHandler $photosHandler */
+    /** @var PhotosHandler $photosHandler */
     $photosHandler = $helper->getHandler('Photos');
     @$photosHandler->deletePhotos($_POST['ids']);
 
     redirect_header('admission.php', 2, _ALBM_DELETINGPHOTO);
 }
-/** @var  PhotosHandler $photosHandler */
+/** @var PhotosHandler $photosHandler */
 $photosHandler = $helper->getHandler('Photos');
 
 // extracting by free word

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
@@ -10,8 +10,7 @@ if (!\class_exists('TextSanitizer')) {
      */
     class TextSanitizer extends \MyTextSanitizer
     {
-        public $nbsp = 0;
-
+        public int $nbsp = 0;
         /*
         * MyAlbumTextSanitizer constructor.
         *
@@ -36,7 +35,7 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return \XoopsModules\Myalbum\TextSanitizer
          */
-        public static function getInstance()
+        public static function getInstance(): TextSanitizer
         {
             static $instance;
             if (null === $instance) {
@@ -60,12 +59,12 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return string
          */
-        public function displayTarea($text, $html = 0, $smiley = 1, $xcode = 1, $image = 1, $br = 1, $nbsp = 0)
+        public function &displayTarea($text, $html = 0, $smiley = 1, $xcode = 1, $image = 1, $br = 1, int $nbsp = 0): string
         {
             $this->nbsp = $nbsp;
             $text       = parent::displayTarea($text, $html, $smiley, $xcode, $image, $br);
-
-            return $this->postCodeDecode($text);
+            $ret        = $this->postCodeDecode($text);
+            return $ret;
             /*      if ($html != 1) {
                         // html not allowed
                         $text =& $this->htmlSpecialChars($text);
@@ -99,7 +98,7 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return string
          **/
-        public function postCodeDecode($text)
+        public function postCodeDecode(string $text): string
         {
             $removal_tags = ['[summary]', '[/summary]', '[pagebreak]'];
             $text         = \str_replace($removal_tags, '', $text);
@@ -128,9 +127,9 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return string
          **/
-        public function extractSummary($text)
+        public function extractSummary(string $text): string
         {
-            $patterns[]     = "/^(.*)\[summary\](.*)\[\/summary\](.*)$/sU";
+            $patterns[]     = '/^(.*)\[summary\](.*)\[\/summary\](.*)$/sU';
             $replacements[] = '$2';
 
             return \preg_replace($patterns, $replacements, $text);
@@ -143,7 +142,7 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return string
          */
-        public function nl2Br($text)
+        public function nl2Br($text): string
         {
             $text = \preg_replace("/(\015\012)|(\015)|(\012)/", '<br>', $text);
             if ($this->nbsp) {
@@ -179,7 +178,7 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return string
          */
-        public function stripSlashesGPC($text)
+        public function stripSlashesGPC($text): string
         {
             if (@\get_magic_quotes_gpc()) {
                 $text = \stripslashes($text);
@@ -191,7 +190,6 @@ if (!\class_exists('TextSanitizer')) {
 
             return $text;
         }
-
         // The End of Class
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 if (defined('FOR_XOOPS_LANG_CHECKER') || !defined('MYALBUM_MB_LOADED')) {
     define('MYALBUM_MB_LOADED', 1);

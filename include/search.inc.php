@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use XoopsModules\Myalbum\{
     Helper
@@ -18,9 +18,9 @@ use XoopsModules\Myalbum\{
 function myalbum_search($keywords, $andor, $limit, $offset, $userid)
 {
     global $xoopsDB;
-    $helper = Helper::getInstance();
+    $helper        = Helper::getInstance();
     $moduleDirName = $helper->getDirname();
-    require_once $helper->path( 'include/read_configs.php');
+    require_once $helper->path('include/read_configs.php');
 
     $sql = 'SELECT l.lid,l.cid,l.title,l.submitter,l.date,t.description FROM ' . $xoopsDB->prefix($moduleDirName . '_photos') . ' l LEFT JOIN ' . $xoopsDB->prefix($moduleDirName . '_text') . ' t ON t.lid=l.lid WHERE status>0';
 
@@ -31,7 +31,7 @@ function myalbum_search($keywords, $andor, $limit, $offset, $userid)
     $whr = '';
     if ($keywords && is_array($keywords)) {
         $whr = 'AND (';
-        switch (mb_strtolower($andor)) {
+        switch (\mb_strtolower($andor)) {
             case 'and':
                 foreach ($keywords as $keyword) {
                     $whr .= "CONCAT(l.title,\' \',t.description) LIKE \'%$keyword%\' AND ";
@@ -54,14 +54,17 @@ function myalbum_search($keywords, $andor, $limit, $offset, $userid)
     $sql    = "$sql $whr ORDER BY l.date DESC";
     $result = $xoopsDB->query($sql, $limit, $offset);
     $ret    = [];
-    while (false !== ($myrow = $xoopsDB->fetchArray($result))) {
-        $ret[] = [
-            'image' => 'assets/images/pict.gif',
-            'link'  => 'photo.php?lid=' . $myrow['lid'],
-            'title' => $myrow['title'],
-            'time'  => $myrow['date'],
-            'uid'   => $myrow['submitter'],
-        ];
+    if ($xoopsDB->isResultSet($result)) {
+        /** @var array $myrow */
+        while (false !== ($myrow = $xoopsDB->fetchArray($result))) {
+            $ret[] = [
+                'image' => 'assets/images/pict.gif',
+                'link'  => 'photo.php?lid=' . $myrow['lid'],
+                'title' => $myrow['title'],
+                'time'  => $myrow['date'],
+                'uid'   => $myrow['submitter'],
+            ];
+        }
     }
 
     return $ret;

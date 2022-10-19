@@ -1,7 +1,28 @@
-<h5>3.9 Alpha 1   [WORK IN PROGRESS - NOT RELEASED]</h5>  Dev: XOOPS 2.5.11, PHP 7.4.9
+<h5>3.9 Beta 3   [NOT RELEASED]</h5>  Dev: XOOPS 2.5.11, PHP 7.4.10, PHP 8.2.0 RC-4
+- various updates/cosmetics for PHP 8.2(mamba)
+
+<h5>3.9 Beta 2   [2020-08-21]</h5>  Dev: XOOPS 2.5.11, PHP 8.0 Beta 1
+<hr>
+- fix: function move to Utility (mamba)
+
+<h5>3.9 Beta 1   [2020-08-21]</h5>  Dev: XOOPS 2.5.11, PHP 8.0 Beta 1
 <hr>
 - namespaces (mamba)
 - class autoloading (mamba)
+- fixed several bugs (goffy)
+- PHP8 bitwise operators (mamba)
+- PHP8 Smarty adjustments (mamba)
+- qualifier import (mamba)
+- redundant 'else' keyword
+- replaced MediaUploader with XoopsMediaUploader-
+- fixed bugs with deleting photo (djsherren/goffy)
+- fixed bugs with recreation thumbs (djsherren/goffy)
+- fixed bugs with missing error info 'too big' (djsherren/goffy)
+- fixed bugs with invalid thumb url (djsherren/goffy)
+- fixed bugs in search (wdc/goffy)
+- fixed bugs in tpl topten (djsherren/goffy)
+- fixed bugs with saving vote data (djsherren/goffy)
+- fixed bugs with saving ip (djsherren/goffy)
 
 3.08 Beta 1            NOT RELEASED
 =================================
@@ -251,7 +272,7 @@ modification about a compatibility with PHP Accelerator
  - remade category's admin (renamed as index.php)
  - allowed to upload another type of files (swf,avi etc.)
   - For such implementations, I use the icons of filemanager 3.0
-   - thx to the author Jan Inge Pettersen(Xend) http://www.xendtech.com/
+   - thx to the author Jan Inge Pettersen(Xend) https://www.xendtech.com/
 
 2.70 beta 03         2004-4-5
 =================================

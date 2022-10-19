@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Module\Admin;
@@ -9,10 +9,9 @@ use Xmf\Request;
 use XoopsModules\Myalbum\{
     Utility
 };
+
 /** @var Admin $adminObject */
 /** @var Helper $helper */
-
-
 require_once __DIR__ . '/admin_header.php';
 
 // get and check $_POST['size']
@@ -37,7 +36,7 @@ if (!$myalbum_makethumb) {
 }
 
 // check if the directories of thumbs and photos are same.
-if ($GLOBALS['thumbs_dir'] == $GLOBALS['photos_dir']) {
+if ($GLOBALS['thumbs_dir'] === $GLOBALS['photos_dir']) {
     exit('The directory for thumbnails is same as for photos.');
 }
 
@@ -58,10 +57,14 @@ if ($myalbum_makethumb && !is_dir($thumbs_dir)) {
 if (!empty($_POST['submit'])) {
     ob_start();
 
-    $result         = $xoopsDB->query('SELECT lid , ext , res_x , res_y FROM ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " ORDER BY lid LIMIT $start , $size")
-                      || exit('DB Error');
+    $sql    = 'SELECT lid , ext , res_x , res_y FROM ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " ORDER BY lid LIMIT $start , $size";
+    $result = $xoopsDB->query($sql);
+    if (!$xoopsDB->isResultSet($result)) {
+        throw new \RuntimeException("Query Failed! SQL: $sql- Error: " . $xoopsDB->error());
+    }
+
     $record_counter = 0;
-    while (list($lid, $ext, $w, $h) = $xoopsDB->fetchRow($result)) {
+    while ([$lid, $ext, $w, $h] = $xoopsDB->fetchRow($result)) {
         ++$record_counter;
         echo ($record_counter + $start - 1) . ') ';
         printf(_AM_FMT_CHECKING, "$lid.$ext");
@@ -79,7 +82,7 @@ if (!empty($_POST['submit'])) {
         }
 
         // Check if the file is normal image
-        if (!in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+        if (!\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
             if ($forceredo || !is_readable("$thumbs_dir/$lid.gif")) {
                 Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
                 echo _AM_MB_CREATEDTHUMBS . "<br>\n";
@@ -90,7 +93,7 @@ if (!empty($_POST['submit'])) {
         }
 
         // Size of main photo
-        list($true_w, $true_h) = getimagesize("$photos_dir/$lid.$ext");
+        [$true_w, $true_h] = getimagesize("$photos_dir/$lid.$ext");
         echo "{$true_w}x{$true_h} .. ";
 
         // Check and resize the main photo if necessary
@@ -101,31 +104,30 @@ if (!empty($_POST['submit'])) {
             Utility::editPhoto($tmp_path, "$photos_dir/$lid.$ext");
             @unlink($tmp_path);
             echo _AM_MB_PHOTORESIZED . ' &nbsp; ';
-            list($true_w, $true_h) = getimagesize("$photos_dir/$lid.$ext");
+            [$true_w, $true_h] = getimagesize("$photos_dir/$lid.$ext");
         }
 
         // Check and repair record of the photo if necessary
         if ($true_w != $w || $true_h != $h) {
-            $xoopsDB->query('UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " SET res_x=$true_w, res_y=$true_h WHERE lid=$lid")
+            $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " SET res_x=$true_w, res_y=$true_h WHERE lid=$lid";
+            $xoopsDB->query($sql)
             || exit('DB error: UPDATE photo table.');
             echo _AM_MB_SIZEREPAIRED . ' &nbsp; ';
         }
 
         // Create Thumbs
         if (is_readable("$thumbs_dir/$lid.$ext")) {
-            list($thumbs_w, $thumbs_h) = getimagesize("$thumbs_dir/$lid.$ext");
+            [$thumbs_w, $thumbs_h] = getimagesize("$thumbs_dir/$lid.$ext");
             echo "{$thumbs_w}x{$thumbs_h} ... ";
             if ($forceredo) {
                 $retcode = Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
             } else {
                 $retcode = 3;
             }
+        } elseif ($myalbum_makethumb) {
+            $retcode = Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
         } else {
-            if ($myalbum_makethumb) {
-                $retcode = Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
-            } else {
-                $retcode = 3;
-            }
+            $retcode = 3;
         }
 
         switch ($retcode) {
@@ -143,8 +145,7 @@ if (!empty($_POST['submit'])) {
                 break;
         }
     }
-    $result_str = ob_get_contents();
-    ob_end_clean();
+    $result_str = ob_get_clean();
 
     $start += $size;
 }

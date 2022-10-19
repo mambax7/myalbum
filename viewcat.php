@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Request;
@@ -13,6 +13,9 @@ use XoopsModules\Myalbum\{
     Utility
 };
 
+$moduleDirName                           = basename(__DIR__);
+$GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_viewcat_table.tpl";
+
 /** @var Helper $helper */
 /** @var PhotosHandler $photosHandler */
 /** @var CategoryHandler $catHandler */
@@ -22,19 +25,19 @@ require_once __DIR__ . '/header.php';
 // GET variables
 $cid = Request::getInt('cid', 0, 'GET');
 $uid = Request::getInt('uid', 0, 'GET');
-$num = Request::getInt('num', (int)$myalbum_perpage, 'GET');
+$num = Request::getInt('num', (int)$helper->getConfig('myalbum_perpage'), 'GET');
 if ($num < 1) {
     $num = 10;
 }
 $pos  = Request::getInt('pos', 0, 'GET');
-$view = $_GET['view'] ?? $myalbum_viewcattype;
+$view = $_GET['view'] ?? $helper->getConfig('myalbum_viewcattype');
 
 $photosHandler = $helper->getHandler('Photos');
 $catHandler    = $helper->getHandler('Category');
 
-if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
+if ($helper->getConfig('htaccess')) {
     if (0 == $cid) {
-        $url = XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/cat,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . '.html';
+        $url = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/cat,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . '.html';
     } else {
         $cat = $catHandler->get($cid);
         $url = $cat->getURL($uid, $num, $pos, $view);
@@ -49,15 +52,15 @@ if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
 
 // Orders
 require_once $helper->path('include/photo_orders.php');
-if (Request::hasVar('orderby', 'GET') && isset($myalbum_orders[$_GET['orderby']])) {
-    $orderby = $_GET['orderby'];
-} elseif (isset($myalbum_orders[$myalbum_defaultorder])) {
-        $orderby = $myalbum_defaultorder;
-    } else {
-        //$orderby = 'titleA';
-        $orderby = 'cidD';
-    }
-
+if (Request::hasVar('orderby', 'GET')) {
+    $orderby = Request::getString('orderby', '', 'GET');
+} /** @var array $myalbum_orders */
+elseif (isset($myalbum_orders[$helper->getConfig('myalbum_defaultorder')])) {
+    $orderby = $helper->getConfig('myalbum_defaultorder');
+} else {
+    //$orderby = 'titleA';
+    $orderby = 'cidD';
+}
 
 if ('table' === $view) {
     $GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_viewcat_table.tpl";
@@ -92,8 +95,8 @@ if ($cid > 0) {
     foreach ($GLOBALS['cattree']->getAllChild($cid) as $child) {
         $cids[$child->getVar('cid')] = $child->getVar('cid');
     }
-    $cids[]   = $cid;
-    $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
+    $cids[]          = $cid;
+    $criteria        = new \CriteriaCompo(new \Criteria('status', '0', '>'));
     $photo_total_sum = Utility::getTotalCount($cids, $criteria);
     if (!empty($cids)) {
         foreach ($cids as $index => $child) {
@@ -120,7 +123,7 @@ if ($cid > 0) {
         // uid Specified
     } else {
         $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
-        $criteria->add(new \Criteria('`submitter`', $uid));
+        $criteria->add(new \Criteria('submitter', $uid));
         $GLOBALS['xoopsTpl']->assign('uid', $uid);
         $GLOBALS['xoopsTpl']->assign('album_sub_title', "<img src='$mod_url/assets/images/myphotos.gif' alt='' >" . Preview::getNameFromUid($uid));
     }

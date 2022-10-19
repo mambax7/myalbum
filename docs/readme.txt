@@ -91,8 +91,8 @@ Original README on Daniel's myAlbum
 based on XOOPS OO code with XOOPS classes beeing used when ever possible.
  It was based on mylinks module, with comments from xoopspoll and the upload
 of photos using the avatar upload code.
- The demo site is http://datsun1200.com and the development site is
-http://xoopsforge.sourceforge.net/xf/project/?myalbum
+ The demo site is https://datsun1200.com and the development site is
+https://xoopsforge.sourceforge.net/xf/project/?myalbum
 
  The Licence is GPL (https://www.gnu.org/licenses/gpl.html).
 

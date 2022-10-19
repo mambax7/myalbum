@@ -1,9 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // $Id$
 
-
-
-if (mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
+if (\mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
     // Keep Block option values when update (by nobunobu)
     global $xoopsDB;
     $query  = 'SELECT mid FROM ' . $xoopsDB->prefix('modules') . " WHERE dirname='" . $modversion['dirname'] . "' ";
@@ -58,6 +56,7 @@ if (mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
 
         $sql     = 'SELECT * FROM ' . $xoopsDB->prefix('newblocks') . ' WHERE mid=' . $mid . " AND block_type <>'D' AND func_num > $count";
         $fresult = $xoopsDB->query($sql);
+        /** @var array $fblock */
         while (false !== ($fblock = $xoopsDB->fetchArray($fresult))) {
             $local_msgs[] = 'Non Defined Block <b>' . $fblock['name'] . '</b> will be deleted';
             $sql          = 'DELETE FROM ' . $xoopsDB->prefix('newblocks') . " WHERE bid='" . $fblock['bid'] . "'";

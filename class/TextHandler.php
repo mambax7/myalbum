@@ -1,8 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
-
-
 
 require_once \dirname(__DIR__) . '/include/read_configs.php';
 
@@ -12,7 +10,6 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * of XOOPS user class objects.
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
- * @package kernel
  */
 class TextHandler extends \XoopsPersistableObjectHandler
 {
@@ -27,12 +24,17 @@ class TextHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBytes()
+    public function getBytes(): string
     {
-        $sql = 'SELECT SUM(LENGTH(`description`)) AS `bytes` FROM ' . $GLOBALS['xoopsDB']->prefix($GLOBALS['table_text']);
-        [$bytes] = $GLOBALS['xoopsDB']->fetchRow($GLOBALS['xoopsDB']->queryF($sql));
+        $bytes  = '';
+        $sql    = 'SELECT SUM(LENGTH(`description`)) AS `bytes` FROM ' . $GLOBALS['xoopsDB']->prefix($GLOBALS['table_text']);
+        $result = $GLOBALS['xoopsDB']->queryF($sql);
+        if ($GLOBALS['xoopsDB']->isResultSet($result)) {
+            //            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
+            [$bytes] = $GLOBALS['xoopsDB']->fetchRow($result);
+        }
 
         return $bytes;
     }

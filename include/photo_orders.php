@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 $myalbum_orders = [
     'cidA'    => ['cid ASC', _ALBM_CIDASC],

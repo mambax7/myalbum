@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * You may not change or alter any portion of this comment or credits
  * of supporting developers from this source code or any supporting source code
@@ -11,21 +11,17 @@
 
 /**
  * @copyright    {@link https://xoops.org/ XOOPS Project}
- * @license      {@link https://www.gnu.org/licenses/gpl-2.0.html GNU GPL 2 or later}
- * @package
- * @since
+ * @license      {@link https://www.gnu.org/licenses/gpl-2.0.html GNU GPL 2.0 or later}
  * @author       XOOPS Development Team
  */
 
-use XoopsModules\Myalbum\{Helper
-};
+use XoopsModules\Myalbum\Helper;
 
 /** @var Helper $helper */
+require_once \dirname(__DIR__, 2) . '/mainfile.php';
+require_once XOOPS_ROOT_PATH . '/header.php';
 
-require dirname(__DIR__, 2) . '/mainfile.php';
-require XOOPS_ROOT_PATH . '/header.php';
-
-require __DIR__ . '/preloads/autoloader.php';
+require_once __DIR__ . '/preloads/autoloader.php';
 
 //$moduleDirName = basename(__DIR__);
 
@@ -35,7 +31,7 @@ $moduleDirName = $helper->getDirname();
 $myts = \MyTextSanitizer::getInstance();
 
 if (!isset($GLOBALS['xoTheme']) || !is_object($GLOBALS['xoTheme'])) {
-    require $GLOBALS['xoops']->path('class/theme.php');
+    require_once $GLOBALS['xoops']->path('class/theme.php');
     $GLOBALS['xoTheme'] = new \xos_opal_Theme();
 }
 
@@ -46,7 +42,7 @@ if (!isset($GLOBALS['xoTheme']) || !is_object($GLOBALS['xoTheme'])) {
 $helper->loadLanguage('main');
 
 if (!isset($GLOBALS['xoopsTpl']) || !($GLOBALS['xoopsTpl'] instanceof XoopsTpl)) {
-    require $GLOBALS['xoops']->path('class/template.php');
+    require_once $GLOBALS['xoops']->path('class/template.php');
     $xoopsTpl = new XoopsTpl();
 }
 
@@ -55,16 +51,16 @@ require_once $helper->path('include/read_configs.php');
 require_once $helper->path('include/get_perms.php');
 
 /** @var \XoopsModuleHandler $moduleHandler */
-$moduleHandler                  = xoops_getHandler('module');
+$moduleHandler = xoops_getHandler('module');
 /** @var \XoopsConfigHandler $configHandler */
 $configHandler                  = xoops_getHandler('config');
 $GLOBALS['myalbumModule']       = $moduleHandler->getByDirname($GLOBALS['mydirname']);
 $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
 $GLOBALS['myalbum_mid']         = $GLOBALS['myalbumModule']->getVar('mid');
-$GLOBALS['photos_dir']          = XOOPS_ROOT_PATH . $GLOBALS['myalbumModuleConfig']['myalbum_photospath'];
-$GLOBALS['thumbs_dir']          = XOOPS_ROOT_PATH . $GLOBALS['myalbumModuleConfig']['myalbum_thumbspath'];
-$GLOBALS['photos_url']          = XOOPS_URL . $GLOBALS['myalbumModuleConfig']['myalbum_photospath'];
-$GLOBALS['thumbs_url']          = XOOPS_URL . $GLOBALS['myalbumModuleConfig']['myalbum_thumbspath'];
+$GLOBALS['photos_dir']          = XOOPS_ROOT_PATH . $helper->getConfig('myalbum_photospath');
+$GLOBALS['thumbs_dir']          = XOOPS_ROOT_PATH . $helper->getConfig('myalbum_thumbspath');
+$GLOBALS['photos_url']          = XOOPS_URL . $helper->getConfig('myalbum_photospath');
+$GLOBALS['thumbs_url']          = XOOPS_URL . $helper->getConfig('myalbum_thumbspath');
 
 xoops_load('pagenav');
 xoops_load('xoopslists');
@@ -77,7 +73,7 @@ $catHandler         = $helper->getHandler('Category');
 $cats               = $catHandler->getObjects(null, true);
 $GLOBALS['cattree'] = new \XoopsObjectTree($cats, 'cid', 'pid', 0);
 
-if ($GLOBALS['myalbumModuleConfig']['tag']) {
+if ($helper->getConfig('tag')) {
     require_once $GLOBALS['xoops']->path('modules/tag/include/formtag.php');
 }
 

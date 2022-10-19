@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Module\Admin;
@@ -44,8 +44,9 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
     }
 
     // read configs from xoops_config directly
-    $rs = $GLOBALS['xoopsDB']->query('SELECT conf_name,conf_value FROM  ' . $GLOBALS['xoopsDB']->prefix('config') . " WHERE conf_modid='$src_mid'");
-    while (list($key, $val) = $GLOBALS['xoopsDB']->fetchRow($rs)) {
+    $sql = 'SELECT conf_name,conf_value FROM  ' . $GLOBALS['xoopsDB']->prefix('config') . " WHERE conf_modid='$src_mid'";
+    $rs  = $GLOBALS['xoopsDB']->query($sql);
+    while ([$key, $val] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
         $src_configs[$key] = $val;
     }
     $src_photos_dir = XOOPS_ROOT_PATH . $src_configs['myalbum_photospath'];
@@ -63,18 +64,25 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
     }
 
     // create category
-    $GLOBALS['xoopsDB']->query('INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "(pid, title, imgurl) SELECT '0',title,imgurl FROM $src_table_cat WHERE cid='$src_cid'")
+    $sql = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "(pid, title, imgurl) SELECT '0',title,imgurl FROM $src_table_cat WHERE cid='$src_cid'";
+    $GLOBALS['xoopsDB']->query($sql)
     || exit('DB error: INSERT cat table');
     $cid = $GLOBALS['xoopsDB']->getInsertId();
 
     // INSERT loop
-    $rs           = $GLOBALS['xoopsDB']->query("SELECT lid,ext FROM $src_table_photos WHERE cid='$src_cid'");
+    $sql          = "SELECT lid,ext FROM $src_table_photos WHERE cid='$src_cid'";
+    $rs           = $GLOBALS['xoopsDB']->query($sql);
     $import_count = 0;
-    while (list($src_lid, $ext) = $GLOBALS['xoopsDB']->fetchRow($rs)) {
+    while ([$src_lid, $ext] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
         // photos table
         $set_comments = $move_mode ? 'comments' : "'0'";
-        $sql          = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "(cid,title,ext,res_x,res_y,submitter,`status`,date,hits,rating,votes,comments) SELECT '$cid',title,ext,res_x,res_y,submitter,`status`,date,hits,rating,votes,$set_comments FROM $src_table_photos WHERE lid='$src_lid'";
-        $GLOBALS['xoopsDB']->query($sql) or exit('DB error: INSERT photo table');
+        $sql          = 'INSERT INTO '
+                        . $GLOBALS['xoopsDB']->prefix($table_photos)
+                        . "(cid,title,ext,res_x,res_y,submitter,`status`,date,hits,rating,votes,comments) SELECT '$cid',title,ext,res_x,res_y,submitter,`status`,date,hits,rating,votes,$set_comments FROM $src_table_photos WHERE lid='$src_lid'";
+        $result       = $GLOBALS['xoopsDB']->query($sql);
+        if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+            throw new \RuntimeException("DB error: INSERT photo table! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error());
+        }
         $lid = $GLOBALS['xoopsDB']->getInsertId();
 
         // text table
@@ -86,7 +94,7 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
         $GLOBALS['xoopsDB']->query($sql);
 
         @copy("$src_photos_dir/{$src_lid}.{$ext}", "$photos_dir/{$lid}.{$ext}");
-        if (in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+        if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
             @copy("$src_thumbs_dir/{$src_lid}.{$ext}", "$thumbs_dir/{$lid}.{$ext}");
         } else {
             @copy("$src_photos_dir/{$src_lid}.gif", "$photos_dir/{$lid}.gif");
@@ -131,74 +139,82 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
     redirect_header('import.php', 2, sprintf(_AM_FMT_IMPORTSUCCESS, $import_count));
 } // From imagemanager
 elseif (!empty($_POST['imagemanager_import']) && !empty($_POST['imgcat_id'])) {
-        // authority check
-        $grouppermHandler = xoops_getHandler('groupperm');
-        if (!$grouppermHandler->checkRight('system_admin', XOOPS_SYSTEM_IMAGE, $GLOBALS['xoopsUser']->getGroups())) {
-            exit;
-        }
-
-        // anti-CSRF
-        $xsecurity = new XoopsSecurity();
-        if (!$xsecurity->checkReferer()) {
-            exit('XOOPS_URL is not included in your REFERER');
-        }
-
-        // get src information
-        $src_cid          = Request::getInt('imgcat_id', 0, 'POST');
-        $src_table_photos = $GLOBALS['xoopsDB']->prefix('image');
-        $src_table_cat    = $GLOBALS['xoopsDB']->prefix('imagecategory');
-
-        // create category
-        $crs = $GLOBALS['xoopsDB']->query("SELECT imgcat_name,imgcat_storetype FROM $src_table_cat WHERE imgcat_id='$src_cid'");
-        [$imgcat_name, $imgcat_storetype] = $GLOBALS['xoopsDB']->fetchRow($crs);
-
-        $GLOBALS['xoopsDB']->query('INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "SET pid=0,title='" . addslashes($imgcat_name) . "'")
-        || exit('DB error: INSERT cat table');
-        $cid = $GLOBALS['xoopsDB']->getInsertId();
-
-        // INSERT loop
-        $rs           = $GLOBALS['xoopsDB']->query("SELECT image_id,image_name,image_nicename,image_created,image_display FROM $src_table_photos WHERE imgcat_id='$src_cid'");
-        $import_count = 0;
-        while (list($image_id, $image_name, $image_nicename, $image_created, $image_display) = $GLOBALS['xoopsDB']->fetchRow($rs)) {
-            $src_file = XOOPS_UPLOAD_PATH . "/$image_name";
-            $ext      = mb_substr(mb_strrchr($image_name, '.'), 1);
-
-            // photos table
-            $sql = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET cid='$cid',title='" . addslashes($image_nicename) . "',ext='$ext',submitter='$my_uid',`status`='$image_display',date='$image_created'";
-            $GLOBALS['xoopsDB']->query($sql) or exit('DB error: INSERT photo table');
-            $lid = $GLOBALS['xoopsDB']->getInsertId();
-
-            // text table
-            $sql = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_text) . " SET lid='$lid',description=''";
-            $GLOBALS['xoopsDB']->query($sql);
-
-            $dst_file = "$photos_dir/{$lid}.{$ext}";
-            if ('db' === $imgcat_storetype) {
-                $fp = fopen($dst_file, 'wb');
-                if (false === $fp) {
-                    continue;
-                }
-                $brs = $GLOBALS['xoopsDB']->query('SELECT image_body FROM  ' . $GLOBALS['xoopsDB']->prefix('imagebody') . " WHERE image_id='$image_id'");
-                [$body] = $GLOBALS['xoopsDB']->fetchRow($brs);
-                fwrite($fp, $body);
-                fclose($fp);
-                Utility::createThumb($dst_file, $lid, $ext);
-            } else {
-                @copy($src_file, $dst_file);
-                Utility::createThumb($src_file, $lid, $ext);
-            }
-
-            [$width, $height, $type] = getimagesize($dst_file);
-            $GLOBALS['xoopsDB']->query('UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET res_x='$width',res_y='$height' WHERE lid='$lid'");
-
-            ++$import_count;
-        }
-
-        redirect_header('import.php', 2, sprintf(_AM_FMT_IMPORTSUCCESS, $import_count));
+    // authority check
+    /** @var \XoopsGroupPermHandler $grouppermHandler */
+    $grouppermHandler = xoops_getHandler('groupperm');
+    if (!$grouppermHandler->checkRight('system_admin', XOOPS_SYSTEM_IMAGE, $GLOBALS['xoopsUser']->getGroups())) {
+        exit;
     }
 
+    // anti-CSRF
+    $xsecurity = new XoopsSecurity();
+    if (!$xsecurity->checkReferer()) {
+        exit('XOOPS_URL is not included in your REFERER');
+    }
 
-require_once dirname(__DIR__) . '/include/myalbum.forms.php';
+    // get src information
+    $src_cid          = Request::getInt('imgcat_id', 0, 'POST');
+    $src_table_photos = $GLOBALS['xoopsDB']->prefix('image');
+    $src_table_cat    = $GLOBALS['xoopsDB']->prefix('imagecategory');
+
+    // create category
+    $sql = "SELECT imgcat_name,imgcat_storetype FROM $src_table_cat WHERE imgcat_id='$src_cid'";
+    $crs = $GLOBALS['xoopsDB']->query($sql);
+    [$imgcat_name, $imgcat_storetype] = $GLOBALS['xoopsDB']->fetchRow($crs);
+
+    $sql = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "SET pid=0,title='" . addslashes($imgcat_name) . "'";
+    $GLOBALS['xoopsDB']->query($sql)
+    || exit('DB error: INSERT cat table');
+    $cid = $GLOBALS['xoopsDB']->getInsertId();
+
+    // INSERT loop
+    $sql          = "SELECT image_id,image_name,image_nicename,image_created,image_display FROM $src_table_photos WHERE imgcat_id='$src_cid'";
+    $rs           = $GLOBALS['xoopsDB']->query($sql);
+    $import_count = 0;
+    while ([$image_id, $image_name, $image_nicename, $image_created, $image_display] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
+        $src_file = XOOPS_UPLOAD_PATH . "/$image_name";
+        $ext      = mb_substr(\mb_strrchr($image_name, '.'), 1);
+
+        // photos table
+        $sql    = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET cid='$cid',title='" . addslashes($image_nicename) . "',ext='$ext',submitter='$my_uid',`status`='$image_display',date='$image_created'";
+        $result = $GLOBALS['xoopsDB']->query($sql);
+        if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+            throw new \RuntimeException("DB error: INSERT photo table! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error());
+        }
+        $lid = $GLOBALS['xoopsDB']->getInsertId();
+
+        // text table
+        $sql = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_text) . " SET lid='$lid',description=''";
+        $GLOBALS['xoopsDB']->query($sql);
+
+        $dst_file = "$photos_dir/{$lid}.{$ext}";
+        if ('db' === $imgcat_storetype) {
+            $fp = fopen($dst_file, 'wb');
+            if (false === $fp) {
+                continue;
+            }
+            $sql = 'SELECT image_body FROM  ' . $GLOBALS['xoopsDB']->prefix('imagebody') . " WHERE image_id='$image_id'";
+            $brs = $GLOBALS['xoopsDB']->query($sql);
+            [$body] = $GLOBALS['xoopsDB']->fetchRow($brs);
+            fwrite($fp, $body);
+            fclose($fp);
+            Utility::createThumb($dst_file, $lid, $ext);
+        } else {
+            @copy($src_file, $dst_file);
+            Utility::createThumb($src_file, $lid, $ext);
+        }
+
+        [$width, $height, $type] = getimagesize($dst_file);
+        $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET res_x='$width',res_y='$height' WHERE lid='$lid'";
+        $GLOBALS['xoopsDB']->query($sql);
+
+        ++$import_count;
+    }
+
+    redirect_header('import.php', 2, sprintf(_AM_FMT_IMPORTSUCCESS, $import_count));
+}
+
+require_once \dirname(__DIR__) . '/include/myalbum.forms.php';
 xoops_cp_header();
 $adminObject = Admin::getInstance();
 $adminObject->displayNavigation(basename(__FILE__));

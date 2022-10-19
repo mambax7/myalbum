@@ -1,8 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
-
-
 
 require_once \dirname(__DIR__) . '/include/read_configs.php';
 
@@ -12,12 +10,11 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * of XOOPS user class objects.
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
- * @package kernel
  */
 class PhotosHandler extends \XoopsPersistableObjectHandler
 {
-    public $_table   = null;
-    public $_dirname = null;
+    public $_table;
+    public $_dirname;
 
     /**
      * @param null|\XoopsDatabase $db
@@ -30,19 +27,21 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
         parent::__construct($db, $this->_table, Photos::class, 'lid', 'title');
     }
 
-    /**
-     *
-     * @param null
-     *
-     * @return self
-     */
-//    public static function getInstance()
-//    {
-//        static $instance = false;
-//        if (!$instance) {
-//            $instance = new self();
-//        }
-//    }
+    //    /**
+    //     *
+    //     * @param null
+    //     * @param mixed $ids
+    //     * @param mixed $status
+    //     *
+    //     * @return self
+    //     */
+    //    public static function getInstance()
+    //    {
+    //        static $instance = false;
+    //        if (!$instance) {
+    //            $instance = new self();
+    //        }
+    //    }
 
     /**
      * @param     $ids
@@ -50,7 +49,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return bool
      */
-    public function setStatus($ids, $status = 1)
+    public function setStatus($ids, int $status = 1): bool
     {
         if (empty($ids)) {
             return false;
@@ -62,18 +61,19 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
             $where = "`lid` = '$ids'";
         }
 
-        $this->db->query('UPDATE ' . $this->db->prefix($this->_table) . " SET `status`='$status' WHERE $where");
+        $sql = 'UPDATE ' . $this->db->prefix($this->_table) . " SET `status`='$status' WHERE $where";
+        $this->db->query($sql);
 
         switch ($status) {
             case 1:
                 $helper = Helper::getInstance();
                 /** @var CategoryHandler $catHandler */
                 $catHandler = $helper->getHandler('Category');
-                $cats  = $catHandler->getObjects(null, true);
+                $cats       = $catHandler->getObjects(null, true);
                 // Trigger Notification
                 /** @var \XoopsNotificationHandler $notificationHandler */
                 $notificationHandler = \xoops_getHandler('notification');
-                $criteria            = new \Criteria('`lid`', "('" . \implode("','", $ids) . "')", 'IN');
+                $criteria            = new \Criteria('lid', "('" . \implode("','", $ids) . "')", 'IN');
                 $photos              = $this->getObjects($criteria, true);
                 foreach ($photos as $lid => $photo) {
                     $notificationHandler->triggerEvent(
@@ -109,7 +109,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return bool
      */
-    public function deletePhotos($ids)
+    public function deletePhotos($ids): bool
     {
         foreach ($ids as $lid) {
             @$this->delete($lid, true);
@@ -120,11 +120,11 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
 
     /**
      * @param \XoopsObject|int $photo
-     * @param bool         $force
+     * @param bool             $force
      *
      * @return bool
      */
-    public function delete(\XoopsObject $photo, $force = true)
+    public function delete(\XoopsObject $photo, $force = true): bool
     {
         if (\is_numeric($photo)) {
             $photo = $this->get($photo);
@@ -144,13 +144,13 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
 
         $helper = Helper::getInstance();
 
-        /** @var  VotedataHandler $votedataHandler */
+        /** @var VotedataHandler $votedataHandler */
         $votedataHandler = $helper->getHandler('Votedata');
         /** @var TextHandler $textHandler */
         $textHandler = $helper->getHandler('Text');
         /** @var CommentsHandler $commentsHandler */
         $commentsHandler = $helper->getHandler('Comments');
-        $criteria        = new \Criteria('`lid`', $photo->getVar('lid'));
+        $criteria        = new \Criteria('lid', $photo->getVar('lid'));
         $votedataHandler->deleteAll($criteria, $force);
         $textHandler->deleteAll($criteria, $force);
 
@@ -162,7 +162,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return int
      */
-    public function getCountDeadPhotos($criteria = null)
+    public function getCountDeadPhotos($criteria = null): int
     {
         $objects = $this->getObjects($criteria, true);
         $i       = 0;
@@ -180,7 +180,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return int
      */
-    public function getCountDeadThumbs($criteria = null)
+    public function getCountDeadThumbs($criteria = null): int
     {
         $objects = $this->getObjects($criteria, true);
         $i       = 0;
@@ -198,7 +198,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return array
      */
-    public function getDeadPhotos($criteria = null)
+    public function getDeadPhotos($criteria = null): array
     {
         $objects = $this->getObjects($criteria, true);
         foreach ($objects as $lid => $object) {
@@ -215,7 +215,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return array
      */
-    public function getDeadThumbs($criteria = null)
+    public function getDeadThumbs($criteria = null): array
     {
         $objects = $this->getObjects($criteria, true);
         foreach ($objects as $lid => $object) {

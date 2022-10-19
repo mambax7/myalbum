@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * You may not change or alter any portion of this comment or credits
  * of supporting developers from this source code or any supporting source code
@@ -10,19 +10,15 @@
  */
 
 /**
- * @copyright    XOOPS Project https://xoops.org/
- * @license      GNU GPL 2 or later (https://www.gnu.org/licenses/gpl-2.0.html)
- * @package
- * @since
+ * @copyright    XOOPS Project (https://xoops.org)
+ * @license      GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @author       XOOPS Development Team, Kazumi Ono (AKA onokazu)
  */
 
 use Xmf\Request;
-use XoopsModules\Myalbum\{
-    Helper
-};
-/** @var Helper $helper */
+use XoopsModules\Myalbum\Helper;
 
+/** @var Helper $helper */
 if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($xoopsModule->mid())) {
     exit('Access Denied');
 }
@@ -64,7 +60,8 @@ if ('show' === $op) {
     }
     require_once XOOPS_ROOT_PATH . '/class/xoopsformloader.php';
     require_once XOOPS_ROOT_PATH . '/class/xoopslists.php';
-    $form          = new \XoopsThemeForm(constant($confcat->getVar('confcat_name')), 'pref_form', 'admin.php?fct=preferences');
+    $form = new \XoopsThemeForm(constant($confcat->getVar('confcat_name')), 'pref_form', 'admin.php?fct=preferences');
+    /** @var \XoopsConfigHandler $configHandler */
     $configHandler = xoops_getHandler('config');
     $criteria      = new \CriteriaCompo();
     $criteria->add(new \Criteria('conf_modid', 0));
@@ -79,9 +76,9 @@ if ('show' === $op) {
                 $myts = \MyTextSanitizer::getInstance();
                 if ('array' === $config[$i]->getVar('conf_valuetype')) {
                     // this is exceptional.. only when value type is arrayneed a smarter way for this
-                    $ele = ('' != $config[$i]->getVar('conf_value')) ? new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars(implode('|', $config[$i]->getConfValueForOutput())), 5, 50) : new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), '', 5, 50);
+                    $ele = ('' != $config[$i]->getVar('conf_value')) ? new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars(implode('|', $config[$i]->getConfValueForOutput()), ENT_QUOTES | ENT_HTML5), 5, 50) : new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), '', 5, 50);
                 } else {
-                    $ele = new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars($config[$i]->getConfValueForOutput()), 5, 50);
+                    $ele = new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5), 5, 50);
                 }
                 break;
             case 'select':
@@ -114,7 +111,7 @@ if ('show' === $op) {
                 $dirlist = [];
                 while (false !== ($file = readdir($handle))) {
                     if (is_dir(XOOPS_THEME_PATH . '/' . $file) && !preg_match('/^[.]{1,2}$/', $file)
-                        && 'cvs' !== mb_strtolower($file)) {
+                        && 'cvs' !== \mb_strtolower($file)) {
                         $dirlist[$file] = $file;
                     }
                 }
@@ -178,16 +175,16 @@ if ('show' === $op) {
                 $modules       = $moduleHandler->getObjects(new \Criteria('hasmain', 1), true);
                 $currrent_val  = $config[$i]->getConfValueForOutput();
                 $cache_options = [
-                    '0'      => _NOCACHE,
-                    '30'     => sprintf(_SECONDS, 30),
-                    '60'     => _MINUTE,
-                    '300'    => sprintf(_MINUTES, 5),
-                    '1800'   => sprintf(_MINUTES, 30),
-                    '3600'   => _HOUR,
-                    '18000'  => sprintf(_HOURS, 5),
-                    '86400'  => _DAY,
-                    '259200' => sprintf(_DAYS, 3),
-                    '604800' => _WEEK,
+                    0      => _NOCACHE,
+                    30     => sprintf(_SECONDS, 30),
+                    60     => _MINUTE,
+                    300    => sprintf(_MINUTES, 5),
+                    1800   => sprintf(_MINUTES, 30),
+                    3600   => _HOUR,
+                    18000  => sprintf(_HOURS, 5),
+                    86400  => _DAY,
+                    259200 => sprintf(_DAYS, 3),
+                    604800 => _WEEK,
                 ];
                 if (count($modules) > 0) {
                     $ele = new \XoopsFormElementTray($title, '<br>');
@@ -206,27 +203,27 @@ if ('show' === $op) {
                 $ele = new \XoopsFormSelect($title, $config[$i]->getVar('conf_name'), $config[$i]->getConfValueForOutput());
                 $ele->addOptionArray(
                     [
-                        '0'      => _NOCACHE,
-                        '30'     => sprintf(_SECONDS, 30),
-                        '60'     => _MINUTE,
-                        '300'    => sprintf(_MINUTES, 5),
-                        '1800'   => sprintf(_MINUTES, 30),
-                        '3600'   => _HOUR,
-                        '18000'  => sprintf(_HOURS, 5),
-                        '86400'  => _DAY,
-                        '259200' => sprintf(_DAYS, 3),
-                        '604800' => _WEEK,
+                        0      => _NOCACHE,
+                        30     => sprintf(_SECONDS, 30),
+                        60     => _MINUTE,
+                        300    => sprintf(_MINUTES, 5),
+                        1800   => sprintf(_MINUTES, 30),
+                        3600   => _HOUR,
+                        18000  => sprintf(_HOURS, 5),
+                        86400  => _DAY,
+                        259200 => sprintf(_DAYS, 3),
+                        604800 => _WEEK,
                     ]
                 );
                 break;
             case 'password':
                 $myts = \MyTextSanitizer::getInstance();
-                $ele  = new \XoopsFormPassword($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput()));
+                $ele  = new \XoopsFormPassword($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5));
                 break;
             case 'textbox':
             default:
                 $myts = \MyTextSanitizer::getInstance();
-                $ele  = new \XoopsFormText($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput()));
+                $ele  = new \XoopsFormText($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5));
                 break;
         }
         $hidden = new \XoopsFormHidden('conf_ids[]', $config[$i]->getVar('conf_id'));
@@ -245,6 +242,7 @@ if ('show' === $op) {
 }
 
 if ('showmod' === $op) {
+    /** @var \XoopsConfigHandler $configHandler */
     $configHandler = xoops_getHandler('config');
     $mod           = Request::getInt('mod', 0, 'GET');
     if (empty($mod)) {
@@ -288,9 +286,9 @@ if ('showmod' === $op) {
                 $myts = \MyTextSanitizer::getInstance();
                 if ('array' === $config[$i]->getVar('conf_valuetype')) {
                     // this is exceptional.. only when value type is arrayneed a smarter way for this
-                    $ele = ('' != $config[$i]->getVar('conf_value')) ? new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars(implode('|', $config[$i]->getConfValueForOutput())), 5, 50) : new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), '', 5, 50);
+                    $ele = ('' != $config[$i]->getVar('conf_value')) ? new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars(implode('|', $config[$i]->getConfValueForOutput()), ENT_QUOTES | ENT_HTML5), 5, 50) : new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), '', 5, 50);
                 } else {
-                    $ele = new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars($config[$i]->getConfValueForOutput()), 5, 50);
+                    $ele = new \XoopsFormTextArea($title, $config[$i]->getVar('conf_name'), htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5), 5, 50);
                 }
                 break;
             case 'select':
@@ -335,12 +333,12 @@ if ('showmod' === $op) {
                 break;
             case 'password':
                 $myts = \MyTextSanitizer::getInstance();
-                $ele  = new \XoopsFormPassword($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput()));
+                $ele  = new \XoopsFormPassword($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5));
                 break;
             case 'textbox':
             default:
                 $myts = \MyTextSanitizer::getInstance();
-                $ele  = new \XoopsFormText($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput()));
+                $ele  = new \XoopsFormText($title, $config[$i]->getVar('conf_name'), 50, 255, htmlspecialchars($config[$i]->getConfValueForOutput(), ENT_QUOTES | ENT_HTML5));
                 break;
         }
         $hidden = new \XoopsFormHidden('conf_ids[]', $config[$i]->getVar('conf_id'));
@@ -389,6 +387,7 @@ if ('save' === $op) {
                 // if default theme has been changed
                 if (!$theme_updated && XOOPS_CONF == $config->getVar('conf_catid')
                     && 'theme_set' === $config->getVar('conf_name')) {
+                    /** @var \XoopsMemberHandler $memberHandler */
                     $memberHandler = xoops_getHandler('member');
                     $memberHandler->updateUsersByField('theme', ${$config->getVar('conf_name')});
                     $theme_updated = true;
@@ -406,6 +405,7 @@ if ('save' === $op) {
 
                         // generate compiled files for the new theme
                         // block files only for now..
+                        /** @var \XoopsTplfileHandler $tplfileHandler */
                         $tplfileHandler = xoops_getHandler('tplfile');
                         $dtemplates     = $tplfileHandler->find('default', 'block');
                         $dcount         = count($dtemplates);
@@ -441,8 +441,10 @@ if ('save' === $op) {
                 // add read permission for the start module to all groups
                 if (!$startmod_updated && '--' != $new_value && XOOPS_CONF == $config->getVar('conf_catid')
                     && 'startpage' === $config->getVar('conf_name')) {
-                    $memberHandler    = xoops_getHandler('member');
-                    $groups           = $memberHandler->getGroupList();
+                    /** @var \XoopsMemberHandler $memberHandler */
+                    $memberHandler = xoops_getHandler('member');
+                    $groups        = $memberHandler->getGroupList();
+                    /** @var \XoopsGroupPermHandler $grouppermHandler */
                     $grouppermHandler = xoops_getHandler('groupperm');
                     /** @var \XoopsModuleHandler $moduleHandler */
                     $moduleHandler = xoops_getHandler('module');

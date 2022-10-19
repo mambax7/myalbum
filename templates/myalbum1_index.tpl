@@ -12,12 +12,14 @@
                 <hr>
                 <form name='cid_select' action='<{$mod_url}>/viewcat.php' method='GET'
                       style='margin:0;text-align:center;'>
-                    <select name='cid' onchange='submit();'>
-                        <option value=''><{$lang_directcatsel}></option>
-                        <{$category_options}>
-                    </select> &nbsp; &nbsp;
+                    <label>
+                        <select name='cid' onchange='submit();'>
+                            <option value=''><{$lang_directcatsel}></option>
+                            <{$category_options}>
+                        </select>
+                    </label> &nbsp; &nbsp;
                     <{$photo_global_sum}> &nbsp; &nbsp;
-                    <{if $lang_add_photo}><a href="submit.php"><{$lang_add_photo}><img
+                    <{if $lang_add_photo|default:''}><a href="submit.php"><{$lang_add_photo}><img
                         src="<{xoModuleIcons16 add.png}>" border="0"
                         alt="<{$lang_add_photo}>" title="<{$lang_add_photo}>"></a><{/if}>
                 </form>

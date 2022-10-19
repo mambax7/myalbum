@@ -12,7 +12,7 @@
                                 &nbsp;<{$photo.title}></span>
                         </td>
                         <td align='right'>
-                            <{if $lang_add_photo}>
+                            <{if $lang_add_photo|default:''}>
                                 <a href="submit.php"><{$lang_add_photo}><img src="<{xoModuleIcons16 add.png}>"
                                                                              border="0" alt="<{$lang_add_photo}>"
                                                                              title="<{$lang_add_photo}>"></a>
@@ -54,7 +54,7 @@
 
                             <{* PHOTO'S SUBJECT *}>
                             <a name='<{$photo.lid}>'></a>
-                            <a href='<{$mod_url}>/photo.php?lid=<{$photo.lid}>&amp;cid=<{$photo.cid}>'><strong><{$photo.title}></b></a>
+                            <a href='<{$mod_url}>/photo.php?lid=<{$photo.lid}>&amp;cid=<{$photo.cid}>'><strong><{$photo.title}></strong></a>
 
                             <{* NEW ICON *}>
                             <{if $photo.is_newphoto}>
@@ -190,11 +190,11 @@
     </div>
     <div style="margin: 3px; padding: 3px;">
         <!-- start comments loop -->
-        <{if $comment_mode == "flat"}>
-            <{include file="db:system_comments_flat.tpl"}>
-        <{elseif $comment_mode == "thread"}>
-            <{include file="db:system_comments_thread.tpl"}>
-        <{elseif $comment_mode == "nest"}>
+    <{if $comment_mode|default:'' == "flat"}>
+        <{include file="db:system_comments_flat.tpl"}>
+    <{elseif $comment_mode|default:'' == "thread"}>
+        <{include file="db:system_comments_thread.tpl"}>
+    <{elseif $comment_mode|default:'' == "nest"}>
             <{include file="db:system_comments_nest.tpl"}>
         <{/if}>
         <!-- end comments loop -->

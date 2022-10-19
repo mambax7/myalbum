@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
@@ -10,7 +10,6 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * of XOOPS user class objects.
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
- * @package kernel
  */
 class CategoryHandler extends \XoopsPersistableObjectHandler
 {
@@ -24,12 +23,12 @@ class CategoryHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
-     * @param     $cid
+     * @param int $cid
      * @param int $depth
      *
      * @return int
      */
-    public function prefixDepth($cid, $depth = 0)
+    public function prefixDepth($cid, int $depth = 0): int
     {
         $cat = $this->get($cid);
         ++$depth;

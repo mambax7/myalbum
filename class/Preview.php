@@ -1,6 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
+
+use Xmf\Request;
 
 /**
  * Class MyalbumPreview
@@ -8,7 +10,10 @@ namespace XoopsModules\Myalbum;
 class Preview extends \XoopsObject
 {
     // for older files
-    public static function header()
+    /**
+     * @return void
+     */
+    public static function header(): void
     {
         global $mod_url, $moduleDirName;
 
@@ -18,7 +23,11 @@ class Preview extends \XoopsObject
     }
 
     // for older files
-    public static function footer()
+
+    /**
+     * @return void
+     */
+    public static function footer(): void
     {
         global $mod_copyright, $moduleDirName;
 
@@ -34,7 +43,7 @@ class Preview extends \XoopsObject
      *
      * @return string
      */
-    public static function getNameFromUid($uid)
+    public static function getNameFromUid($uid): string
     {
         global $myalbum_nameoruname;
 
@@ -69,7 +78,7 @@ class Preview extends \XoopsObject
      *
      * @return array
      */
-    public static function getArrayForPhotoAssign($photo, $summary = false)
+    public static function getArrayForPhotoAssign($photo, bool $summary = false): array
     {
         global $my_uid, $isadmin, $global_perms;
         global $photos_url, $thumbs_url, $thumbs_dir, $mod_url, $mod_path;
@@ -77,13 +86,13 @@ class Preview extends \XoopsObject
 
         $helper = Helper::getInstance();
 
-        /** @var  PhotosHandler $photosHandler */
+        /** @var PhotosHandler $photosHandler */
         $photosHandler = $helper->getHandler('Photos');
         /** @var TextHandler $textHandler */
         $textHandler = $helper->getHandler('Text');
         /** @var CategoryHandler $catHandler */
         $catHandler = $helper->getHandler('Category');
-        /** @var  VotedataHandler $votedataHandler */
+        /** @var VotedataHandler $votedataHandler */
         $votedataHandler = $helper->getHandler('Votedata');
         /** @varCommentsHandler $commentsHandler */
         $commentsHandler = $helper->getHandler('Comments');
@@ -93,7 +102,7 @@ class Preview extends \XoopsObject
         $cat  = $catHandler->get($photo->getVar('cid'));
         $ext  = $photo->vars['ext']['value'];
 
-        if (\in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+        if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
             $imgsrc_thumb    = $photo->getThumbsURL();
             $imgsrc_photo    = $photo->getPhotoURL();
             $ahref_photo     = $photo->getPhotoURL();
@@ -137,7 +146,7 @@ class Preview extends \XoopsObject
         // Summarize description
         if (\is_object($text)) {
             if ($summary) {
-                $description = \extractSummary($text->getVar('description'));
+                $description = Utility::extractSummary($text->getVar('description'));
             } else {
                 $description = $text->getVar('description');
             }
@@ -145,16 +154,16 @@ class Preview extends \XoopsObject
             $description = '';
         }
 
-        if (\Xmf\Request::hasVar('preview', 'POST')) {
-            $description = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
-            $title       = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
+        if (Request::hasVar('preview', 'POST')) {
+            $description = ($_POST['desc_text']);
+            $title       = ($_POST['title']);
         }
 
-        if ($GLOBALS['myalbumModuleConfig']['tag']) {
-            require_once XOOPS_ROOT_PATH . '/modules/tag/include/tagbar.php';
-            $tagbar = \tagBar($lid, $cid);
-        } else {
-            $tagbar = [];
+        $helper = Helper::getInstance();
+        $tagbar = [];
+        if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
+            $tagbarObj = new \XoopsModules\Tag\Tagbar();
+            $tagbar    = $tagbarObj->getTagbar($lid, $cid);
         }
 
         return [
@@ -201,11 +210,13 @@ class Preview extends \XoopsObject
      *
      * @return array
      */
-    public static function getArrayForPhotoAssignLight($photo, $summary = false)
+    public static function getArrayForPhotoAssignLight($photo, bool $summary = false): array
     {
         global $my_uid, $isadmin, $global_perms;
         global $photos_url, $thumbs_url, $thumbs_dir;
         global $myalbum_makethumb, $myalbum_thumbsize, $myalbum_normal_exts;
+
+        $helper = Helper::getInstance();
 
         /** @var PhotosHandler $photosHandler */
         $photosHandler = $helper->getHandler('Photos');
@@ -222,7 +233,7 @@ class Preview extends \XoopsObject
         $text = $textHandler->get($photo->getVar('lid'));
         $cat  = $catHandler->get($photo->getVar('cid'));
 
-        if (\in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+        if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
             $imgsrc_thumb    = $photo->getThumbsURL();
             $imgsrc_photo    = $photo->getPhotoURL();
             $is_normal_image = true;
@@ -239,11 +250,11 @@ class Preview extends \XoopsObject
             $width_spec      = '';
         }
 
-        if ($GLOBALS['myalbumModuleConfig']['tag']) {
-            require_once XOOPS_ROOT_PATH . '/modules/tag/include/tagbar.php';
-            $tagbar = \tagBar($lid, $cid);
-        } else {
-            $tagbar = [];
+        $helper = Helper::getInstance();
+        $tagbar = [];
+        if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
+            $tagbarObj = new \XoopsModules\Tag\Tagbar();
+            $tagbar    = $tagbarObj->getTagbar($lid, $cid);
         }
 
         return [
@@ -278,7 +289,7 @@ class Preview extends \XoopsObject
      *
      * @return array
      */
-    public static function getSubCategories($parent_id, $cattree)
+    public static function getSubCategories($parent_id, $cattree): array
     {
         $ret      = [];
         $criteria = new \Criteria('status', '0', '>');
@@ -288,7 +299,7 @@ class Preview extends \XoopsObject
 
         $helper = Helper::getInstance();
 
-//        $textHandler = $helper->getHandler('Text');
+        //        $textHandler = $helper->getHandler('Text');
         /** @var CategoryHandler $catHandler */
         $catHandler = $helper->getHandler('Category');
 
@@ -310,7 +321,7 @@ class Preview extends \XoopsObject
             }
 
             // Category's banner default
-            if ('http://' === $imgurl) {
+            if ('https://' === $imgurl) {
                 $imgurl = '';
             }
 
@@ -345,13 +356,13 @@ class Preview extends \XoopsObject
      *
      * @return array
      */
-    public static function getImageAttribsForPreview($preview_name)
+    public static function getImageAttribsForPreview($preview_name): array
     {
         global $photos_url, $mod_url, $mod_path, $myalbum_normal_exts, $myalbum_thumbsize;
 
-        $ext = mb_substr(mb_strrchr($preview_name, '.'), 1);
+        $ext = mb_substr(\mb_strrchr($preview_name, '.'), 1);
 
-        if (\in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+        if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
             return ["$photos_url/$preview_name", "width='$myalbum_thumbsize'", "$photos_url/$preview_name"];
         }
         if (\file_exists("$mod_path/assets/images/icons/$ext.gif")) {

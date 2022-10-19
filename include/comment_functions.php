@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 
 use XoopsModules\Myalbum\{
     Helper,
@@ -7,8 +6,7 @@ use XoopsModules\Myalbum\{
 };
 
 /** @var Helper $helper */
-/** @var  PhotosHandler $photosHandler */
-
+/** @var PhotosHandler $photosHandler */
 if (!defined('MYALBUM_COMMENT_FUNCTIONS_INCLUDED')) {
     define('MYALBUM_COMMENT_FUNCTIONS_INCLUDED', 1);
 
@@ -22,7 +20,7 @@ if (!defined('MYALBUM_COMMENT_FUNCTIONS_INCLUDED')) {
      */
     function myalbum_comments_update($lid, $total_num)
     {
-        $helper = Helper::getInstance();
+        $helper        = Helper::getInstance();
         $photosHandler = $helper->getHandler('Photos');
         $photo         = $photosHandler->get($lid);
         $photo->setVar('comments', $total_num);
@@ -33,7 +31,7 @@ if (!defined('MYALBUM_COMMENT_FUNCTIONS_INCLUDED')) {
     /**
      * @param $comment
      */
-    function myalbum_comments_approve(&$comment)
+    function myalbum_comments_approve(&$comment): void
     {
         // notification mail here
     }

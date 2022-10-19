@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
     define('MYALBUM_BLOCK_RPHOTO_INCLUDED', 1);
@@ -10,7 +10,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
      */
     function b_myalbum_rphoto_show($options)
     {
-        global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts;
+        global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts, $thumbs_url;
 
         // For myAlbum-P < 2.70
         if (0 != strncmp($options[0], 'myalbum', 7)) {
@@ -27,7 +27,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         $cycle               = empty($options[5]) ? 60 : (int)$options[5];
         $cols                = empty($options[6]) ? 1 : (int)$options[6];
 
-        require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
+        require XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
 
         // Category limitation
         if ($cat_limitation) {
@@ -54,102 +54,107 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         $block           = [];
         $GLOBALS['myts'] = \MyTextSanitizer::getInstance();
         // Get number of photo
-        $result = $xoopsDB->query('SELECT count(lid) FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext");
+        $sql    = 'SELECT count(lid) FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
+        $result = $xoopsDB->query($sql);
         [$numrows] = $xoopsDB->fetchRow($result);
         if ($numrows < 1) {
             return $block;
         }
 
         if ($numrows <= $photos_num) {
-            $result = $xoopsDB->query('SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext");
+            $sql    = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
+            $result = $xoopsDB->query($sql);
         } else {
-            $result   = $xoopsDB->query('SELECT lid FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext");
+            $sql      = 'SELECT lid FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
+            $result   = $xoopsDB->query($sql);
             $lids     = [];
             $sel_lids = [];
-            while (list($lid) = $xoopsDB->fetchRow($result)) {
-                $lids[] = $lid;
-            }
-            $sel_lids = array_rand($lids, $photos_num);
-            if (is_array($sel_lids)) {
-                $whr_lid = '';
-                foreach ($sel_lids as $key) {
-                    $whr_lid .= $lids[$key] . ',';
-                }
-                $whr_lid = mb_substr($whr_lid, 0, -1);
-            } else {
-                $whr_lid = $lids[$sel_lids];
-            }
-            $result = $xoopsDB->query('SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND lid IN ($whr_lid)");
+            $lids[]   = $lid;
         }
-
-        $count = 1;
-        while (false !== ($photo = $xoopsDB->fetchArray($result))) {
-            $photo['title']      = $GLOBALS['myts']->displayTarea($photo['title']);
-            $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
-            $photo['date']       = formatTimestamp($photo['unixtime'], 's');
-            $photo['thumbs_url'] = $thumbs_url;
-
-            if (in_array(mb_strtolower($photo['ext']), $myalbum_normal_exts)) {
-                // width&height attirbs for <img>
-                if ($box_size <= 0) {
-                    $photo['img_attribs'] = '';
-                } else {
-                    [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
-                    if ($width > $box_size || $height > $box_size) {
-                        if ($width > $height) {
-                            $photo['img_attribs'] = "width='$box_size'";
-                        } else {
-                            $photo['img_attribs'] = "height='$box_size'";
-                        }
-                    } else {
-                        $photo['img_attribs'] = '';
-                    }
-                }
-            } else {
-                $photo['ext']         = 'gif';
-                $photo['img_attribs'] = '';
+        $sel_lids = array_rand($lids, $photos_num);
+        if (is_array($sel_lids)) {
+            $whr_lid = '';
+            foreach ($sel_lids as $key) {
+                $whr_lid .= $lids[$key] . ',';
             }
-
-            $block['photo'][$count++] = $photo;
+            $whr_lid = mb_substr($whr_lid, 0, -1);
+        } else {
+            $whr_lid = $lids[$sel_lids];
         }
-        $block['mod_url'] = $mod_url;
-        $block['cols']    = $cols;
-
-        return $block;
+        $sql    = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND lid IN ($whr_lid)";
+        $result = $xoopsDB->query($sql);
     }
 
-    /**
-     * @param $options
-     *
-     * @return string
-     */
-    function b_myalbum_rphoto_edit($options)
-    {
-        global $xoopsDB;
+    $count = 1;
 
-        // For myAlbum-P < 2.70
-        if (0 != strncmp($options[0], 'myalbum', 7)) {
-            $photos_num    = (int)$options[1];
-            $box_size      = (int)$options[0];
-            $moduleDirName = 'myalbum';
+    /** @var array $photo */
+    while (false !== ($photo = $xoopsDB->fetchArray($result))) {
+        $photo['title']      = $GLOBALS['myts']->displayTarea($photo['title']);
+        $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
+        $photo['date']       = formatTimestamp($photo['unixtime'], 's');
+        $photo['thumbs_url'] = $thumbs_url;
+
+        if (\in_array(\mb_strtolower($photo['ext']), $myalbum_normal_exts, true)) {
+            // width&height attirbs for <img>
+            if ($box_size <= 0) {
+                $photo['img_attribs'] = '';
+            } else {
+                [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
+                if ($width > $box_size || $height > $box_size) {
+                    if ($width > $height) {
+                        $photo['img_attribs'] = "width='$box_size'";
+                    } else {
+                        $photo['img_attribs'] = "height='$box_size'";
+                    }
+                } else {
+                    $photo['img_attribs'] = '';
+                }
+            }
         } else {
-            $photos_num    = (int)$options[2];
-            $box_size      = (int)$options[1];
-            $moduleDirName = $options[0];
+            $photo['ext']         = 'gif';
+            $photo['img_attribs'] = '';
         }
-        $cat_limitation      = empty($options[3]) ? 0 : (int)$options[3];
-        $cat_limit_recursive = empty($options[4]) ? 0 : 1;
-        $cycle               = empty($options[5]) ? 60 : (int)$options[5];
-        $cols                = empty($options[6]) ? 1 : (int)$options[6];
 
-        require_once XOOPS_ROOT_PATH . '/class/xoopstree.php';
-        $cattree = new \XoopsTree($xoopsDB->prefix("{$moduleDirName }_cat"), 'cid', 'pid');
+        $block['photo'][$count++] = $photo;
+    }
+    $block['mod_url'] = $mod_url;
+    $block['cols']    = $cols;
 
-        ob_start();
-        $cattree->makeMySelBox('title', 'title', $cat_limitation, 1, 'options[3]');
-        $catselbox = ob_get_clean();
+    return $block;
+}
 
-        $form = '
+/**
+ * @param $options
+ *
+ * @return string
+ */
+function b_myalbum_rphoto_edit($options)
+{
+    global $xoopsDB;
+
+    // For myAlbum-P < 2.70
+    if (0 != strncmp($options[0], 'myalbum', 7)) {
+        $photos_num    = (int)$options[1];
+        $box_size      = (int)$options[0];
+        $moduleDirName = 'myalbum';
+    } else {
+        $photos_num    = (int)$options[2];
+        $box_size      = (int)$options[1];
+        $moduleDirName = $options[0];
+    }
+    $cat_limitation      = empty($options[3]) ? 0 : (int)$options[3];
+    $cat_limit_recursive = empty($options[4]) ? 0 : 1;
+    $cycle               = empty($options[5]) ? 60 : (int)$options[5];
+    $cols                = empty($options[6]) ? 1 : (int)$options[6];
+
+    require_once XOOPS_ROOT_PATH . '/class/xoopstree.php';
+    $cattree = new \XoopsTree($xoopsDB->prefix("{$moduleDirName }_cat"), 'cid', 'pid');
+
+    ob_start();
+    $cattree->makeMySelBox('title', 'title', $cat_limitation, 1, 'options[3]');
+    $catselbox = ob_get_clean();
+
+    $form = '
         ' . _ALBM_TEXT_BLOCK_WIDTH . "&nbsp;
         <input type='hidden' name='options[0]' value='{$moduleDirName }' >
         <input type='text' size='6' name='options[1]' value='$box_size' style='text-align:right;' >&nbsp;pixel " . _ALBM_TEXT_BLOCK_WIDTH_NOTES . '
@@ -170,6 +175,5 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         <br>
         \n";
 
-        return $form;
-    }
+    return $form;
 }

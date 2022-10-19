@@ -1,6 +1,4 @@
-<?php
-
-
+<?php declare(strict_types=1);
 
 $GLOBALS['myalbum_assign_globals'] = [
     'lang_total'           => _ALBM_CAPTION_TOTAL,

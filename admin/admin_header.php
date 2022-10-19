@@ -1,20 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Module\Admin;
+use Xmf\Request;
 use XoopsModules\Myalbum\{
     CategoryHandler,
     Helper
 };
+
 /** @var Admin $adminObject */
 /** @var Helper $helper */
 
-require dirname(__DIR__) . '/preloads/autoloader.php';
+require_once \dirname(__DIR__) . '/preloads/autoloader.php';
 
-$moduleDirName = basename(dirname(__DIR__));
-require_once dirname(dirname(dirname(__DIR__))) . '/include/cp_header.php';
-//require_once dirname(__DIR__) . '/include/functions.php';
-require_once dirname(__DIR__) . '/include/read_configs.php';
-require  dirname(__DIR__) . '/include/common.php';
+$moduleDirName = \basename(\dirname(__DIR__));
+require_once \dirname(__DIR__, 3) . '/include/cp_header.php';
+//require_once \dirname(__DIR__) . '/include/functions.php';
+
+$helper      = Helper::getInstance();
+$adminObject = Admin::getInstance();
+require_once $helper->path('include/read_configs.php');
+require_once $helper->path('include/common.php');
 
 if (!defined('_CHARSET')) {
     define('_CHARSET', 'UTF-8');
@@ -25,19 +30,17 @@ if (!defined('_CHARSET_ISO')) {
 
 $GLOBALS['myts'] = \MyTextSanitizer::getInstance();
 
-$helper = Helper::getInstance();
-$adminObject = Admin::getInstance();
-
 /** @var \XoopsModuleHandler $moduleHandler */
-$moduleHandler                  = xoops_getHandler('module');
+$moduleHandler = xoops_getHandler('module');
+/** @var \XoopsConfigHandler $configHandler */
 $configHandler                  = xoops_getHandler('config');
 $GLOBALS['myalbumModule']       = $moduleHandler->getByDirname($GLOBALS['mydirname']);
 $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
 $GLOBALS['myalbum_mid']         = $GLOBALS['myalbumModule']->getVar('mid');
-$GLOBALS['photos_dir']          = XOOPS_ROOT_PATH . $GLOBALS['myalbumModuleConfig']['myalbum_photospath'];
-$GLOBALS['thumbs_dir']          = XOOPS_ROOT_PATH . $GLOBALS['myalbumModuleConfig']['myalbum_thumbspath'];
-$GLOBALS['photos_url']          = XOOPS_URL . $GLOBALS['myalbumModuleConfig']['myalbum_photospath'];
-$GLOBALS['thumbs_url']          = XOOPS_URL . $GLOBALS['myalbumModuleConfig']['myalbum_thumbspath'];
+$GLOBALS['photos_dir']          = XOOPS_ROOT_PATH . $helper->getConfig('myalbum_photospath');
+$GLOBALS['thumbs_dir']          = XOOPS_ROOT_PATH . $helper->getConfig('myalbum_thumbspath');
+$GLOBALS['photos_url']          = XOOPS_URL . $helper->getConfig('myalbum_photospath');
+$GLOBALS['thumbs_url']          = XOOPS_URL . $helper->getConfig('myalbum_thumbspath');
 
 xoops_load('pagenav');
 xoops_load('xoopslists');
@@ -58,6 +61,7 @@ $GLOBALS['myalbumImageIcon']  = XOOPS_URL . '/' . $GLOBALS['myalbumModule']->get
 $GLOBALS['myalbumImageAdmin'] = XOOPS_URL . '/' . $GLOBALS['myalbumModule']->getInfo('modicons32');
 
 if ($GLOBALS['xoopsUser']) {
+    /** @var \XoopsGroupPermHandler $grouppermHandler */
     $grouppermHandler = xoops_getHandler('groupperm');
     if (!$grouppermHandler->checkRight('module_admin', $GLOBALS['myalbumModule']->getVar('mid'), $GLOBALS['xoopsUser']->getGroups())) {
         redirect_header(XOOPS_URL, 1, _NOPERM);
@@ -82,16 +86,20 @@ if (!isset($GLOBALS['xoopsTpl']) || !is_object($GLOBALS['xoopsTpl'])) {
 $GLOBALS['xoopsTpl']->assign('pathImageIcon', $GLOBALS['myalbumImageIcon']);
 $GLOBALS['xoopsTpl']->assign('pathImageAdmin', $GLOBALS['myalbumImageAdmin']);
 
-if (\Xmf\Request::hasVar('lid', 'GET')) {
-    $lid    = \Xmf\Request::getInt('lid', 0, 'GET');
-    $result = $GLOBALS['xoopsDB']->query("SELECT submitter FROM $table_photos where lid=$lid", 0);
-    list($submitter) = $GLOBALS['xoopsDB']->fetchRow($result);
+if (Request::hasVar('lid', 'GET')) {
+    $lid    = Request::getInt('lid', 0, 'GET');
+    $sql    = "SELECT submitter FROM $table_photos where lid=$lid";
+    $result = $GLOBALS['xoopsDB']->query($sql, 0);
+    if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+        \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
+    }
+    [$submitter] = $GLOBALS['xoopsDB']->fetchRow($result);
 } else {
     $submitter = $GLOBALS['xoopsUser']->getVar('uid');
 }
 
-if ($GLOBALS['myalbumModuleConfig']['tag']) {
-    require_once $GLOBALS['xoops']->path('modules/tag/include/formtag.php');
-}
+//if ($GLOBALS['myalbumModuleConfig']['tag']) {
+//    require_once $GLOBALS['xoops']->path('modules/tag/include/formtag.php');
+//}
 
 extract($GLOBALS['myalbumModuleConfig']);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Request;
 
@@ -48,9 +48,10 @@ if (count($cats) > 0) {
 
     // select box for category
     $cat_options  = "<option value='0'>--</option>\n";
-    $prs          = $xoopsDB->query("SELECT cid,COUNT(lid) FROM $table_photos WHERE status>0 AND $whr_ext GROUP BY cid");
+    $sql          = "SELECT cid,COUNT(lid) FROM $table_photos WHERE status>0 AND $whr_ext GROUP BY cid";
+    $prs          = $xoopsDB->query($sql);
     $photo_counts = [];
-    while (list($c, $p) = $xoopsDB->fetchRow($prs)) {
+    while ([$c, $p] = $xoopsDB->fetchRow($prs)) {
         $photo_counts[$c] = $p;
     }
     foreach ($cats as $cat) {
@@ -67,11 +68,13 @@ if (count($cats) > 0) {
     if ($cid > 0) {
         $xoopsTpl->assign('lang_addimage', _ADDIMAGE);
 
-        $rs = $xoopsDB->query("SELECT COUNT(*) FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext");
+        $sql = "SELECT COUNT(*) FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext";
+        $rs  = $xoopsDB->query($sql);
         [$total] = $xoopsDB->fetchRow($rs);
         if ($total > 0) {
             $start = Request::getInt('start', 0, 'GET');
-            $prs   = $xoopsDB->query("SELECT lid,cid,title,ext,submitter,res_x,res_y,$select_is_normal AS is_normal FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext ORDER BY date DESC LIMIT $start,$num");
+            $sql   = "SELECT lid,cid,title,ext,submitter,res_x,res_y,$select_is_normal AS is_normal FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext ORDER BY date DESC LIMIT $start,$num";
+            $prs   = $xoopsDB->query($sql);
             $xoopsTpl->assign('image_total', $total);
             $xoopsTpl->assign('lang_image', _IMAGE);
             $xoopsTpl->assign('lang_imagename', _IMAGENAME);
@@ -97,7 +100,7 @@ if (count($cats) > 0) {
             }
 
             $i = 1;
-            while (list($lid, $cid, $title, $ext, $submitter, $res_x, $res_y, $is_normal) = $xoopsDB->fetchRow($prs)) {
+            while ([$lid, $cid, $title, $ext, $submitter, $res_x, $res_y, $is_normal] = $xoopsDB->fetchRow($prs)) {
                 // Width of thumb
                 if (!$is_normal) {
                     $width_spec = '';

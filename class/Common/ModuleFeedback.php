@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum\Common;
 
@@ -16,12 +16,11 @@ namespace XoopsModules\Myalbum\Common;
  * Feedback plugin for xoops modules
  *
  * @copyright      XOOPS Project  (https://xoops.org)
- * @license        GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
- * @author         Michael Beck <mambax7@gmailc.com>
+ * @license        GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
+ * @author         Michael Beck <mambax7@gmail.com>
  * @author         Wedega - Email:<webmaster@wedega.com>
  * @author         Fernando Santos (topet05) <fernando@mastop.com.br>
  */
-
 \defined('XOOPS_ROOT_PATH') || die('Restricted access');
 
 /**
@@ -29,16 +28,16 @@ namespace XoopsModules\Myalbum\Common;
  */
 class ModuleFeedback extends \XoopsObject
 {
-    public $name    = '';
-    public $email   = '';
-    public $site    = '';
-    public $type    = '';
-    public $content = '';
+    public string $name    = '';
+    public string $email   = '';
+    public string $site    = '';
+    public string $type    = '';
+    public string $content = '';
 
     /**
      * Constructor
      *
-     * @param null
+     * @param
      */
     public function __construct()
     {
@@ -47,9 +46,9 @@ class ModuleFeedback extends \XoopsObject
     /**
      * @static function &getInstance
      *
-     * @param null
+     * @param
      */
-    public static function getInstance()
+    public static function getInstance(): void
     {
         static $instance = false;
         if (!$instance) {
@@ -63,13 +62,13 @@ class ModuleFeedback extends \XoopsObject
      * @param bool|string $action
      * @return \XoopsThemeForm
      */
-    public function getFormFeedback($action = false)
+    public function getFormFeedback($action = false): \XoopsThemeForm
     {
         if (!$action) {
             $action = $_SERVER['REQUEST_URI'];
         }
         $moduleDirName      = \basename(\dirname(__DIR__, 2));
-        $moduleDirNameUpper = mb_strtoupper($moduleDirName);
+        $moduleDirNameUpper = \mb_strtoupper($moduleDirName);
         // Get Theme Form
         \xoops_load('XoopsFormLoader');
         $form = new \XoopsThemeForm(\constant('CO_' . $moduleDirNameUpper . '_' . 'FB_FORM_TITLE'), 'formfeedback', 'feedback.php', 'post', true);
@@ -105,8 +104,8 @@ class ModuleFeedback extends \XoopsObject
         $editorConfigs['width']  = '100%';
         $editorConfigs['height'] = '400px';
         /** @var \XoopsModuleHandler $moduleHandler */
-        $moduleHandler           = \xoops_getHandler('module');
-        $module                  = $moduleHandler->getByDirname('system');
+        $moduleHandler = \xoops_getHandler('module');
+        $module        = $moduleHandler->getByDirname('system');
         /** @var \XoopsConfigHandler $configHandler */
         $configHandler           = \xoops_getHandler('config');
         $config                  = $configHandler->getConfigsByCat(0, $module->getVar('mid'));
@@ -115,7 +114,7 @@ class ModuleFeedback extends \XoopsObject
         $form->addElement($editor, true);
 
         $form->addElement(new \XoopsFormHidden('op', 'send'));
-        $form->addElement(new \XoopsFormButtonTray('', _SUBMIT, 'submit', '', false));
+        $form->addElement(new \XoopsFormButtonTray('', \_SUBMIT, 'submit', '', false));
 
         return $form;
     }

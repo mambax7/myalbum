@@ -1,6 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
+
+use Xmf\Request;
+use XoopsModules\Tag\FormTag;
 
 /**
  * Class Forms
@@ -10,18 +13,18 @@ class Forms extends \XoopsObject
     /**
      * @return string
      */
-    public static function getAdminFormAdmission()
+    public static function getAdminFormAdmission(): string
     {
         // Make form objects
         $form       = new \XoopsThemeForm(\_ALBM_PHOTOBATCHUPLOAD, 'batchupload', 'batch.php');
         $title_text = new \XoopsFormText('', 'title', 50, 255, $GLOBALS['title4edit']);
-        $titleTray = new \XoopsFormElementTray(\_AM_TH_TITLE, '<br><br>');
+        $titleTray  = new \XoopsFormElementTray(\_AM_TH_TITLE, '<br><br>');
         $titleTray->addElement($title_text);
         $titleTray->addElement(new \XoopsFormLabel('', \_ALBM_BATCHBLANK));
         $cat_select       = new \XoopsFormLabel(\_AM_TH_CATEGORIES, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', null, false));
         $submitter_select = new \XoopsFormSelectUser(\_AM_TH_SUBMITTER, 'submitter', false, $GLOBALS['submitter']);
         $date_text        = new \XoopsFormText(\_AM_TH_DATE, 'post_date', 20, 20, \formatTimestamp(\time(), \_ALBM_DTFMT_YMDHI));
-        $dirTray         = new \XoopsFormElementTray(\_ALBM_TEXT_DIRECTORY, '<br><br>');
+        $dirTray          = new \XoopsFormElementTray(\_ALBM_TEXT_DIRECTORY, '<br><br>');
         $dir_text         = new \XoopsFormText(\_ALBM_PHOTOPATH, 'dir', 50, 255, $GLOBALS['dir4edit']);
         $dirTray->addElement($dir_text);
         $dirTray->addElement(new \XoopsFormLabel(\_ALBM_DESC_PHOTOPATH));
@@ -34,7 +37,7 @@ class Forms extends \XoopsObject
         $html_configs['height'] = '400px';
         $html_configs['editor'] = $GLOBALS['myalbumModuleConfig']['editor'];
         $desc_tarea             = new \XoopsFormEditor(\_ALBM_PHOTODESC, $html_configs['name'], $html_configs);
-        $submit_button          = new \XoopsFormButton('', 'submit', _SUBMIT, 'submit');
+        $submit_button          = new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit');
         $form->addElement($titleTray);
         $form->addElement($desc_tarea);
         $form->addElement($cat_select);
@@ -50,13 +53,13 @@ class Forms extends \XoopsObject
     /**
      * @return string
      */
-    public static function getAdminFormExport()
+    public static function getAdminFormExport(): string
     {
         $irs            = $GLOBALS['xoopsDB']->query(
             'SELECT c.imgcat_id,c.imgcat_name,c.imgcat_storetype,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight'
         );
         $imgcat_options = '';
-        while (list($imgcat_id, $imgcat_name, $imgcat_storetype, $imgcat_sum) = $GLOBALS['xoopsDB']->fetchRow($irs)) {
+        while ([$imgcat_id, $imgcat_name, $imgcat_storetype, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
             $imgcat_options .= "<option value='$imgcat_id'>$imgcat_storetype : $imgcat_name ($imgcat_sum)</option>\n";
         }
 
@@ -79,7 +82,7 @@ class Forms extends \XoopsObject
 <input type='checkbox' name='use_thumb' value='1' checked >" . \_AM_CB_EXPORTTHUMB . "
 <br>
 <br>
-<input type='submit' name='imagemanager_export' value='" . _GO . "' onclick='return confirm(\"" . \_AM_MB_EXPORTCONFIRM . "\");' >
+<input type='submit' name='imagemanager_export' value='" . \_GO . "' onclick='return confirm(\"" . \_AM_MB_EXPORTCONFIRM . "\");' >
 </form>\n";
 
         return $form;
@@ -88,7 +91,7 @@ class Forms extends \XoopsObject
     /**
      * @return string
      */
-    public static function getAdminFormGroups()
+    public static function getAdminFormGroups(): string
     {
         global $xoopsModule;
 
@@ -114,12 +117,13 @@ class Forms extends \XoopsObject
     /**
      * @return string
      */
-    public static function getAdminFormImportMyalbum()
+    public static function getAdminFormImportMyalbum(): string
     {
         $moduleHandler = \xoops_getHandler('module');
-        $mrs           = $GLOBALS['xoopsDB']->query('SELECT dirname FROM ' . $GLOBALS['xoopsDB']->prefix('modules') . " WHERE dirname like 'myalbum%'");
+        $sql           = 'SELECT dirname FROM ' . $GLOBALS['xoopsDB']->prefix('modules') . " WHERE dirname like 'myalbum%'";
+        $mrs           = $GLOBALS['xoopsDB']->query($sql);
         $frm           = '';
-        while (list($src_dirname) = $GLOBALS['xoopsDB']->fetchRow($mrs)) {
+        while ([$src_dirname] = $GLOBALS['xoopsDB']->fetchRow($mrs)) {
             if ($GLOBALS['mydirname'] == $src_dirname) {
                 continue;
             }
@@ -145,7 +149,7 @@ class Forms extends \XoopsObject
                 <select name='cid'>
                     $myalbum_cat_options
                 </select>
-                <input type='submit' name='myalbum_import' value='" . _GO . "' onclick='return confirm(\"" . \_AM_MB_IMPORTCONFIRM . "\");' >
+                <input type='submit' name='myalbum_import' value='" . \_GO . "' onclick='return confirm(\"" . \_AM_MB_IMPORTCONFIRM . "\");' >
                 </form>\n";
 
             $frm .= '<br></p>';
@@ -157,15 +161,16 @@ class Forms extends \XoopsObject
     /**
      * @return string
      */
-    public static function getAdminFormImportImageManager()
+    public static function getAdminFormImportImageManager(): string
     {
         $grouppermHandler = \xoops_getHandler('groupperm');
         $frm              = '';
         if ($grouppermHandler->checkRight('system_admin', \XOOPS_SYSTEM_IMAGE, $GLOBALS['xoopsUser']->getGroups())) {
             // only when user has admin right of system 'imagemanager'
-            $irs            = $GLOBALS['xoopsDB']->query('SELECT c.imgcat_id,c.imgcat_name,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight');
+            $sql            = 'SELECT c.imgcat_id,c.imgcat_name,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight';
+            $irs            = $GLOBALS['xoopsDB']->query($sql);
             $imgcat_options = '';
-            while (list($imgcat_id, $imgcat_name, $imgcat_sum) = $GLOBALS['xoopsDB']->fetchRow($irs)) {
+            while ([$imgcat_id, $imgcat_name, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
                 $imgcat_options .= "<option value='$imgcat_id'>$imgcat_name ($imgcat_sum)</option>\n";
             }
             $frm .= '<p>
@@ -174,7 +179,7 @@ class Forms extends \XoopsObject
                 <select name='imgcat_id'>
                     $imgcat_options
                 </select>
-                <input type='submit' name='imagemanager_import' value='" . _GO . "' onclick='return confirm(\"" . \_AM_MB_IMPORTCONFIRM . "\");' >
+                <input type='submit' name='imagemanager_import' value='" . \_GO . "' onclick='return confirm(\"" . \_AM_MB_IMPORTCONFIRM . "\");' >
                 </form>\n";
             $frm .= '<br></p>';
         }
@@ -189,7 +194,7 @@ class Forms extends \XoopsObject
      *
      * @return string
      */
-    public static function getAdminFormDisplayEdit($cat_array, $form_title, $action)
+    public static function getAdminFormDisplayEdit($cat_array, $form_title, $action): string
     {
         global $cattree;
 
@@ -216,8 +221,8 @@ class Forms extends \XoopsObject
 
         // Buttons
         $buttonTray = new \XoopsFormElementTray('', '&nbsp;');
-        $buttonTray->addElement(new \XoopsFormButton('', 'submit', _SUBMIT, 'submit'));
-        $buttonTray->addElement(new \XoopsFormButton('', 'reset', _CANCEL, 'reset'));
+        $buttonTray->addElement(new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit'));
+        $buttonTray->addElement(new \XoopsFormButton('', 'reset', \_CANCEL, 'reset'));
         $form->addElement($buttonTray);
 
         // End of XoopsForm
@@ -231,7 +236,7 @@ class Forms extends \XoopsObject
      *
      * @return string
      */
-    public static function getUserFormSubmit($caller, $photo, $lid)
+    public static function getUserFormSubmit(string $caller, $photo, $lid): string
     {
         // Show the form
         \extract($GLOBALS['myalbumModuleConfig']);
@@ -248,7 +253,7 @@ class Forms extends \XoopsObject
 
         $title_text = new \XoopsFormText(\_ALBM_PHOTOTITLE, 'title', 50, 255, $photo['title']);
 
-        $cat_select = new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', \Xmf\Request::getInt('cid', null, 'REQUEST'), false));
+        $cat_select = new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', Request::getInt('cid', null, 'REQUEST'), false));
 
         $html_configs           = [];
         $html_configs['name']   = 'desc_text';
@@ -278,10 +283,10 @@ class Forms extends \XoopsObject
         }
         $preview_hidden = new \XoopsFormHidden('preview_name', \htmlspecialchars($preview_name, \ENT_QUOTES | \ENT_HTML5), \ENT_QUOTES);
 
-        $submit_button  = new \XoopsFormButton('', 'submit', _SUBMIT, 'submit');
-        $preview_button = new \XoopsFormButton('', 'preview', _PREVIEW, 'submit');
-        $reset_button   = new \XoopsFormButton('', 'reset', _CANCEL, 'reset');
-        $submitTray    = new \XoopsFormElementTray('');
+        $submit_button  = new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit');
+        $preview_button = new \XoopsFormButton('', 'preview', \_PREVIEW, 'submit');
+        $reset_button   = new \XoopsFormButton('', 'reset', \_CANCEL, 'reset');
+        $submitTray     = new \XoopsFormElementTray('');
         if ('imagemanager' !== $caller) {
             $submitTray->addElement($preview_button);
         }
@@ -292,7 +297,7 @@ class Forms extends \XoopsObject
         $form->addElement($size_label);
         $form->addElement($title_text);
         $form->addElement($desc_tarea);
-        if ($GLOBALS['myalbumModuleConfig']['tag']) {
+        if ($GLOBALS['myalbumModuleConfig']['tag'] && \class_exists(\XoopsModules\Tag\FormTag::class)) {
             $form->addElement(new \XoopsModules\Tag\FormTag('tags', 35, 255, $lid));
         }
         $form->addElement($cat_select);

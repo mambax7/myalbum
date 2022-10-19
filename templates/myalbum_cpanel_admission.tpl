@@ -1,5 +1,5 @@
 <h3 style='text-align:left;'><{$admin_title}></h3>
-<{if $smarty.get.mes}><p><span style='color:blue;'>(<{$smarty.get.mes}>)</span></p><{/if}>
+<{if $smarty.get.mes|default:false}><p><span style='color:blue;'>(<{$smarty.get.mes}>)</span></p><{/if}>
 <table width='95%' border='0' cellpadding='4' cellspacing='0'>
     <tr>
         <td>
@@ -17,8 +17,10 @@
                 <input type='hidden' name='action' value=''>
                 <table width='95%' class='outer' cellpadding='4' cellspacing='1'>
                     <tr valign='middle'>
-                        <th width='5'><input type='checkbox' name='dummy'
-                                             onclick="with(document.MainForm){for(var i=0;i<length;i++){if(elements[i].type=='checkbox'){elements[i].checked=this.checked;}}}">
+                        <th width='5'><label>
+                                <input type='checkbox' name='dummy'
+                                                     onclick="with(document.MainForm){for(var i=0;i<length;i++){if(elements[i].type=='checkbox'){elements[i].checked=this.checked;}}}">
+                            </label>
                         </th>
                         <th><{$smarty.const._AM_TH_THUMBNAIL}></th>
                         <th><{$smarty.const._AM_TH_SUBMITTER}></th>
@@ -27,9 +29,11 @@
                         <th><{$smarty.const._AM_TH_CATEGORIES}></th>
                         <th><{$smarty.const._ALBM_ACTION}></th>
                     </tr>
-                    <{foreach item=photo from=$photos key=lid}>
+                    <{foreach item=photo from=$photos|default:null key=lid}>
                         <tr class="<{cycle values='even,odd'}>">
-                            <td><input type='checkbox' name='ids[]' value='<{$photo.photo.lid}>'></td>
+                            <td><label>
+                                    <input type='checkbox' name='ids[]' value='<{$photo.photo.lid}>'>
+                                </label></td>
                             <td><img src='<{$thumbs_url}>/<{$photo.photo.lid}>.<{$photo.photo.ext}>'></td>
                             <td><{$photo.user.uname}></td>
                             <td><a href='<{$photos_url}>/<{$photo.lid}>.<{$photo.ext}>'

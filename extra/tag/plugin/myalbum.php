@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  You may not change or alter any portion of this comment or credits
  of supporting developers from this source code or any supporting source code
@@ -13,14 +13,15 @@
  * XOOPS tag management module
  *
  * @copyright       XOOPS Project (https://xoops.org)
- * @license         http://www.fsf.org/copyleft/gpl.html GNU public license
+ * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @since           1.0.0
  * @author          Taiwen Jiang <phppp@users.sourceforge.net>
  * @version         $Id: myalbum.php 11905 2013-08-14 05:25:33Z beckmi $
- * @package         tag
  * @param mixed $items
  */
 
+use XoopsModules\Tag\Helper;
+use XoopsModules\Tag\Utility;
 
 /**
  * Get item fields:
@@ -32,6 +33,7 @@
  * uname
  * tags
  *
+ * @param mixed      $items
  * @return    bool
  * @var        array $items associative array of items: [modid][catid][itemid]
  *
@@ -64,7 +66,7 @@ function myalbum_tag_iteminfo(&$items)
                 'uid'     => $item_obj->getVar('submitter'),
                 'link'    => "photo.php?lid={$item_id}&cid=" . $item_obj->getVar('cid'),
                 'time'    => $item_obj->getVar('date'),
-                'tags'    => \XoopsModules\Tag\Utility::tag_parse_tag($item_obj->getVar('tags', 'n')),
+                'tags'    => Utility::tag_parse_tag($item_obj->getVar('tags', 'n')),
                 'content' => $GLOBALS['myts']->displayTarea($text->getVar('description'), 1, 1, 1, 1, 1, 1),
             ];
         }
@@ -77,13 +79,14 @@ function myalbum_tag_iteminfo(&$items)
  *
  * @param $mid
  */
-function myalbum_tag_synchronization($mid)
+function myalbum_tag_synchronization($mid): void
 {
     $itemHandler = $helper->getHandler('Photos');
-    $linkHandler = \XoopsModules\Tag\Helper::getInstance()->getHandler('Link'); //@var \XoopsModules\Tag\Handler $tagHandler
+    $linkHandler = Helper::getInstance()
+                         ->getHandler('Link'); //@var \XoopsModules\Tag\Handler $tagHandler
 
     /* clear tag-item links */
-    if (version_compare($GLOBALS['xoopsDB']->getServerVersion(), '4.1.0', 'ge')):
+    if (version_compare($GLOBALS['xoopsDB']->getServerVersion(), '4.1.0', 'ge')) :
         $sql = "    DELETE FROM {$linkHandler->table}"
                . '    WHERE '
                . "        tag_modid = {$mid}"
@@ -94,7 +97,7 @@ function myalbum_tag_synchronization($mid)
                . "                WHERE {$itemHandler->table}.approved > 0"
                . '            ) '
                . '        )';
-    else:
+    else :
         $sql = "    DELETE {$linkHandler->table} FROM {$linkHandler->table}"
                . "    LEFT JOIN {$itemHandler->table} AS aa ON {$linkHandler->table}.tag_itemid = aa.{$itemHandler->keyName} "
                . '    WHERE '

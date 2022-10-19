@@ -1,10 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Module\Admin;
+use Xmf\Request;
 use XoopsModules\Myalbum\{
     CategoryHandler,
     Forms,
@@ -13,19 +14,20 @@ use XoopsModules\Myalbum\{
     TextHandler,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var Admin $adminObject */
 
 require_once __DIR__ . '/admin_header.php';
 
 // GPCS vars
-$GLOBALS['submitter'] = \Xmf\Request::getInt('submitter', $my_uid, 'POST');
+$GLOBALS['submitter'] = Request::getInt('submitter', $my_uid, 'POST');
 
-$cid = \Xmf\Request::getInt('cid', 0);
+$cid = Request::getInt('cid', 0);
 
-$GLOBALS['dir4edit']   = isset($_POST['dir']) ? $GLOBALS['myts']->htmlSpecialChars($_POST['dir']) : '';
-$GLOBALS['title4edit'] = isset($_POST['title']) ? $GLOBALS['myts']->htmlSpecialChars($_POST['title']) : '';
-$GLOBALS['desc4edit']  = isset($_POST['desc']) ? $GLOBALS['myts']->htmlSpecialChars($_POST['desc']) : '';
+$GLOBALS['dir4edit']   = Request::getString('dir', '', 'POST');
+$GLOBALS['title4edit'] = Request::getString('title', '', 'POST');
+$GLOBALS['desc4edit']  = Request::getText('desc', '', 'POST');
 
 // reject Not Admin
 if (!$isadmin) {
@@ -38,22 +40,22 @@ $count = $catHandler->getCount();
 if ($count < 1) {
     redirect_header(XOOPS_URL . "/modules/$moduleDirName/admin", 2, _ALBM_MUSTADDCATFIRST);
 }
-/** @var  PhotosHandler $photosHandler */
+/** @var PhotosHandler $photosHandler */
 $photosHandler = $helper->getHandler('Photos');
-/** @var  TextHandler $textHandler */
+/** @var TextHandler $textHandler */
 $textHandler = $helper->getHandler('Text');
 
-if (\Xmf\Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
+if (Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
     ob_start();
 
     // Check Directory
-    $dir = $GLOBALS['myts']->stripSlashesGPC($_POST['dir']);
+    $dir = Request::getString('dir', '', 'POST');
     if (empty($dir) || !is_dir($dir)) {
         if (0x2f !== ord($dir)) {
             $dir = "/$dir";
         }
         $prefix = XOOPS_ROOT_PATH;
-        while (mb_strlen($prefix) > 0) {
+        while (\mb_strlen($prefix) > 0) {
             if (is_dir("$prefix$dir")) {
                 $dir = "$prefix$dir";
                 break;
@@ -64,14 +66,14 @@ if (\Xmf\Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
             redirect_header('batch.php', 3, _ALBM_MES_INVALIDDIRECTORY . "<br>$dir4edit");
         }
     }
-    if ('/' === mb_substr($dir, -1)) {
+    if ('/' === \mb_substr($dir, -1)) {
         $dir = mb_substr($dir, 0, -1);
     }
 
-    $title4save = $GLOBALS['myts']->htmlSpecialChars($_POST['title']);
-    $desc4save  = $GLOBALS['myts']->addSlashes($_POST['desc']);
+    $title4save = $GLOBALS['myts']->htmlSpecialChars(Request::getString('title'));
+    $desc4save  = $GLOBALS['myts']->addSlashes(Request::getString('desc'));
 
-    $date = strtotime($_POST['post_date']);
+    $date = strtotime(Request::getString('post_date', '', 'POST')); //strtotime($_POST['post_date']);
     if (-1 == $date) {
         $date = time();
     }
@@ -84,21 +86,21 @@ if (\Xmf\Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
     while (false !== ($file_name = readdir($dir_h))) {
         // Skip '.' , '..' and hidden file
         //if (substr($file_name, 0, 1) === '.') {
-        if (0 === mb_strpos($file_name, '.')) {
+        if (0 === \mb_strpos($file_name, '.')) {
             continue;
         }
 
-        $ext       = mb_substr(mb_strrchr($file_name, '.'), 1);
+        $ext       = mb_substr(\mb_strrchr($file_name, '.'), 1);
         $node      = mb_substr($file_name, 0, -mb_strlen($ext) - 1);
         $file_path = "$dir/$node.$ext";
 
         $title = empty($_POST['title']) ? addslashes($node) : "$title4save $filecount";
 
-        if (is_readable($file_path) && in_array(mb_strtolower($ext), $array_allowed_exts)) {
-            if (!in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
-                list($w, $h) = getimagesize($file_path);
+        if (is_readable($file_path) && \in_array(\mb_strtolower($ext), $array_allowed_exts, true)) {
+            if (!\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
+                [$w, $h] = getimagesize($file_path);
             } else {
-                list($w, $h) = [0, 0];
+                [$w, $h] = [0, 0];
             }
             $photo = $photosHandler->create();
             $photo->setVar('cid', $cid);
@@ -132,8 +134,7 @@ if (\Xmf\Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
         printf('<p>' . _ALBM_MES_BATCHDONE . '</p>', $filecount - 1);
     }
 
-    $result_str = ob_get_contents();
-    ob_end_clean();
+    $result_str = ob_get_clean();
 }
 
 xoops_cp_header();

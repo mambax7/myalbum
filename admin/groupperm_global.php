@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Module\Admin;
 use XoopsModules\Myalbum;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
@@ -13,10 +13,8 @@ namespace XoopsModules\Myalbum;
  */
 
 /**
- * @copyright    XOOPS Project https://xoops.org/
- * @license      GNU GPL 2 or later (https://www.gnu.org/licenses/gpl-2.0.html)
- * @package
- * @since
+ * @copyright    XOOPS Project (https://xoops.org)
+ * @license      GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @author       XOOPS Development Team, Kazumi Ono (AKA onokazu)
  */
 require_once XOOPS_ROOT_PATH . '/class/xoopsform/formelement.php';
@@ -31,9 +29,6 @@ require_once XOOPS_ROOT_PATH . '/class/xoopsform/form.php';
  *
  * @author       Kazumi Ono    <onokazu@myweb.ne.jp>
  * @copyright    copyright (c) 2000-2003 XOOPS.org
- *
- * @package      kernel
- * @subpackage   form
  */
 class GroupFormCheckBox extends \XoopsFormElement
 {
@@ -42,25 +37,25 @@ class GroupFormCheckBox extends \XoopsFormElement
      *
      * @var array;
      */
-    public $_value;
+    public array $_value;
     /**
      * Group ID
      *
      * @var int
      */
-    public $_groupId;
+    public int $_groupId;
     /**
      * Option tree
      *
      * @var array
      */
-    public $_optionTree;
+    public array $_optionTree;
     /**
      * Appendix
      *
      * @var array ('permname'=>,'itemid'=>,'itemname'=>,'selected'=>)
      */
-    public $_appendix = [];
+    public array $_appendix = [];
 
     /**
      * Constructor
@@ -83,10 +78,8 @@ class GroupFormCheckBox extends \XoopsFormElement
      * Sets pre-selected values
      *
      * @param mixed $value A group ID or an array of group IDs
-     *
-     * @access public
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         if (\is_array($value)) {
             foreach ($value as $v) {
@@ -101,10 +94,8 @@ class GroupFormCheckBox extends \XoopsFormElement
      * Sets the tree structure of items
      *
      * @param array $optionTree
-     *
-     * @access public
      */
-    public function setOptionTree(&$optionTree)
+    public function setOptionTree(array &$optionTree): void
     {
         $this->_optionTree = &$optionTree;
     }
@@ -112,10 +103,9 @@ class GroupFormCheckBox extends \XoopsFormElement
     /**
      * Sets appendix of checkboxes
      *
-     * @access public
      * @param $appendix
      */
-    public function setAppendix($appendix)
+    public function setAppendix($appendix): void
     {
         $this->_appendix = $appendix;
     }
@@ -124,9 +114,8 @@ class GroupFormCheckBox extends \XoopsFormElement
      * Renders checkbox options for this group
      *
      * @return string
-     * @access public
      */
-    public function render()
+    public function render(): string
     {
         $ret = '';
 
@@ -173,10 +162,8 @@ class GroupFormCheckBox extends \XoopsFormElement
      * @param array  $option
      * @param string $prefix
      * @param array  $parentIds
-     *
-     * @access private
      */
-    private function renderOptionTree(&$tree, $option, $prefix, $parentIds = [])
+    private function renderOptionTree(string &$tree, array $option, string $prefix, array $parentIds = []): void
     {
         $tree .= $prefix . '<input type="checkbox" name="' . $this->getName() . '[groups][' . $this->_groupId . '][' . $option['id'] . ']" id="' . $this->getName() . '[groups][' . $this->_groupId . '][' . $option['id'] . ']" onclick="';
         // If there are parent elements, add javascript that will
@@ -195,7 +182,7 @@ class GroupFormCheckBox extends \XoopsFormElement
             $tree      .= "var ele = xoopsGetElementById('" . $child_ele . "'); if (this.checked !== true) {ele.checked = false;}";
         }
         $tree .= '" value="1"';
-        if (isset($this->_value) && \in_array($option['id'], $this->_value)) {
+        if (isset($this->_value) && \in_array($option['id'], $this->_value, true)) {
             $tree .= ' checked';
         }
         $tree .= ' >' . $option['name'] . '<input type="hidden" name="' . $this->getName() . '[parents][' . $option['id'] . ']" value="' . \implode(':', $parentIds) . '" ><input type="hidden" name="' . $this->getName() . '[itemname][' . $option['id'] . ']" value="' . \htmlspecialchars(

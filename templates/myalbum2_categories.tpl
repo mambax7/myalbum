@@ -2,7 +2,7 @@
     <tr>
         <{foreach from=$subcategories item=cat key=count}>
         <td valign="top" align="right">
-            <{if $cat.imgurl != ""}>
+            <{if $cat.imgurl|default:'' != ''}>
                 <a href="<{$mod_url}>/viewcat.php?cid=<{$cat.cid}>">
                     <img src="<{$cat.imgurl}>" width="120" border="0" alt="">
                 </a>

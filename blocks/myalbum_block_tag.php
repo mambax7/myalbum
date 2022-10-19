@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * @param $options
@@ -8,7 +8,8 @@
 function myalbum_tag_block_cloud_show($options)
 {
     if (file_exists(XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php')) {
-        global $module_dirname;
+        //        global $module_dirname;
+        $module_dirname = '';
         require_once XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php';
 
         return tag_block_cloud_show($options, $module_dirname);
@@ -41,7 +42,8 @@ function myalbum_tag_block_cloud_edit($options)
 function myalbum_tag_block_top_show($options)
 {
     if (file_exists(XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php')) {
-        global $module_dirname;
+        //        global $module_dirname;
+        $module_dirname = '';
         require_once XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php';
 
         return tag_block_top_show($options, $module_dirname);

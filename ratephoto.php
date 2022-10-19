@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 use Xmf\Request;
 use XoopsModules\Myalbum\{
@@ -11,19 +11,19 @@ use XoopsModules\Myalbum\{
     VotedataHandler,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var PhotosHandler $photosHandler */
 /** @var VotedataHandler $votedataHandler */
 /** @var Utility $utility */
-
 require_once __DIR__ . '/header.php';
 
 if (!($global_perms & GPERM_RATEVOTE)) {
     $helper->redirect('index.php', 1, _NOPERM);
 }
 
-$lid = Request::getInt('lid', 0, 'GET');
-$photosHandler = $helper->getHandler('Photos');
+$lid             = Request::getInt('lid', 0, 'GET');
+$photosHandler   = $helper->getHandler('Photos');
 $votedataHandler = $helper->getHandler('Votedata');
 if (!$photo_obj = $photosHandler->get($lid)) {
     $helper->redirect('index.php', 2, _ALBM_NOMATCH);
@@ -44,15 +44,15 @@ if (Request::hasVar('submit', 'POST')) {
 
     if (0 != $ratinguser) {
         // Check if Photo POSTER is voting
-        $criteria = new \CriteriaCompo(new \Criteria('`lid`', $lid, '='));
-        $criteria->add(new \Criteria('`submitter`', $ratinguser));
+        $criteria = new \CriteriaCompo(new \Criteria('lid', $lid, '='));
+        $criteria->add(new \Criteria('submitter', $ratinguser));
 
         if ($photosHandler->getCount($criteria)) {
             $helper->redirect('index.php', 4, _ALBM_CANTVOTEOWN);
         }
 
-        $criteria = new \CriteriaCompo(new \Criteria('`lid`', $lid, '='));
-        $criteria->add(new \Criteria('`ratinguser`', $ratinguser));
+        $criteria = new \CriteriaCompo(new \Criteria('lid', $lid, '='));
+        $criteria->add(new \Criteria('ratinguser', $ratinguser));
 
         // Check if REG user is trying to vote twice.
         if ($votedataHandler->getCount($criteria)) {
@@ -61,9 +61,9 @@ if (Request::hasVar('submit', 'POST')) {
     } else {
         // Check if ANONYMOUS user is trying to vote more than once per day.
         $yesterday = (time() - (86400 * $anonwaitdays));
-        $criteria  = new \CriteriaCompo(new \Criteria('`ratingtimestamp`', $yesterday, '>'));
-        $criteria->add(new \Criteria('`ratinguser`', 0));
-        $criteria->add(new \Criteria('`ratinghostname`', $ip));
+        $criteria  = new \CriteriaCompo(new \Criteria('ratingtimestamp', $yesterday, '>'));
+        $criteria->add(new \Criteria('ratinguser', 0));
+        $criteria->add(new \Criteria('ratinghostname', $ip));
         // Check if REG user is trying to vote twice.
         if ($votedataHandler->getCount($criteria)) {
             $helper->redirect('index.php', 4, _ALBM_VOTEONCE2);
@@ -78,7 +78,14 @@ if (Request::hasVar('submit', 'POST')) {
     $vote->setVar('rating', $rating);
     $vote->setVar('ratinghostname', $ip);
     $vote->setVar('ratingtimestamp', $datetime);
-    $votedataHandler->insert($vote, true) || exit('DB error: INSERT votedata table');
+    //    $votedataHandler->insert($vote, true) or exit('DB Error: INSERT votedata table');
+    try {
+        $votedataHandler->insert($vote, true);
+        // exit();
+    } catch (\Throwable $e) {
+        echo 'Caught exception: couldn not insert Votedata Rating' . $e->getMessage() . 'n';
+    }
+
     //All is well.  Calculate Score & Add to Summary (for quick retrieval & sorting) to DB.
     Utility::updateRating($lid);
     $ratemessage = _ALBM_VOTEAPPRE . '<br>' . sprintf(_ALBM_THANKURATE, $xoopsConfig['sitename']);
@@ -91,7 +98,7 @@ if (Request::hasVar('submit', 'POST')) {
     }
 
     $GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_ratephoto.tpl";
-    require $GLOBALS['xoops']->path('header.php');
+    require_once $GLOBALS['xoops']->path('header.php');
 
     $GLOBALS['xoopsTpl']->assign('photo', Preview::getArrayForPhotoAssign($photo_obj));
 
@@ -107,5 +114,5 @@ if (Request::hasVar('submit', 'POST')) {
     $GLOBALS['xoopsTpl']->assign('xoConfig', $GLOBALS['myalbumModuleConfig']);
     $GLOBALS['xoopsTpl']->assign('mydirname', $GLOBALS['mydirname']);
 
-    require $GLOBALS['xoops']->path('footer.php');
+    require_once $GLOBALS['xoops']->path('footer.php');
 }

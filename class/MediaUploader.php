@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
@@ -13,10 +13,8 @@ namespace XoopsModules\Myalbum;
  */
 
 /**
- * @copyright    XOOPS Project https://xoops.org/
- * @license      GNU GPL 2 or later (https://www.gnu.org/licenses/gpl-2.0.html)
- * @package
- * @since
+ * @copyright    XOOPS Project (https://xoops.org)
+ * @license      GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @author       XOOPS Development Team, Kazumi Ono (AKA onokazu)
  */
 
@@ -51,50 +49,42 @@ Example
  */
 class MediaUploader
 {
-    public $mediaName;
-    public $mediaType;
-    public $mediaSize;
-    public $mediaTmpName;
-    public $mediaError;
-
-    public $uploadDir = '';
-
-    public $allowedMimeTypes  = [];
-    public $allowedExtensions = [];
-
-    public $maxFileSize = 0;
-    public $maxWidth;
-    public $maxHeight;
-
-    public $targetFileName;
-
-    public $prefix;
-
-    public $errors = [];
-
-    public $savedDestination;
-
-    public $savedFileName;
+    public string $mediaName;
+    public string $mediaType;
+    public int    $mediaSize;
+    public string $mediaTmpName;
+    public        $mediaError;
+    public string $uploadDir         = '';
+    public array  $allowedMimeTypes  = [];
+    public array  $allowedExtensions = [];
+    public int    $maxFileSize       = 0;
+    public int    $maxWidth;
+    public int    $maxHeight;
+    public        $targetFileName;
+    public        $prefix;
+    public array  $errors            = [];
+    public string $savedDestination;
+    public string $savedFileName;
 
     /**
      * Constructor
      *
-     * @param string $uploadDir
-     * @param array  $allowedMimeTypes
-     * @param int    $maxFileSize
-     * @param int    $maxWidth
-     * @param int    $maxHeight
-     * @param array  $allowedExtensions
+     * @param string     $uploadDir
+     * @param array      $allowedMimeTypes
+     * @param int        $maxFileSize
+     * @param int|null   $maxWidth
+     * @param int|null   $maxHeight
+     * @param array|null $allowedExtensions
      *
      * @internal param int $cmodvalue
      */
     public function __construct(
-        $uploadDir,
-        $allowedMimeTypes,
-        $maxFileSize,
-        $maxWidth = null,
-        $maxHeight = null,
-        $allowedExtensions = null
+        string $uploadDir,
+        array  $allowedMimeTypes,
+        int    $maxFileSize,
+        int    $maxWidth = null,
+        int    $maxHeight = null,
+        array  $allowedExtensions = null
     ) {
         if (\is_array($allowedMimeTypes)) {
             $this->allowedMimeTypes = &$allowedMimeTypes;
@@ -115,12 +105,12 @@ class MediaUploader
     /**
      * Fetch the uploaded file
      *
-     * @param string $media_name Name of the file field
-     * @param int    $index      Index of the file (if more than one uploaded under that name)
+     * @param string   $media_name Name of the file field
+     * @param int|null $index      Index of the file (if more than one uploaded under that name)
      *
      * @return bool
      **/
-    public function fetchMedia($media_name, $index = null)
+    public function fetchMedia(string $media_name, int $index = null): bool
     {
         if (!isset($_FILES[$media_name])) {
             $this->setErrors('File not found');
@@ -173,7 +163,7 @@ class MediaUploader
      *
      * @param string $value
      **/
-    public function setTargetFileName($value)
+    public function setTargetFileName(string $value): void
     {
         $this->targetFileName = \trim($value);
     }
@@ -183,7 +173,7 @@ class MediaUploader
      *
      * @param string $value
      **/
-    public function setPrefix($value)
+    public function setPrefix(string $value): void
     {
         $this->prefix = \trim($value);
     }
@@ -193,7 +183,7 @@ class MediaUploader
      *
      * @return string
      **/
-    public function getMediaName()
+    public function getMediaName(): string
     {
         return $this->mediaName;
     }
@@ -203,7 +193,7 @@ class MediaUploader
      *
      * @return string
      **/
-    public function getMediaType()
+    public function getMediaType(): string
     {
         return $this->mediaType;
     }
@@ -213,7 +203,7 @@ class MediaUploader
      *
      * @return int
      **/
-    public function getMediaSize()
+    public function getMediaSize(): int
     {
         return $this->mediaSize;
     }
@@ -223,7 +213,7 @@ class MediaUploader
      *
      * @return string
      **/
-    public function getMediaTmpName()
+    public function getMediaTmpName(): string
     {
         return $this->mediaTmpName;
     }
@@ -233,7 +223,7 @@ class MediaUploader
      *
      * @return string
      **/
-    public function getSavedFileName()
+    public function getSavedFileName(): string
     {
         return $this->savedFileName;
     }
@@ -243,7 +233,7 @@ class MediaUploader
      *
      * @return string
      **/
-    public function getSavedDestination()
+    public function getSavedDestination(): string
     {
         return $this->savedDestination;
     }
@@ -255,7 +245,7 @@ class MediaUploader
      *
      * @return bool
      */
-    public function upload($chmod = 0644)
+    public function upload(int $chmod = 0644): bool
     {
         if ('' == $this->uploadDir) {
             $this->setErrors('Upload directory not set');
@@ -310,18 +300,18 @@ class MediaUploader
      *
      * @return bool
      */
-    public function copyFile($chmod)
+    public function copyFile($chmod): bool
     {
         $matched = [];
-        if (!\preg_match("/\.([a-zA-Z0-9]+)$/", $this->mediaName, $matched)) {
+        if (!\preg_match('/\.([a-zA-Z0-9]+)$/', $this->mediaName, $matched)) {
             return false;
         }
         if (isset($this->targetFileName)) {
             $this->savedFileName = $this->targetFileName;
         } elseif (isset($this->prefix)) {
-            $this->savedFileName = \uniqid($this->prefix, true) . '.' . mb_strtolower($matched[1]);
+            $this->savedFileName = \uniqid($this->prefix, true) . '.' . \mb_strtolower($matched[1]);
         } else {
-            $this->savedFileName = mb_strtolower($this->mediaName);
+            $this->savedFileName = \mb_strtolower($this->mediaName);
         }
         $this->savedDestination = $this->uploadDir . '/' . $this->savedFileName;
         if (!\move_uploaded_file($this->mediaTmpName, $this->savedDestination)) {
@@ -337,7 +327,7 @@ class MediaUploader
      *
      * @return bool
      **/
-    public function checkMaxFileSize()
+    public function checkMaxFileSize(): bool
     {
         if ($this->mediaSize > $this->maxFileSize) {
             return false;
@@ -351,12 +341,13 @@ class MediaUploader
      *
      * @return bool
      **/
-    public function checkMaxWidth()
+    public function checkMaxWidth(): bool
     {
         if (!isset($this->maxWidth)) {
             return true;
         }
-        if (false !== $dimension = \getimagesize($this->mediaTmpName)) {
+        /** @var array $dimension */
+        if (false !== ($dimension = \getimagesize($this->mediaTmpName))) {
             if ($dimension[0] > $this->maxWidth) {
                 return false;
             }
@@ -372,11 +363,12 @@ class MediaUploader
      *
      * @return bool
      **/
-    public function checkMaxHeight()
+    public function checkMaxHeight(): bool
     {
         if (!isset($this->maxHeight)) {
             return true;
         }
+        /** @var array $dimension */
         if (false !== $dimension = \getimagesize($this->mediaTmpName)) {
             if ($dimension[1] > $this->maxHeight) {
                 return false;
@@ -395,9 +387,9 @@ class MediaUploader
      *
      * @return bool
      **/
-    public function checkMimeType()
+    public function checkMimeType(): bool
     {
-        if (\count($this->allowedMimeTypes) > 0 && !\in_array($this->mediaType, $this->allowedMimeTypes)) {
+        if (\count($this->allowedMimeTypes) > 0 && !\in_array($this->mediaType, $this->allowedMimeTypes, true)) {
             return false;
         }
 
@@ -409,10 +401,10 @@ class MediaUploader
      *
      * @return bool
      **/
-    public function checkExtension()
+    public function checkExtension(): bool
     {
-        $ext = mb_substr(mb_strrchr($this->mediaName, '.'), 1);
-        if (!empty($this->allowedExtensions) && !\in_array(mb_strtolower($ext), $this->allowedExtensions)) {
+        $ext = mb_substr(\mb_strrchr($this->mediaName, '.'), 1);
+        if (!empty($this->allowedExtensions) && !\in_array(\mb_strtolower($ext), $this->allowedExtensions, true)) {
             return false;
         }
 
@@ -424,7 +416,7 @@ class MediaUploader
      *
      * @param string $error
      **/
-    public function setErrors($error)
+    public function setErrors(string $error): void
     {
         $this->errors[] = \trim($error);
     }
@@ -436,7 +428,7 @@ class MediaUploader
      *
      * @return array|string Array of array messages OR HTML string
      */
-    public function &getErrors($ashtml = true)
+    public function &getErrors(bool $ashtml = true)
     {
         if (!$ashtml) {
             return $this->errors;

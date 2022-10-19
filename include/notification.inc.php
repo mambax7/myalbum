@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * You may not change or alter any portion of this comment or credits
  * of supporting developers from this source code or any supporting source code
@@ -11,20 +11,17 @@
 
 /**
  * @copyright    {@link https://xoops.org/ XOOPS Project}
- * @license      {@link https://www.gnu.org/licenses/gpl-2.0.html GNU GPL 2 or later}
- * @package
- * @since
+ * @license      {@link https://www.gnu.org/licenses/gpl-2.0.html GNU GPL 2.0 or later}
  * @author       XOOPS Development Team
  */
 
-
-
-$moduleDirName = basename(dirname(__DIR__));
+$moduleDirName = \basename(\dirname(__DIR__));
 if (!preg_match('/^Myalbum\d*$/', $moduleDirName)) {
     exit('invalid dirname of myalbum: ' . htmlspecialchars($moduleDirName, ENT_QUOTES | ENT_HTML5));
 }
 
-eval('function ' . $moduleDirName . '_notify_iteminfo($not_category, $item_id){
+eval(
+    'function ' . $moduleDirName . '_notify_iteminfo($not_category, $item_id){
     global $xoopsModule, $xoopsModuleConfig, $xoopsConfig , $xoopsDB ;
 
     if (empty($xoopsModule) || $xoopsModule->getVar("dirname") != "' . $moduleDirName . '" ) {
@@ -48,7 +45,7 @@ eval('function ' . $moduleDirName . '_notify_iteminfo($not_category, $item_id){
         list( $title ) = $xoopsDB->fetchRow( $rs ) ;
         $item[\'name\'] = $title ;
         $item[\'url\'] = "$mod_url/viewcat.php?cid=$item_id" ;
-    } elseif ($not_category == \'photo\') {
+    } elseif ($not_category == "photo") {
         // Assume we have a valid event_id
         $sql = \'SELECT title FROM \'.$xoopsDB->prefix(\'' . $moduleDirName . '";
         $rs = $xoopsDB->query( $sql ) ;
@@ -58,5 +55,6 @@ eval('function ' . $moduleDirName . '_notify_iteminfo($not_category, $item_id){
     }
 
     return $item;
-}');
+}'
+);
 ?>

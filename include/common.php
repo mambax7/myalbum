@@ -1,22 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Module\Admin;
 use XoopsModules\Myalbum\{
     Helper,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var Utility $utility */
+include \dirname(__DIR__) . '/preloads/autoloader.php';
 
-include dirname(__DIR__) . '/preloads/autoloader.php';
-
-$moduleDirName = basename(dirname(__DIR__));
-$moduleDirNameUpper = mb_strtoupper($moduleDirName); //$capsDirName
+$moduleDirName      = \basename(\dirname(__DIR__));
+$moduleDirNameUpper = \mb_strtoupper($moduleDirName);
 
 /** @var \XoopsDatabase $db */
-$db = \XoopsDatabaseFactory::getDatabaseConnection();
-$debug = false;
-$helper = Helper::getInstance($debug);
+$db      = \XoopsDatabaseFactory::getDatabaseConnection();
+$debug   = false;
+$helper  = Helper::getInstance($debug);
 $utility = new Utility();
 
 $helper->loadLanguage('common');
@@ -25,14 +25,16 @@ $helper->loadLanguage('common');
 //$categoryHandler     = new Myalbum\CategoryHandler($db);
 //$downloadHandler     = new Myalbum\DownloadHandler($db);
 
-$pathIcon16 = Admin::iconUrl('', 16);
-$pathIcon32 = Admin::iconUrl('', 32);
+$pathIcon16 = Admin::iconUrl('', '16');
+$pathIcon32 = Admin::iconUrl('', '32');
 if (is_object($helper->getModule())) {
-    $pathModIcon16 = $helper->getModule()->getInfo('modicons16');
-    $pathModIcon32 = $helper->getModule()->getInfo('modicons32');
+    $pathModIcon16 = $helper->getModule()
+                            ->getInfo('modicons16');
+    $pathModIcon32 = $helper->getModule()
+                            ->getInfo('modicons32');
 }
 
-define('_ALBM_DIRNAME', basename(dirname(__DIR__)));
+define('_ALBM_DIRNAME', \basename(\dirname(__DIR__)));
 define('_ALBM_URL', XOOPS_URL . '/modules/' . _ALBM_DIRNAME);
 define('_ALBM_PATH', XOOPS_ROOT_PATH . '/modules/' . _ALBM_DIRNAME);
 define('_ALBM_IMAGES_URL', _ALBM_URL . '/assets/images');
@@ -44,7 +46,7 @@ define('_ALBM_UPLOAD_URL', XOOPS_UPLOAD_URL . '/' . _ALBM_DIRNAME); // WITHOUT T
 define('_ALBM_UPLOAD_PATH', XOOPS_UPLOAD_PATH . '/' . _ALBM_DIRNAME); // WITHOUT Trailing slash
 
 if (!defined($moduleDirNameUpper . '_CONSTANTS_DEFINED')) {
-    define($moduleDirNameUpper . '_DIRNAME', basename(dirname(__DIR__)));
+    define($moduleDirNameUpper . '_DIRNAME', \basename(\dirname(__DIR__)));
     define($moduleDirNameUpper . '_ROOT_PATH', XOOPS_ROOT_PATH . '/modules/' . $moduleDirName . '/');
     define($moduleDirNameUpper . '_PATH', XOOPS_ROOT_PATH . '/modules/' . $moduleDirName . '/');
     define($moduleDirNameUpper . '_URL', XOOPS_URL . '/modules/' . $moduleDirName . '/');
@@ -82,12 +84,22 @@ if (!isset($GLOBALS['xoopsTpl']) || !($GLOBALS['xoopsTpl'] instanceof \XoopsTpl)
     $GLOBALS['xoopsTpl'] = new \XoopsTpl();
 }
 
-$GLOBALS['xoopsTpl']->assign('mod_url', XOOPS_URL . '/modules/' . $moduleDirName);
+$GLOBALS['xoopsTpl']->assign('mod_url', $helper->url());
 // Local icons path
 if (is_object($helper->getModule())) {
-    $pathModIcon16 = $helper->getModule()->getInfo('modicons16');
-    $pathModIcon32 = $helper->getModule()->getInfo('modicons32');
+    $pathModIcon16 = $helper->getModule()
+                            ->getInfo('modicons16');
+    $pathModIcon32 = $helper->getModule()
+                            ->getInfo('modicons32');
 
     $GLOBALS['xoopsTpl']->assign('pathModIcon16', XOOPS_URL . '/modules/' . $moduleDirName . '/' . $pathModIcon16);
     $GLOBALS['xoopsTpl']->assign('pathModIcon32', $pathModIcon32);
 }
+
+xoops_loadLanguage('main', $moduleDirName);
+if (class_exists('D3LanguageManager')) {
+    require_once XOOPS_TRUST_PATH . '/libs/altsys/class/D3LanguageManager.class.php';
+    $langman = D3LanguageManager::getInstance();
+    $langman->read('main.php', $moduleDirName);
+}
+

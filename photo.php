@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 use Xmf\Request;
 use XoopsModules\Myalbum\{
@@ -11,11 +11,15 @@ use XoopsModules\Myalbum\{
     Preview,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var CategoryHandler $catHandler */
 /** @var PhotosHandler $photosHandler */
-
 $catpath = '';
+
+$moduleDirName                           = basename(__DIR__);
+$GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_photo.tpl";
+
 require_once __DIR__ . '/header.php';
 
 // GET variables
@@ -36,7 +40,7 @@ if (Request::hasVar('op', 'GET')) {
 function deleteImage($lid)
 {
     global $global_perms;
-    $helper = Helper::getInstance();
+    $helper        = Helper::getInstance();
     $photosHandler = $helper->getHandler('Photos');
     $photo_obj     = $photosHandler->get($lid);
 
@@ -68,7 +72,7 @@ switch ($op) {
     default:
         Utility::updateRating($lid);
         $photosHandler = $helper->getHandler('Photos');
-        $catHandler = $helper->getHandler('Category');
+        $catHandler    = $helper->getHandler('Category');
 
         if (!is_object($photo_obj = $photosHandler->get($lid))) {
             redirect_header('index.php', 2, _ALBM_NOMATCH);
@@ -82,8 +86,7 @@ switch ($op) {
 
         $cat = $catHandler->get($photo_obj->getVar('cid'));
 
-        $GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_photo.tpl";
-        require $GLOBALS['xoops']->path('header.php');
+        require_once $GLOBALS['xoops']->path('header.php');
 
         if ($global_perms & GPERM_INSERTABLE) {
             $GLOBALS['xoopsTpl']->assign('lang_add_photo', _ALBM_ADDPHOTO);
@@ -118,9 +121,8 @@ switch ($op) {
                     $photo['width_height'] = "width='$max_w'";
                 }
             } elseif ($res_y > $max_h) {
-                    $photo['width_height'] = "height='$max_h'";
-                }
-
+                $photo['width_height'] = "height='$max_h'";
+            }
         }
 
         $GLOBALS['xoopsTpl']->assign_by_ref('photo', $photo);
@@ -147,11 +149,10 @@ switch ($op) {
         if (Request::hasVar('orderby', 'GET') && isset($myalbum_orders[$_GET['orderby']])) {
             $orderby = $_GET['orderby'];
         } elseif (isset($myalbum_orders[$myalbum_defaultorder])) {
-                $orderby = $myalbum_defaultorder;
-            } else {
-                $orderby = 'lidA';
-            }
-
+            $orderby = $myalbum_defaultorder;
+        } else {
+            $orderby = 'lidA';
+        }
 
         $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
         $criteria->add(new \Criteria('cid', $photo_obj->getVar('cid')));
@@ -209,5 +210,5 @@ switch ($op) {
 
         require_once XOOPS_ROOT_PATH . '/include/comment_view.php';
 
-        require $GLOBALS['xoops']->path('footer.php');
+        require_once $GLOBALS['xoops']->path('footer.php');
 }

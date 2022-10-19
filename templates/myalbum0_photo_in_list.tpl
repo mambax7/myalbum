@@ -39,7 +39,7 @@
 
             <{* PHOTO'S SUBJECT *}>
             <a name='<{$photo.lid}>'></a><a
-                    href='<{$mod_url}>/photo.php?lid=<{$photo.lid}>&amp;cid=<{$photo.cid}>'><strong><{$photo.title}></b></a>
+                    href='<{$mod_url}>/photo.php?lid=<{$photo.lid}>&amp;cid=<{$photo.cid}>'><strong><{$photo.title}></strong></a>
 
             <{* NEW ICON *}>
             <{if $photo.is_newphoto}>

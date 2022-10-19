@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum\Common;
 
@@ -16,19 +16,13 @@ namespace XoopsModules\Myalbum\Common;
  */
 
 /**
- *
- * @license      https://www.fsf.org/copyleft/gpl.html GNU public license
+ * @license      GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @copyright    https://xoops.org 2000-2020 &copy; XOOPS Project
  * @author       ZySpec <zyspec@yahoo.com>
  * @author       Mamba <mambax7@gmail.com>
  */
 
-use MyTextSanitizer;
-use XoopsFormDhtmlTextArea;
-use XoopsFormTextArea;
-use XoopsModules\Myalbum\{
-    Helper
-};
+use XoopsModules\Myalbum\Helper;
 
 /**
  * Class SysUtility
@@ -60,11 +54,11 @@ class SysUtility
      *
      * @return string Trimmed string.
      */
-    public static function truncateHtml($text, $length = 100, $ending = '...', $exact = false, $considerHtml = true)
+    public static function truncateHtml(string $text, int $length = 100, string $ending = '...', bool $exact = false, bool $considerHtml = true): string
     {
         if ($considerHtml) {
             // if the plain text is shorter than the maximum length, return the whole text
-            if (mb_strlen(\preg_replace('/<.*?' . '>/', '', $text)) <= $length) {
+            if (\mb_strlen(\preg_replace('/<.*?' . '>/', '', $text)) <= $length) {
                 return $text;
             }
             // splits all html-tags to scanable lines
@@ -79,7 +73,7 @@ class SysUtility
                     if (\preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])) {
                         // do nothing
                         // if tag is a closing tag
-                    } elseif (\preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+                    } elseif (\preg_match('/^<\s*\/(\S+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
                         // delete tag from $open_tags list
                         $pos = \array_search($tag_matchings[1], $open_tags, true);
                         if (false !== $pos) {
@@ -88,7 +82,7 @@ class SysUtility
                         // if tag is an opening tag
                     } elseif (\preg_match('/^<\s*([^\s>!]+).*?' . '>$/s', $line_matchings[1], $tag_matchings)) {
                         // add tag to the beginning of $open_tags list
-                        \array_unshift($open_tags, mb_strtolower($tag_matchings[1]));
+                        \array_unshift($open_tags, \mb_strtolower($tag_matchings[1]));
                     }
                     // add html-tag to $truncate'd text
                     $truncate .= $line_matchings[1];
@@ -125,7 +119,7 @@ class SysUtility
                 }
             }
         } else {
-            if (mb_strlen($text) <= $length) {
+            if (\mb_strlen($text) <= $length) {
                 return $text;
             }
             $truncate = mb_substr($text, 0, $length - mb_strlen($ending));
@@ -152,11 +146,11 @@ class SysUtility
     }
 
     /**
-     * @param \Xmf\Module\Helper $helper
-     * @param array|null         $options
+     * @param \Xmf\Module\Helper|null $helper
+     * @param array|null              $options
      * @return \XoopsFormDhtmlTextArea|\XoopsFormEditor
      */
-    public static function getEditor($helper = null, $options = null)
+    public static function getEditor(\Xmf\Module\Helper $helper = null, array $options = null)
     {
         /** @var Helper $helper */
         if (null === $options) {
@@ -191,16 +185,75 @@ class SysUtility
     }
 
     /**
-     * @param $fieldname
-     * @param $table
-     *
+     * @param string $fieldname
+     * @param string $table
      * @return bool
      */
-    public function fieldExists($fieldname, $table)
+    public static function fieldExists(string $fieldname, string $table): bool
     {
         global $xoopsDB;
-        $result = $xoopsDB->queryF("SHOW COLUMNS FROM   $table LIKE '$fieldname'");
+        $sql    = "SHOW COLUMNS FROM   $table LIKE '$fieldname'";
+        $result = $xoopsDB->queryF($sql);
 
         return ($xoopsDB->getRowsNum($result) > 0);
+    }
+
+    /**
+     * @param array|string $tableName
+     * @param string       $id_field
+     * @param int          $id
+     *
+     * @return mixed
+     */
+    public static function cloneRecord($tableName, string $id_field, int $id)
+    {
+        $new_id = false;
+        $table  = $GLOBALS['xoopsDB']->prefix($tableName);
+        // copy content of the record you wish to clone
+        $sql    = "SELECT * FROM $table WHERE $id_field='" . $id . "' ";
+        $result = $GLOBALS['xoopsDB']->query($sql);
+        if ($GLOBALS['xoopsDB']->isResultSet($result)) {
+            $tempTable = $GLOBALS['xoopsDB']->fetchArray($result, \MYSQLI_ASSOC);
+            if (!$tempTable) {
+                \trigger_error($GLOBALS['xoopsDB']->error());
+            }
+        }
+
+        // set the auto-incremented id's value to blank.
+        unset($tempTable[$id_field]);
+        // insert cloned copy of the original  record
+        $sql    = "INSERT INTO $table (" . \implode(', ', \array_keys($tempTable)) . ") VALUES ('" . \implode("', '", $tempTable) . "')";
+        $result = $GLOBALS['xoopsDB']->queryF($sql);
+        if (!$result) {
+            \trigger_error($GLOBALS['xoopsDB']->error());
+        }
+        // Return the new id
+        $new_id = $GLOBALS['xoopsDB']->getInsertId();
+
+        return $new_id;
+    }
+
+    /**
+     * Check if dB table exists
+     *
+     * @param string $tablename dB tablename with prefix
+     * @return bool true if table exists
+     */
+    public static function tableExists(string $tablename): bool
+    {
+        $ret   = false;
+        $trace = \debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        \trigger_error(__FUNCTION__ . " is deprecated, called from {$trace[0]['file']} line {$trace[0]['line']}");
+        $GLOBALS['xoopsLogger']->addDeprecated(
+            \basename(\dirname(__DIR__, 2)) . ' Module: ' . __FUNCTION__ . ' function is deprecated, please use Xmf\Database\Tables method(s) instead.' . " Called from {$trace[0]['file']}line {$trace[0]['line']}"
+        );
+        $sql    = "SHOW TABLES LIKE '$tablename'";
+        $result = $GLOBALS['xoopsDB']->queryF($sql);
+
+        if ($GLOBALS['xoopsDB']->isResultSet($result)) {
+            $ret = $GLOBALS['xoopsDB']->getRowsNum($result) > 0;
+        }
+
+        return $ret;
     }
 }

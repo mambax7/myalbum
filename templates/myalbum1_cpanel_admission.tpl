@@ -1,11 +1,13 @@
 <h3 style='text-align:left;'><{$admin_title}></h3>
-<{if $smarty.get.mes}><p><span style='color:blue;'>(<{$smarty.get.mes}>)</span></p><{/if}>
+<{if $smarty.get.mes|default:false}><p><span style='color:blue;'>(<{$smarty.get.mes}>)</span></p><{/if}>
 <table width='95%' border='0' cellpadding='4' cellspacing='0'>
     <tr>
         <td>
             <form action='' method='GET' style='margin-bottom:0;text-align:right;'>
                 <input type='hidden' name='num' value='<{$num}>'>
-                <input type='text' name='txt' value='<{$txt}>'>
+                <label>
+                    <input type='text' name='txt' value='<{$txt}>'>
+                </label>
                 <input type='submit' value='<{$smarty.const._ALBM_AM_BUTTON_EXTRACT}>'> &nbsp;
                 <{$nav_html}> &nbsp;
             </form>
@@ -14,8 +16,10 @@
                 <table width='95%' class='outer' cellpadding='4' cellspacing='1'>
                     <tr valign='middle'>
                         <th><{$smarty.const._AM_TH_THUMBNAIL}></th>
-                        <th width='5'><input type='checkbox' name='dummy'
-                                             onclick="with(document.MainForm){for(var i=0;i<length;i++){if(elements[i].type=='checkbox'){elements[i].checked=this.checked;}}}">
+                        <th width='5'><label>
+                                <input type='checkbox' name='dummy'
+                                                     onclick="with(document.MainForm){for(var i=0;i<length;i++){if(elements[i].type=='checkbox'){elements[i].checked=this.checked;}}}">
+                            </label>
                         </th>
                         <th></th>
                         <th><{$smarty.const._AM_TH_SUBMITTER}></th>
@@ -23,10 +27,12 @@
                         <th><{$smarty.const._AM_TH_DESCRIPTION}></th>
                         <th><{$smarty.const._AM_TH_CATEGORIES}></th>
                     </tr>
-                    <{foreach item=photo from=$photos key=lid}>
+                    <{foreach item=photo from=$photos|default:null key=lid}>
                         <tr class="<{cycle value='even,odd'}>">
                             <td><img src='<{$thumbs_url}>/<{$photo.photo.lid}>.<{$photo.photo.ext}>'></td>
-                            <td><input type='checkbox' name='ids[]' value='<{$photo.photo.lid}>'></td>
+                            <td><label>
+                                    <input type='checkbox' name='ids[]' value='<{$photo.photo.lid}>'>
+                                </label></td>
                             <td><a href='<{$xoops_url}>/modules/<{$mydirname}>/editphoto.php?lid=$photo.photo.lid'
                                    target='_blank'><img
                                             src='<{xoModuleIcons16 edit.png}>' border='0'

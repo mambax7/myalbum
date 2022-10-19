@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Module\Admin;
 
-$moduleDirName      = basename(dirname(__DIR__));
-$moduleDirNameUpper = mb_strtoupper($moduleDirName);
+$moduleDirName      = \basename(\dirname(__DIR__));
+$moduleDirNameUpper = \mb_strtoupper($moduleDirName);
 
 return (object)[
     'name'           => $moduleDirNameUpper . ' Module Configurator',
@@ -62,14 +62,15 @@ return (object)[
         '/tcpdf',
     ],
 
-    'renameTables' => [//         'XX_archive'     => 'ZZZZ_archive',
+    'renameTables'  => [//         'XX_archive'     => 'ZZZZ_archive',
     ],
-    'moduleStats'  => [
+    'renameColumns' => [//        'extcal_event' => ['from' => 'event_etablissement', 'to' => 'event_location'],
+    ],
+    'moduleStats'   => [
         //            'totalcategories' => $helper->getHandler('Category')->getCategoriesCount(-1),
         //            'totalitems'      => $helper->getHandler('Item')->getItemsCount(),
         //            'totalsubmitted'  => $helper->getHandler('Item')->getItemsCount(-1, [Constants::PUBLISHER_STATUS_SUBMITTED]),
     ],
-    'modCopyright' => "<a href='https://xoops.org' title='XOOPS Project' target='_blank'>
+    'modCopyright'  => "<a href='https://xoops.org' title='XOOPS Project' target='_blank'>
                      <img src='" . Admin::iconUrl('xoopsmicrobutton.gif') . "' alt='XOOPS Project'></a>",
 ];
-

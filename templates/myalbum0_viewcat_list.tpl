@@ -14,7 +14,7 @@
                                         href='index.php'><{$lang_album_main}></a>&nbsp;:&nbsp;<{$album_sub_title}></span>&nbsp;<{$lang_total}><{$photo_total_sum}>
                         </td>
                         <td align='right'>
-                            <{if $lang_add_photo}>
+                            <{if $lang_add_photo|default:''}>
                                 <a href="submit.php?cid=<{$category_id}>"><{$lang_add_photo}>
                                     <img src="<{xoModuleIcons16 add.png}>" border="0" alt="<{$lang_add_photo}>"
                                          title="<{$lang_add_photo}>">

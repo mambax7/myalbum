@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 // for older files
 use Xmf\Request;
@@ -8,7 +8,8 @@ use XoopsModules\Myalbum\{
     Helper,
     PhotosHandler,
     TextHandler,
-    VotedataHandler
+    VotedataHandler,
+    Utility
 };
 
 /** @var Helper $helper */
@@ -17,8 +18,7 @@ use XoopsModules\Myalbum\{
 /** @var TextHandler $textHandler */
 /** @var CommentsHandler $commentsHandler */
 /** @var VotedataHandler $votedataHandler */
-
-function myalbum_header()
+function myalbum_header(): void
 {
     global $mod_url, $moduleDirName;
 
@@ -28,7 +28,7 @@ function myalbum_header()
 }
 
 // for older files
-function myalbum_footer()
+function myalbum_footer(): void
 {
     global $mod_copyright, $moduleDirName;
 
@@ -48,6 +48,7 @@ function myalbum_get_name_from_uid($uid)
     global $myalbum_nameoruname;
 
     if ($uid > 0) {
+        /** @var \XoopsMemberHandler $memberHandler */
         $memberHandler = xoops_getHandler('member');
         $poster        = $memberHandler->getUser($uid);
 
@@ -77,7 +78,7 @@ function myalbum_get_name_from_uid($uid)
  *
  * @return array
  */
-function myalbum_get_array_for_photo_assign($photo, $summary = false)
+function myalbum_get_array_for_photo_assign($photo, bool $summary = false)
 {
     global $my_uid, $isadmin, $global_perms;
     global $photos_url, $thumbs_url, $thumbs_dir, $mod_url, $mod_path;
@@ -96,7 +97,7 @@ function myalbum_get_array_for_photo_assign($photo, $summary = false)
     $cat  = $catHandler->get($photo->getVar('cid'));
     $ext  = $photo->vars['ext']['value'];
 
-    if (in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+    if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
         $imgsrc_thumb    = $photo->getThumbsURL();
         $imgsrc_photo    = $photo->getPhotoURL();
         $ahref_photo     = $photo->getPhotoURL();
@@ -140,7 +141,7 @@ function myalbum_get_array_for_photo_assign($photo, $summary = false)
     // Summarize description
     if (is_object($text)) {
         if ($summary) {
-            $description = extractSummary($text->getVar('description'));
+            $description = Utility::extractSummary($text->getVar('description'));
         } else {
             $description = $text->getVar('description');
         }
@@ -149,15 +150,15 @@ function myalbum_get_array_for_photo_assign($photo, $summary = false)
     }
 
     if (Request::hasVar('preview', 'POST')) {
-        $description = $GLOBALS['myts']->stripSlashesGPC($_POST['desc_text']);
-        $title       = $GLOBALS['myts']->stripSlashesGPC($_POST['title']);
+        $description = Request::getText('desc_text', '', 'POST');
+        $title       = Request::getString('title', '', 'POST');
     }
 
-    if ($GLOBALS['myalbumModuleConfig']['tag']) {
-        require_once XOOPS_ROOT_PATH . '/modules/tag/include/tagbar.php';
-        $tagbar = tagBar($lid, $cid);
-    } else {
-        $tagbar = [];
+    $helper = Helper::getInstance();
+    $tagbar = [];
+    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
+        $tagbarObj = new \XoopsModules\Tag\Tagbar();
+        $tagbar    = $tagbarObj->getTagbar($lid, $cid);
     }
 
     return [
@@ -203,7 +204,7 @@ function myalbum_get_array_for_photo_assign($photo, $summary = false)
  *
  * @return array
  */
-function myalbum_get_array_for_photo_assign_light($photo, $summary = false)
+function myalbum_get_array_for_photo_assign_light($photo, bool $summary = false)
 {
     global $my_uid, $isadmin, $global_perms;
     global $photos_url, $thumbs_url, $thumbs_dir;
@@ -221,7 +222,7 @@ function myalbum_get_array_for_photo_assign_light($photo, $summary = false)
     $text = $textHandler->get($photo->getVar('lid'));
     $cat  = $catHandler->get($photo->getVar('cid'));
 
-    if (in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+    if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
         $imgsrc_thumb    = $photo->getThumbsURL();
         $imgsrc_photo    = $photo->getPhotoURL();
         $is_normal_image = true;
@@ -238,11 +239,11 @@ function myalbum_get_array_for_photo_assign_light($photo, $summary = false)
         $width_spec      = '';
     }
 
-    if ($GLOBALS['myalbumModuleConfig']['tag']) {
-        require_once XOOPS_ROOT_PATH . '/modules/tag/include/tagbar.php';
-        $tagbar = tagBar($lid, $cid);
-    } else {
-        $tagbar = [];
+    $helper = Helper::getInstance();
+    $tagbar = [];
+    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
+        $tagbarObj = new \XoopsModules\Tag\Tagbar();
+        $tagbar    = $tagbarObj->getTagbar($lid, $cid);
     }
 
     return [
@@ -284,7 +285,7 @@ function myalbum_get_sub_categories($parent_id, $cattree)
     $criterib->setSort('cid');
     $criterib->setOrder('DESC');
 
-    $helper = Helper::getInstance();
+    $helper     = Helper::getInstance();
     $catHandler = $helper->getHandler('Category');
 
     $cats = $catHandler->getObjects($criterib, true);
@@ -299,13 +300,13 @@ function myalbum_get_sub_categories($parent_id, $cattree)
                 'cid'              => $child->getVar('cid'),
                 'title'            => $child->getVar('title'),
                 'weight'           => $child->getVar('weight'),
-                'photo_small_sum'  => myalbum_get_photo_small_sum_from_cat($child->getVar('cid'), $criteria),
+                'photo_small_sum'  => Utility::getCategoryCount($child->getVar('cid'), $criteria),
                 'number_of_subcat' => count($GLOBALS['cattree']->getFirstChild($child->getVar('cid'))),
             ];
         }
 
         // Category's banner default
-        if ('http://' === $imgurl) {
+        if ('https://' === $imgurl) {
             $imgurl = '';
         }
 
@@ -322,7 +323,7 @@ function myalbum_get_sub_categories($parent_id, $cattree)
         $ret[] = [
             'cid'             => $cid,
             'imgurl'          => $GLOBALS['myts']->htmlSpecialChars($imgurl),
-            'photo_small_sum' => myalbum_get_photo_small_sum_from_cat($cid, $criteria),
+            'photo_small_sum' => Utility::getCategoryCount($cid, $criteria),
             'photo_total_sum' => $photo_total_sum,
             'title'           => $title,
             'weight'          => $weight,
@@ -343,9 +344,9 @@ function myalbum_get_img_attribs_for_preview($preview_name)
 {
     global $photos_url, $mod_url, $mod_path, $myalbum_normal_exts, $myalbum_thumbsize;
 
-    $ext = mb_substr(mb_strrchr($preview_name, '.'), 1);
+    $ext = mb_substr(\mb_strrchr($preview_name, '.'), 1);
 
-    if (in_array(mb_strtolower($ext), $myalbum_normal_exts)) {
+    if (\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
         return ["$photos_url/$preview_name", "width='$myalbum_thumbsize'", "$photos_url/$preview_name"];
     }
     if (file_exists("$mod_path/assets/images/icons/$ext.gif")) {

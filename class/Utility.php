@@ -1,16 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
-use XoopsModules\Myalbum\{
-    Common
-};
-
+use Criteria;
+use CriteriaCompo;
+use CriteriaElement;
+use Xmf\Request;
 
 // constants
 \define('PIPEID_GD', 0);
@@ -25,13 +25,12 @@ use XoopsModules\Myalbum\{
 class Utility extends Common\SysUtility
 {
     //--------------- Custom module methods -----------------------------
-
     /**
      * @param $cols
      *
      * @return string
      */
-    public static function mysqliGetSqlSet($cols)
+    public static function mysqliGetSqlSet($cols): string
     {
         $ret = '';
 
@@ -39,7 +38,7 @@ class Utility extends Common\SysUtility
             [$field, $lang, $essential] = \explode(':', $types);
 
             // Undefined col is regarded as ''
-            $data = empty($_POST[$col]) ? '' : $GLOBALS['myts']->stripSlashesGPC($_POST[$col]);
+            $data = empty($_POST[$col]) ? '' : ($_POST[$col]);
 
             // Check if essential
             if ($essential && !$data) {
@@ -98,7 +97,7 @@ class Utility extends Common\SysUtility
      *
      * @return array
      */
-    public static function getThumbWidth($width, $height)
+    public static function getThumbWidth($width, $height): array
     {
         $moduleDirName = \basename(\dirname(__DIR__));
         switch ($GLOBALS[$moduleDirName . '_thumbrule']) {
@@ -150,10 +149,10 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function createThumb($src_path, $node, $ext)
+    public static function createThumb($src_path, $node, $ext): int
     {
         $moduleDirName = \basename(\dirname(__DIR__));
-        if (!\in_array(mb_strtolower($ext), $GLOBALS[$moduleDirName . '_normal_exts'])) {
+        if (!\in_array(\mb_strtolower($ext), $GLOBALS[$moduleDirName . '_normal_exts'], true)) {
             return static::createThumbsFromIcons($src_path, $node, $ext);
         }
 
@@ -177,7 +176,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function createThumbsFromIcons($src_path, $node, $ext)
+    public static function createThumbsFromIcons($src_path, $node, $ext): int
     {
         global $mod_path, $thumbs_dir;
 
@@ -201,7 +200,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function createThumbsWithGd($src_path, $node, $ext)
+    public static function createThumbsWithGd($src_path, $node, $ext): int
     {
         global $thumbs_dir;
 
@@ -211,7 +210,7 @@ class Utility extends Common\SysUtility
         if (!$GLOBALS[$moduleDirName . '_forcegd2'] && \function_exists('gd_info')) {
             $gd_info = gd_info();
             // if (substr($gd_info['GD Version'], 0, 10) === 'bundled (2') {
-            if (0 === mb_strpos($gd_info['GD Version'], 'bundled (2')) {
+            if (0 === \mb_strpos($gd_info['GD Version'], 'bundled (2')) {
                 $bundled_2 = true;
             }
         }
@@ -290,12 +289,12 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function createThumbsWithImagick($src_path, $node, $ext)
+    public static function createThumbsWithImagick($src_path, $node, $ext): int
     {
         global $thumbs_dir;
         $moduleDirName = \basename(\dirname(__DIR__));
         // Check the path to binaries of imaging packages
-        if ('' != \trim($GLOBALS[$moduleDirName . '_imagickpath']) && '/' !== mb_substr($GLOBALS[$moduleDirName . '_imagickpath'], -1)) {
+        if ('' != \trim($GLOBALS[$moduleDirName . '_imagickpath']) && '/' !== \mb_substr($GLOBALS[$moduleDirName . '_imagickpath'], -1)) {
             $GLOBALS[$moduleDirName . '_imagickpath'] .= '/';
         }
 
@@ -335,7 +334,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function createThumbsWithNetpbm($src_path, $node, $ext)
+    public static function createThumbsWithNetpbm($src_path, $node, $ext): int
     {
         global $thumbs_dir;
         $moduleDirName = \basename(\dirname(__DIR__));
@@ -400,12 +399,12 @@ class Utility extends Common\SysUtility
      * @param $src_path
      * @param $dst_path
      */
-    public static function editPhoto($src_path, $dst_path)
+    public static function editPhoto($src_path, $dst_path): void
     {
         $moduleDirName = \basename(\dirname(__DIR__));
-        $ext           = mb_substr(mb_strrchr($dst_path, '.'), 1);
+        $ext           = mb_substr(\mb_strrchr($dst_path, '.'), 1);
 
-        if (!\in_array(mb_strtolower($ext), $GLOBALS[$moduleDirName . '_normal_exts'])) {
+        if (!\in_array(\mb_strtolower($ext), $GLOBALS[$moduleDirName . '_normal_exts'], true)) {
             \rename($src_path, $dst_path);
         }
 
@@ -414,11 +413,10 @@ class Utility extends Common\SysUtility
         } elseif (PIPEID_NETPBM == $GLOBALS[$moduleDirName . '_imagingpipe']) {
             static::editPhotoWithNetpbm($src_path, $dst_path);
         } elseif ($GLOBALS[$moduleDirName . '_forcegd2']) {
-                static::editPhotoWithGd($src_path, $dst_path);
-            } else {
-                \rename($src_path, $dst_path);
-            }
-
+            static::editPhotoWithGd($src_path, $dst_path);
+        } else {
+            \rename($src_path, $dst_path);
+        }
     }
 
     // Modifying Original Photo by GD
@@ -429,12 +427,13 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function editPhotoWithGd($src_path, $dst_path)
+    public static function editPhotoWithGd($src_path, $dst_path): int
     {
         if (!\is_readable($src_path)) {
             return 0;
         }
 
+        $moduleDirName = \basename(\dirname(__DIR__));
         [$width, $height, $type] = \getimagesize($src_path);
 
         switch ($type) {
@@ -471,7 +470,7 @@ class Utility extends Common\SysUtility
             \imagecopyresampled($dst_img, $src_img, 0, 0, 0, 0, $new_w, $new_h, $width, $height);
         }
 
-        if (\Xmf\Request::hasVar('rotate', 'POST') && \function_exists('imagerotate')) {
+        if (Request::hasVar('rotate', 'POST') && \function_exists('imagerotate')) {
             switch ($_POST['rotate']) {
                 case 'rot270':
                     if (!isset($dst_img) || !\is_resource($dst_img)) {
@@ -534,7 +533,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function editPhotoWithImagick($src_path, $dst_path)
+    public static function editPhotoWithImagick($src_path, $dst_path): int
     {
         $moduleDirName = \basename(\dirname(__DIR__));
         // Check the path to binaries of imaging packages
@@ -547,12 +546,13 @@ class Utility extends Common\SysUtility
         }
 
         // Make options for imagick
-        $option      = '';
+        $option = '';
+        /** @var array $image_stats */
         $image_stats = \getimagesize($src_path);
         if ($image_stats[0] > $GLOBALS[$moduleDirName . '_width'] || $image_stats[1] > $GLOBALS[$moduleDirName . '_height']) {
             $option .= " -geometry {$GLOBALS[$moduleDirName . '_width']}x{$GLOBALS[$moduleDirName . '_height']}";
         }
-        if (\Xmf\Request::hasVar('rotate', 'POST')) {
+        if (Request::hasVar('rotate', 'POST')) {
             switch ($_POST['rotate']) {
                 case 'rot270':
                     $option .= ' -rotate 270';
@@ -593,7 +593,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function editPhotoWithNetpbm($src_path, $dst_path)
+    public static function editPhotoWithNetpbm($src_path, $dst_path): int
     {
         $moduleDirName = \basename(\dirname(__DIR__));
         // Check the path to binaries of imaging packages
@@ -607,7 +607,7 @@ class Utility extends Common\SysUtility
 
         [$width, $height, $type] = \getimagesize($src_path);
 
-        $pipe1         = '';
+        $pipe1 = '';
         switch ($type) {
             case 1:
                 // GIF
@@ -643,7 +643,7 @@ class Utility extends Common\SysUtility
             $pipe1 .= "{$GLOBALS[$moduleDirName . '_netpbmpath']}pnmscale -xysize $new_w $new_h |";
         }
 
-        if (\Xmf\Request::hasVar('rotate', 'POST')) {
+        if (Request::hasVar('rotate', 'POST')) {
             switch ($_POST['rotate']) {
                 case 'rot270':
                     $pipe1 .= "{$GLOBALS[$moduleDirName . '_netpbmpath']}pnmflip -r90 |";
@@ -685,7 +685,7 @@ class Utility extends Common\SysUtility
      *
      * @return int
      */
-    public static function clearTempFiles($dir_path, $prefix = 'tmp_')
+    public static function clearTempFiles($dir_path, string $prefix = 'tmp_'): int
     {
         // return if directory can't be opened
         if (!($dir = @\opendir($dir_path))) {
@@ -695,7 +695,7 @@ class Utility extends Common\SysUtility
         $ret        = 0;
         $prefix_len = mb_strlen($prefix);
         while (false !== ($file = \readdir($dir))) {
-            if (0 === mb_strpos($file, $prefix)) {
+            if (0 === \mb_strpos($file, $prefix)) {
                 if (@\unlink("$dir_path/$file")) {
                     ++$ret;
                 }
@@ -711,19 +711,19 @@ class Utility extends Common\SysUtility
     /**
      * @param $lid
      */
-    public static function updateRating($lid)
+    public static function updateRating($lid): void
     {
         $moduleDirName = \basename(\dirname(__DIR__));
-        /** @var  VotedataHandler $votedataHandler */
-        //        $votedataHandler = xoops_getModuleHandler('votedata', $moduleDirName);
-//        require_once __DIR__ . '/votedata.php';
-//        $votedataHandler = VotedataHandler::getInstance();
-        $votedataHandler = Helper::getInstance()->getHandler('Votedata');
+        /** @var VotedataHandler $votedataHandler */ //        $votedataHandler = xoops_getModuleHandler('votedata', $moduleDirName);
+        //        require_once __DIR__ . '/votedata.php';
+        //        $votedataHandler = VotedataHandler::getInstance();
+        $votedataHandler = Helper::getInstance()
+                                 ->getHandler('Votedata');
 
-        $criteria        = new \CriteriaCompo(new \Criteria('`lid`', $lid));
-        $votes           = $votedataHandler->getObjects($criteria, true);
-        $votesDB         = $votedataHandler->getCount($criteria);
-        $totalrating     = 0;
+        $criteria    = new CriteriaCompo(new Criteria('`lid`', $lid));
+        $votes       = $votedataHandler->getObjects($criteria, true);
+        $votesDB     = $votedataHandler->getCount($criteria);
+        $totalrating = 0;
         /** @var Votedata $vote */
         foreach ($votes as $vid => $vote) {
             $totalrating += $vote->getVar('rating');
@@ -732,57 +732,57 @@ class Utility extends Common\SysUtility
         if ($votesDB > 0) {
             $finalrating = \number_format($totalrating / $votesDB, 4);
         }
-        /** @var  PhotosHandler $photosHandler */
-        //        $photosHandler = xoops_getModuleHandler('photos', $moduleDirName);
-//        require_once __DIR__ . '/photos.php';
-//        $photosHandler = PhotosHandler::getInstance();
-        $photosHandler = Helper::getInstance()->getHandler('Photos');
+        /** @var PhotosHandler $photosHandler */ //        $photosHandler = xoops_getModuleHandler('photos', $moduleDirName);
+        //        require_once __DIR__ . '/photos.php';
+        //        $photosHandler = PhotosHandler::getInstance();
+        $photosHandler = Helper::getInstance()
+                               ->getHandler('Photos');
         $photo         = $photosHandler->get($lid);
         $photo->setVar('rating', $finalrating);
-        $photosHandler->insert($photo, true) or exit('Error: DB update rating.');
+        $photosHandler->insert($photo, true) || exit('Error: DB update rating.');
     }
 
     // Returns the number of photos included in a Category
 
     /**
-     * @param                      $cid
+     * @param                       $cid
      * @param \CriteriaElement|null $criteria
-     * @return mixed
+     * @return int
      */
-    public static function getCategoryCount($cid, \CriteriaElement $criteria = null)
+    public static function getCategoryCount($cid, CriteriaElement $criteria = null): int
     {
         if (\is_object($criteria)) {
-            $criteria = new \CriteriaCompo($criteria);
+            $criteria = new CriteriaCompo($criteria);
         }
-        $criteria->add(new \Criteria('cid', $cid));
-        /** @var PhotosHandler $photoHandler */
-        //        $photoHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/photos.php';
-//        $photoHandler = PhotosHandler::getInstance();
-        $photosHandler = Helper::getInstance()->getHandler('Photos');
+        $criteria->add(new Criteria('cid', $cid));
+        /** @var PhotosHandler $photoHandler */ //        $photoHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/photos.php';
+        //        $photoHandler = PhotosHandler::getInstance();
+        $photosHandler = Helper::getInstance()
+                               ->getHandler('Photos');
 
-        return $photoHandler->getCount($criteria);
+        return $photosHandler->getCount($criteria);
     }
 
     // Returns the number of whole photos included in a Category
 
     /**
-     * @param                                       $cids
+     * @param array                           $cids
      * @param \CriteriaElement|\CriteriaCompo $criteria
      *
-     * @return mixed
+     * @return int
      */
-    public static function getTotalCount($cids, \CriteriaElement $criteria = null)
+    public static function getTotalCount(array $cids, CriteriaElement $criteria = null): int
     {
         if (\is_object($criteria)) {
-            $criteria = new \CriteriaCompo($criteria);
+            $criteria = new CriteriaCompo($criteria);
         }
-        $criteria->add(new \Criteria('cid', '(' . \implode(',', $cids) . ',0)', 'IN'));
-        /** @var  PhotosHandler $photoHandler */
-        //        $photoHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/photos.php';
-//        $photosHandler = PhotosHandler::getInstance();
-        $photosHandler = Helper::getInstance()->getHandler('Photos');
+        $criteria->add(new Criteria('cid', '(' . \implode(',', $cids) . ',0)', 'IN'));
+        /** @var PhotosHandler $photoHandler */ //        $photoHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/photos.php';
+        //        $photosHandler = PhotosHandler::getInstance();
+        $photosHandler = Helper::getInstance()
+                               ->getHandler('Photos');
 
         return $photosHandler->getCount($criteria);
     }
@@ -790,33 +790,33 @@ class Utility extends Common\SysUtility
     // Update a photo
 
     /**
-     * @param        $lid
-     * @param        $cid
-     * @param        $title
-     * @param        $desc
-     * @param null   $valid
-     * @param string $ext
-     * @param string $x
-     * @param string $y
+     * @param int       $lid
+     * @param int       $cid
+     * @param string    $title
+     * @param string    $desc
+     * @param bool|null $valid
+     * @param string    $ext
+     * @param string    $x
+     * @param string    $y
      */
-    public static function updatePhoto($lid, $cid, $title, $desc, $valid = null, $ext = '', $x = '', $y = '')
+    public static function updatePhoto($lid, $cid, $title, $desc, $valid = null, string $ext = '', string $x = '', string $y = ''): void
     {
-        /** @var CategoryHandler $catHandler */
-        //        $catHandler = xoops_getModuleHandler('cat', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/Category.php';
-//        $catHandler = CategoryHandler::getInstance();
-        $catHandler = Helper::getInstance()->getHandler('Category');
-        /** @var  PhotosHandler $photosHandler */
-        //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/photos.php';
-//        $photosHandler = PhotosHandler::getInstance();
-        $photosHandler = Helper::getInstance()->getHandler('Photos');
+        /** @var CategoryHandler $catHandler */ //        $catHandler = xoops_getModuleHandler('cat', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/Category.php';
+        //        $catHandler = CategoryHandler::getInstance();
+        $catHandler = Helper::getInstance()
+                            ->getHandler('Category');
+        /** @var PhotosHandler $photosHandler */ //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/photos.php';
+        //        $photosHandler = PhotosHandler::getInstance();
+        $photosHandler = Helper::getInstance()
+                               ->getHandler('Photos');
 
-        /** @var TextHandler $textHandler */
-        //        $textHandler   = xoops_getModuleHandler('text', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/text.php';
-//        $textHandler = TextHandler::getInstance();
-        $textHandler = Helper::getInstance()->getHandler('Text');
+        /** @var TextHandler $textHandler */ //        $textHandler   = xoops_getModuleHandler('text', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/text.php';
+        //        $textHandler = TextHandler::getInstance();
+        $textHandler = Helper::getInstance()
+                             ->getHandler('Text');
 
         /** @varPhotos $photo */
         $photo = $photosHandler->get($lid);
@@ -870,7 +870,7 @@ class Utility extends Common\SysUtility
             $photo->setVar('res_y', $y);
         }
 
-        $cid = \Xmf\Request::getInt('cid', 0, 'POST');
+        $cid = Request::getInt('cid', 0, 'POST');
 
         if ($photosHandler->insert($photo, true)) {
             $text->setVar('description', $desc);
@@ -886,13 +886,13 @@ class Utility extends Common\SysUtility
     /**
      * @param null $criteria
      */
-    public static function deletePhotos($criteria = null)
+    public static function deletePhotos($criteria = null): void
     {
-        /** @var  PhotosHandler $photosHandler */
-        //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
-//        require_once __DIR__ . '/photos.php';
-//        $photosHandler = PhotosHandler::getInstance();
-        $photosHandler = Helper::getInstance()->getHandler('Photos');
+        /** @var PhotosHandler $photosHandler */ //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
+        //        require_once __DIR__ . '/photos.php';
+        //        $photosHandler = PhotosHandler::getInstance();
+        $photosHandler = Helper::getInstance()
+                               ->getHandler('Photos');
 
         $photos = $photosHandler->getObjects($criteria);
         /** @varPhotos $photo */
@@ -902,13 +902,21 @@ class Utility extends Common\SysUtility
     }
 
     // Substitution of opentable()
-    public static function openTable()
+
+    /**
+     * @return void
+     */
+    public static function openTable(): void
     {
         echo "<div style='border:2px solid #2F5376; padding:8px; width:95%;' class='bg4'>\n";
     }
 
     // Substitution of closetable()
-    public static function closeTable()
+
+    /**
+     * @return void
+     */
+    public static function closeTable(): void
     {
         echo "</div>\n";
     }
@@ -926,13 +934,13 @@ class Utility extends Common\SysUtility
      * @return string
      */
     public static function getCategoryOptions(
-        $order = 'title',
-        $preset = 0,
-        $prefix = '--',
-        $none = null,
-        $table_name_cat = null,
-        $table_name_photos = null
-    ) {
+        string $order = 'title',
+        int    $preset = 0,
+        string $prefix = '--',
+               $none = null,
+               $table_name_cat = null,
+               $table_name_photos = null
+    ): string {
         if (empty($table_name_cat)) {
             $table_name_cat = $GLOBALS['xoopsDB']->prefix($GLOBALS['table_cat']);
         }
@@ -949,10 +957,11 @@ class Utility extends Common\SysUtility
             'num'      => 0,
         ];
 
-        $rs = $GLOBALS['xoopsDB']->query("SELECT c.title,c.cid,c.pid,COUNT(p.lid) AS num FROM $table_name_cat c LEFT JOIN $table_name_photos p ON c.cid=p.cid GROUP BY c.cid ORDER BY pid ASC,$order DESC");
+        $sql = "SELECT c.title,c.cid,c.pid,COUNT(p.lid) AS num FROM $table_name_cat c LEFT JOIN $table_name_photos p ON c.cid=p.cid GROUP BY c.cid ORDER BY pid ASC,$order DESC";
+        $rs  = $GLOBALS['xoopsDB']->query($sql);
 
         $key = 1;
-        while (list($title, $cid, $pid, $num) = $GLOBALS['xoopsDB']->fetchRow($rs)) {
+        while ([$title, $cid, $pid, $num] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
             $cats[$key] = [
                 'cid'      => (int)$cid,
                 'pid'      => (int)$pid,
@@ -987,10 +996,12 @@ class Utility extends Common\SysUtility
                     $cat['next_key']    = $target['next_key'];
                     $target['next_key'] = $key;
                     break;
-                } elseif ($target['next_key'] < 0) {
+                }
+
+                if ($target['next_key'] < 0) {
                     $cat_backup = &$cat;
                     \array_splice($cats, $key, 1);
-                    \array_push($cats, $cat_backup);
+                    $cats[] = $cat_backup;
                     --$key;
                     break;
                 }
@@ -1018,7 +1029,7 @@ class Utility extends Common\SysUtility
      *
      * @return string
      */
-    public static function extractSummary($html)
+    public static function extractSummary($html): string
     {
         $html = $GLOBALS['myts']->displayTarea($html, 1, 1, 1, 1, 1, 1, 1);
         $ret  = '';
@@ -1056,5 +1067,91 @@ class Utility extends Common\SysUtility
         }
 
         return \trim($ret);
+    }
+
+    /**
+     * @param        $datab
+     * @param string $char
+     * @return string
+     */
+    public static function xoops_sef($datab, $char = '-'): ?string
+    {
+        $datab             = urldecode(\mb_strtolower($datab));
+        $datab             = urlencode($datab);
+        $datab             = str_replace(urlencode('æ'), 'ae', $datab);
+        $datab             = str_replace(urlencode('ø'), 'oe', $datab);
+        $datab             = str_replace(urlencode('å'), 'aa', $datab);
+        $replacement_chars = [
+            ' ',
+            '|',
+            '=',
+            '\\',
+            '/',
+            '+',
+            '-',
+            '_',
+            '{',
+            '}',
+            ']',
+            '[',
+            '\'',
+            '"',
+            ';',
+            ':',
+            '?',
+            '>',
+            '<',
+            '.',
+            ',',
+            ')',
+            '(',
+            '*',
+            '&',
+            '^',
+            '%',
+            '$',
+            '#',
+            '@',
+            '!',
+            '`',
+            '~',
+            ' ',
+            '',
+            '¡',
+            '¦',
+            '§',
+            '¨',
+            '©',
+            'ª',
+            '«',
+            '¬',
+            '®',
+            '­',
+            '¯',
+            '°',
+            '±',
+            '²',
+            '³',
+            '´',
+            'µ',
+            '¶',
+            '·',
+            '¸',
+            '¹',
+            'º',
+            '»',
+            '¼',
+            '½',
+            '¾',
+            '¿',
+        ];
+        $return_data       = str_replace($replacement_chars, $char, urldecode($datab));
+        #print $return_data."<BR><BR>";
+        switch ($char) {
+            default:
+                return urldecode($return_data);
+            case '-':
+                return urlencode($return_data);
+        }
     }
 }

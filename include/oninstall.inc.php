@@ -1,17 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 use XoopsModules\Myalbum\{
     Utility
 };
 
-
-
 $moduleDirName = $_SESSION['myalbum_mydirname'];
 require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/language/english/myalbum_constants.php";
 
 eval(
-    '
-function xoops_module_install_' . $moduleDirName . '( $module )
+    'function xoops_module_install_' . $moduleDirName . '( $module )
 {
     $modid = $module->getVar(\'mid\') ;
     $grouppermHandler = xoops_getHandler(\'groupperm\');
@@ -42,17 +39,13 @@ function xoops_module_install_' . $moduleDirName . '( $module )
     foreach (array_keys($uploadFolders) as $i) {
         Utility::createFolder($uploadFolders[$i]);
     }
-
-
-}
-
-'
+}'
 );
 
 /*
 function xoops_module_install_myalbum(\XoopsModule $xoopsModule)
 {
-    require_once dirname(dirname(dirname(__DIR__))) . '/mainfile.php';
+    require_once \dirname(__DIR__, 3) . '/mainfile.php';
 
     xoops_loadLanguage('admin', $xoopsModule->getVar('dirname'));
     xoops_loadLanguage('modinfo', $xoopsModule->getVar('dirname'));

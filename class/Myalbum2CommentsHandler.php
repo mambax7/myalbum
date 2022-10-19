@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
 require_once \dirname(__DIR__) . '/include/read_configs.php';
 
- /**
+/**
  * Class Myalbum2CommentsHandler
  */
 class Myalbum2CommentsHandler extends CommentsHandler

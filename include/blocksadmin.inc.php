@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Request;
 
@@ -8,9 +8,10 @@ if (!is_object($xoopsUser) || !is_object($xoopsModule) || !$xoopsUser->isAdmin($
 require_once XOOPS_ROOT_PATH . '/class/xoopsblock.php';
 require_once XOOPS_ROOT_PATH . '/modules/system/admin/blocksadmin/blocksadmin.php';
 
-$moduleDirName = basename(dirname(__DIR__));
+$moduleDirName = \basename(\dirname(__DIR__));
 
-//$moduleHandler = xoops_getHandler('module');
+///** @var \XoopsModuleHandler $moduleHandler */
+$moduleHandler = xoops_getHandler('module');
 //$moduleDirName     = $moduleHandler->getByDirname($GLOBALS['mydirname']);
 xoops_loadLanguage('blocks', $moduleDirName);
 
@@ -48,14 +49,14 @@ if (isset($previewblock)) {
         $myblock->setVar('block_type', 'C');
     }
     $myts = \MyTextSanitizer::getInstance();
-    $myblock->setVar('title', $myts->stripSlashesGPC($btitle));
-    $myblock->setVar('content', $myts->stripSlashesGPC($bcontent));
+    $myblock->setVar('title', ($btitle));
+    $myblock->setVar('content', ($bcontent));
     $dummyhtml = '<html><head><meta http-equiv="content-type" content="text/html; charset=' . _CHARSET . '" ><meta http-equiv="content-language" content="' . _LANGCODE . '" ><title>' . $xoopsConfig['sitename'] . '</title><link rel="stylesheet" type="text/css" media="all" href="' . getcss(
             $xoopsConfig['theme_set']
         ) . '" ></head><body><table><tr><th>' . $myblock->getVar('title') . '</th></tr><tr><td>' . $myblock->getContent('S', $bctype) . '</td></tr></table></body></html>';
 
     $dummyfile = '_dummyfile_' . time() . '.tpl';
-    $fp        = fopen(XOOPS_CACHE_PATH . '/' . $dummyfile, 'w');
+    $fp        = fopen(XOOPS_CACHE_PATH . '/' . $dummyfile, 'wb');
     fwrite($fp, $dummyhtml);
     fclose($fp);
     $block['edit_form'] = false;
@@ -98,6 +99,7 @@ if ('list' === $op) {
     exit();
 }
 
+$side = [];
 if ('order' === $op) {
     foreach (array_keys($bid) as $i) {
         if ($side[$i] < 0) {
@@ -248,11 +250,10 @@ function myblocksadmin_update_block(
                 }
             }
         } elseif ($xoopsTpl->is_cached('db:system_dummy.tpl', 'block' . $bid)) {
-                if (!$xoopsTpl->clear_cache('db:system_dummy.tpl', 'block' . $bid)) {
-                    $msg = 'Unable to clear cache for block ID' . $bid;
-                }
+            if (!$xoopsTpl->clear_cache('db:system_dummy.tpl', 'block' . $bid)) {
+                $msg = 'Unable to clear cache for block ID' . $bid;
             }
-
+        }
     } else {
         $msg = 'Failed update of block. ID:' . $bid;
     }

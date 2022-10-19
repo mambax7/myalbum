@@ -11,11 +11,11 @@
             if (targetDom.createTextRange && targetDom.caretPos) {
                 var caretPos = targetDom.caretPos;
                 caretPos.text = caretPos.text.charAt(caretPos.text.length - 1)
-                == ' ' ? addCode + ' ' : addCode;
+                === ' ' ? addCode + ' ' : addCode;
             } else if (targetDom.getSelection && targetDom.caretPos) {
                 var caretPos = targetDom.caretPos;
                 caretPos.text = caretPos.text.charat(caretPos.text.length - 1)
-                == ' ' ? addCode + ' ' : addCode;
+                === ' ' ? addCode + ' ' : addCode;
             } else {
                 targetDom.value = targetDom.value + addCode;
             }
@@ -123,7 +123,9 @@
         <table cellspacing="0" id="imagenav">
             <tr>
                 <td>
-                    <select name="cid" onchange="submit();"><{$cat_options}></select>
+                    <label>
+                        <select name="cid" onchange="submit();"><{$cat_options}></select>
+                    </label>
                     <input type="hidden" name="target" value="<{$target}>">
                     <input type="submit" value="<{$lang_refresh}>">
                 </td>

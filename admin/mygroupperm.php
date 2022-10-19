@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Request;
 
 /**
- * @param \XoopsDatabase|null $db
- * @param                     $gperm_modid
- * @param null                $gperm_name
- * @param null                $gperm_itemid
+ * @param \XoopsDatabase $db
+ * @param int            $gperm_modid
+ * @param string|null    $gperm_name
+ * @param int|null       $gperm_itemid
  *
  * @return bool
  */
@@ -27,7 +27,7 @@ function myDeleteByModule(\XoopsDatabase $db, $gperm_modid, $gperm_name = null, 
     return true;
 }
 
-// require_once  dirname(dirname(dirname(__DIR__))) . '/include/cp_header.php'; GIJ
+// require_once  \dirname(__DIR__, 3) . '/include/cp_header.php'; GIJ
 $modid = Request::getInt('modid', 1, 'POST');
 // we dont want system module permissions to be changed here ( 1 -> 0 GIJ)
 if ($modid <= 0 || !is_object($xoopsUser) || !$xoopsUser->isAdmin($modid)) {
@@ -39,9 +39,11 @@ $module        = $moduleHandler->get($modid);
 if (!is_object($module) || !$module->getVar('isactive')) {
     redirect_header(XOOPS_URL . '/admin.php', 1, _MODULENOEXIST);
 }
+/** @var \XoopsMemberHandler $memberHandler */
 $memberHandler = xoops_getHandler('member');
 $group_list    = $memberHandler->getGroupList();
 if (is_array($_POST['perms']) && !empty($_POST['perms'])) {
+    /** @var \XoopsGroupPermHandler $grouppermHandler */
     $grouppermHandler = xoops_getHandler('groupperm');
     foreach ($_POST['perms'] as $perm_name => $perm_data) {
         foreach ($perm_data['itemname'] as $item_id => $item_name) {
@@ -51,12 +53,12 @@ if (is_array($_POST['perms']) && !empty($_POST['perms'])) {
                 }
                 foreach ($perm_data['groups'] as $group_id => $item_ids) {
                     $selected = $item_ids[$item_id] ?? 0;
-                    if (1 == $selected) {
+                    if (1 === $selected) {
                         // make sure that all parent ids are selected as well
-                        if ('' != $perm_data['parents'][$item_id]) {
+                        if ('' !== $perm_data['parents'][$item_id]) {
                             $parent_ids = explode(':', $perm_data['parents'][$item_id]);
                             foreach ($parent_ids as $pid) {
-                                if (0 != $pid && !array_key_exists($pid, $item_ids)) {
+                                if (0 !== (int)$pid && !array_key_exists($pid, $item_ids)) {
                                     // one of the parent items were not selected, so skip this item
                                     $msg[] = sprintf(_MD_AM_PERMADDNG, '<strong>' . $perm_name . '</strong>', '<strong>' . $perm_data['itemname'][$item_id] . '</strong>', '<strong>' . $group_list[$group_id] . '</strong>') . ' (' . _MD_AM_PERMADDNGP . ')';
                                     continue 2;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Xmf\Request;
 use XoopsModules\Myalbum\{
@@ -8,11 +8,11 @@ use XoopsModules\Myalbum\{
     TextHandler,
     Utility
 };
+
 /** @var Helper $helper */
 /** @var PhotosHandler $photosHandler */
 /** @var TextHandler $textHandler */
 /** @var CategoryHandler $catHandler */
-
 require_once __DIR__ . '/header.php';
 
 // GET variables
@@ -23,14 +23,14 @@ if ($num < 1) {
     $num = 10;
 }
 $pos  = Request::getInt('pos', 0, 'GET');
-$view = Request::getString('view', $myalbum_viewcattype, 'GET');
+$view = Request::getString('view', $helper->getConfig('myalbum_viewcattype'), 'GET');
 
 $photosHandler = $helper->getHandler('Photos');
-$textHandler = $helper->getHandler('Text');
-$catHandler = $helper->getHandler('Category');
-if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
+$textHandler   = $helper->getHandler('Text');
+$catHandler    = $helper->getHandler('Category');
+if ($helper->getConfig('htaccess')) {
     if (0 == $cid) {
-        $url = XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/rss,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $GLOBALS['myalbumModuleConfig']['endofrss'];
+        $url = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/rss,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $helper->getConfig('endofrss');
     } else {
         $cat = $catHandler->get($cid);
         $url = $cat->getRSSURL($uid, $num, $pos, $view);
@@ -62,9 +62,10 @@ if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')
     $GLOBALS['xoopsTpl']->assign('channel_webmaster', checkEmail($xoopsConfig['adminmail'], true));
     $GLOBALS['xoopsTpl']->assign('channel_editor', checkEmail($xoopsConfig['adminmail'], true));
     $GLOBALS['xoopsTpl']->assign('channel_category', $GLOBALS['myalbumModule']->getVar('name'));
-    $GLOBALS['xoopsTpl']->assign('channel_generator', mb_strtoupper($GLOBALS['myalbumModule']->getVar('dirname')));
+    $GLOBALS['xoopsTpl']->assign('channel_generator', \mb_strtoupper($GLOBALS['myalbumModule']->getVar('dirname')));
     $GLOBALS['xoopsTpl']->assign('channel_language', _LANGCODE);
     $GLOBALS['xoopsTpl']->assign('image_url', XOOPS_URL . '/images/logo.png');
+    /** @var array $dimension */
     $dimension = getimagesize(XOOPS_ROOT_PATH . '/images/logo.png');
     if (empty($dimension[0])) {
         $width = 88;
@@ -81,12 +82,10 @@ if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')
     require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/photo_orders.php";
     if (Request::hasVar('orderby', 'GET') && isset($myalbum_orders[$_GET['orderby']])) {
         $orderby = $_GET['orderby'];
+    } elseif (isset($myalbum_orders[$myalbum_defaultorder])) {
+        $orderby = $myalbum_defaultorder;
     } else {
-        if (isset($myalbum_orders[$myalbum_defaultorder])) {
-            $orderby = $myalbum_defaultorder;
-        } else {
-            $orderby = 'titleA';
-        }
+        $orderby = 'titleA';
     }
 
     if ($cid > 0) {
@@ -94,8 +93,8 @@ if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')
         foreach ($GLOBALS['cattree']->getAllChild($cid) as $index => $child) {
             $cids[$child->getVar('cid')] = $child->getVar('cid');
         }
-        $cids[]   = $cid;
-        $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
+        $cids[]          = $cid;
+        $criteria        = new \CriteriaCompo(new \Criteria('status', '0', '>'));
         $photo_total_sum = Utility::getTotalCount($cids, $criteria);
         $sub_title       = preg_replace("/\'\>/", "'><img src='$mod_url/assets/images/folder16.gif' alt=''>", $GLOBALS['cattree']->getNicePathFromId($cid, 'title', "viewcat.php?num=$num"));
         $sub_title       = preg_replace('/^(.+)folder16/', '$1folder_open', $sub_title);
@@ -106,7 +105,7 @@ if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')
             $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
         } else {
             $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
-            $criteria->add(new \Criteria('`submitter`', $uid));
+            $criteria->add(new \Criteria('submitter', $uid));
         }
     } else {
         $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));

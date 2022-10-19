@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
 require_once \dirname(__DIR__) . '/include/read_configs.php';
-
-
 
 /**
  * XOOPS policies handler class.
@@ -12,7 +10,6 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * of XOOPS user class objects.
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
- * @package kernel
  */
 class CommentsHandler extends \XoopsPersistableObjectHandler
 {

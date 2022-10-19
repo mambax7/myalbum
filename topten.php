@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 // ------------------------------------------------------------------------- //
 //                      myAlbum-P - XOOPS photo album                        //
-//                        <http://www.peak.ne.jp>                           //
+//                        <https://www.peak.ne.jp>                           //
 // ------------------------------------------------------------------------- //
 
 use Xmf\Request;
@@ -11,17 +11,17 @@ use XoopsModules\Myalbum\{
     PhotosHandler,
     Preview
 };
+
 /** @var Helper $helper */
 /** @var CategoryHandler $catHandler */
 /** @var PhotosHandler $photosHandler */
-
 require_once __DIR__ . '/header.php';
 
 $hit  = Request::getInt('hit', 0, 'GET');
 $rate = Request::getInt('rate', 0, 'GET');
 
-if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
-    $url = XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/top,' . $hit . ',' . $rate . '.html';
+if ($helper->getConfig('htaccess')) {
+    $url = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/top,' . $hit . ',' . $rate . '.html';
     if (!mb_strpos($url, $_SERVER['REQUEST_URI'])) {
         header('HTTP/1.1 301 Moved Permanently');
         header('Location: ' . $url);
@@ -29,7 +29,7 @@ if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
     }
 }
 $photosHandler = $helper->getHandler('Photos');
-$catHandler = $helper->getHandler('Category');
+$catHandler    = $helper->getHandler('Category');
 
 $GLOBALS['xoopsOption']['template_main'] = "{$moduleDirName }_topten.tpl";
 
@@ -117,7 +117,7 @@ foreach ($catHandler->getObjects($criteria, true) as $cid => $cat) {
             'submitter_name' => Preview::getNameFromUid($photo->getVar('submitter')),
             'category'       => $catpath,
             'hits'           => $photo->getVar('hits'),
-            'rating'         => number_format($photo->getVar('rating'), 2),
+            'rating'         => number_format((float)$photo->getVar('rating'), 2),
             'votes'          => $photo->getVar('votes'),
         ];
 

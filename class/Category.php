@@ -1,15 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace XoopsModules\Myalbum;
 
 require_once \dirname(__DIR__) . '/include/read_configs.php';
 
 /**
- * Class for Blue Room Xcenter
  *
  * @author    Simon Roberts <simon@xoops.org>
  * @copyright copyright (c) 2009-2003 XOOPS.org
- * @package   kernel
  */
 class Category extends \XoopsObject
 {
@@ -28,7 +26,7 @@ class Category extends \XoopsObject
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $ret          = parent::toArray();
         $ret['title'] = $GLOBALS['myts']->htmlSpecialChars($ret['title']);
@@ -44,20 +42,22 @@ class Category extends \XoopsObject
      *
      * @return string
      */
-    public function getURL($uid, $num, $pos, $view)
+    public function getURL($uid, $num, $pos, $view): string
     {
+        $helper        = Helper::getInstance();
         $moduleDirName = \basename(\dirname(__DIR__));
         /** @var \XoopsModuleHandler $moduleHandler */
         $moduleHandler = \xoops_getHandler('module');
+        /** @var \XoopsConfigHandler $configHandler */
         $configHandler = \xoops_getHandler('config');
         if (!isset($GLOBALS['myalbumModule'])) {
             $GLOBALS['myalbumModule'] = $moduleHandler->getByDirname($moduleDirName);
         }
-        if (!isset($GLOBALS['myalbumModuleConfig'])) {
-            $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
-        }
-        if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
-            return XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/' . \str_replace(
+        //        if (!isset($GLOBALS['myalbumModuleConfig'])) {
+        //            $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
+        //        }
+        if ($helper->getConfig('htaccess')) {
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
                     [
                         '_',
                         ' ',
@@ -68,10 +68,11 @@ class Category extends \XoopsObject
                     ],
                     '-',
                     $this->getVar('title')
-                ) . '/cat,' . $this->getVar('cid') . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $GLOBALS['myalbumModuleConfig']['endofurl'];
+                ) . '/cat,' . $this->getVar('cid') . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $helper->getConfig('endofurl');
         }
 
-        return Helper::getInstance()->url() . 'viewcat.php?cid=' . $this->getVar('cid') . '&uid=' . $uid . '&num=' . $num . '&pos=' . $pos . '&view=' . $view;
+        return Helper::getInstance()
+                     ->url() . 'viewcat.php?cid=' . $this->getVar('cid') . '&uid=' . $uid . '&num=' . $num . '&pos=' . $pos . '&view=' . $view;
     }
 
     /**
@@ -82,22 +83,25 @@ class Category extends \XoopsObject
      *
      * @return string
      */
-    public function getRSSURL($uid, $num, $pos, $view)
+    public function getRSSURL($uid, $num, $pos, $view): string
     {
+        $helper        = Helper::getInstance();
         $moduleDirName = \basename(\dirname(__DIR__));
         /** @var \XoopsModuleHandler $moduleHandler */
         $moduleHandler = \xoops_getHandler('module');
+        /** @var \XoopsConfigHandler $configHandler */
         $configHandler = \xoops_getHandler('config');
         if (!isset($GLOBALS['myalbumModule'])) {
             $GLOBALS['myalbumModule'] = $moduleHandler->getByDirname($moduleDirName);
         }
-        if (!isset($GLOBALS['myalbumModuleConfig'])) {
-            $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
-        }
-        if ($GLOBALS['myalbumModuleConfig']['htaccess']) {
-            return XOOPS_URL . '/' . $GLOBALS['myalbumModuleConfig']['baseurl'] . '/' . xoops_sef($this->getVar('title')) . '/rss,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $GLOBALS['myalbumModuleConfig']['endofrss'];
+        //        if (!isset($GLOBALS['myalbumModuleConfig'])) {
+        //            $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
+        //        }
+        if ($helper->getConfig('htaccess')) {
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . Utility::xoops_sef($this->getVar('title')) . '/rss,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $helper->getConfig('endofrss');
         }
 
-        return Helper::getInstance()->url() . 'rss.php?cid=' . $this->getVar('cid') . '&uid=' . $uid . '&num=' . $num . '&pos=' . $pos . '&view=' . $view;
+        return Helper::getInstance()
+                     ->url() . 'rss.php?cid=' . $this->getVar('cid') . '&uid=' . $uid . '&num=' . $num . '&pos=' . $pos . '&view=' . $view;
     }
 }

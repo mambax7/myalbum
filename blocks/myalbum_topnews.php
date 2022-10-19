@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
     define('MYALBUM_BLOCK_TOPNEWS_INCLUDED', 1);
@@ -10,7 +10,7 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
      */
     function b_myalbum_topnews_show($options)
     {
-        global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts;
+        global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts, $myalbum_thumbsize, $myalbum_makethumb, $thumbs_url;
 
         // For myAlbum-P < 2.70
         if (0 != strncmp($options[0], 'myalbum', 7)) {
@@ -26,7 +26,7 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
         $cat_limit_recursive = empty($options[4]) ? 0 : 1;
         $cols                = empty($options[6]) ? 1 : (int)$options[6];
 
-        require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
+        require XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
 
         // Category limitation
         if ($cat_limitation) {
@@ -48,11 +48,13 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
 
         $block           = [];
         $GLOBALS['myts'] = \MyTextSanitizer::getInstance();
-        $result          = $xoopsDB->query('SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat ORDER BY unixtime DESC", $photos_num, 0);
+        $sql             = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat ORDER BY unixtime DESC";
+        $result          = $xoopsDB->query($sql, $photos_num, 0);
         $count           = 1;
+        /** @var array $photo */
         while (false !== ($photo = $xoopsDB->fetchArray($result))) {
             $photo['title'] = $GLOBALS['myts']->displayTarea($photo['title']);
-            if (mb_strlen($photo['title']) >= $title_max_length) {
+            if (\mb_strlen($photo['title']) >= $title_max_length) {
                 if (!XOOPS_USE_MULTIBYTES) {
                     $photo['title'] = mb_substr($photo['title'], 0, $title_max_length - 1) . '...';
                 } elseif (function_exists('mb_strcut')) {
@@ -63,7 +65,7 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
             $photo['date']       = formatTimestamp($photo['unixtime'], 's');
             $photo['thumbs_url'] = $thumbs_url;
 
-            if (in_array(mb_strtolower($photo['ext']), $myalbum_normal_exts)) {
+            if (\in_array(\mb_strtolower($photo['ext']), $myalbum_normal_exts, true)) {
                 $width_spec = "width='$myalbum_thumbsize'";
                 if ($myalbum_makethumb) {
                     [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
