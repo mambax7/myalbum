@@ -11,7 +11,7 @@
  * @copyright       XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  * @since           2.5.9
- * @author          Michael Beck (aka Mamba)
+ * @author          Michael Beck (aka Mamba): https://github.com/mambax7
  */
 
 use Xmf\Database\TableLoad;

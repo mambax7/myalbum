@@ -47,7 +47,7 @@ if (!isset($GLOBALS['xoopsTpl']) || !($GLOBALS['xoopsTpl'] instanceof XoopsTpl))
 }
 
 $GLOBALS['mydirname'] = basename(__DIR__);
-require_once $helper->path('include/read_configs.php');
+require $helper->path('include/read_configs.php');
 require_once $helper->path('include/get_perms.php');
 
 /** @var \XoopsModuleHandler $moduleHandler */

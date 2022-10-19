@@ -2,7 +2,7 @@
 
 namespace XoopsModules\Myalbum;
 
-require_once \dirname(__DIR__) . '/include/read_configs.php';
+require \dirname(__DIR__) . '/include/read_configs.php';
 
 /**
  * Class Myalbum0CommentsHandler

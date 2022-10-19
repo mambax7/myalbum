@@ -7,7 +7,7 @@ if (!defined('XOOPS_ROOT_PATH')) {
 } else {
     // when this script is included by core's imagemanager.php
     $moduleDirName = basename(__DIR__);
-    require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
+    require XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
 }
 
 require_once XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/get_perms.php";
