@@ -278,7 +278,7 @@ final class Forms extends \XoopsObject
         if (!isset($preview_name)) {
             $preview_name = '';
         }
-        $preview_hidden = new \XoopsFormHidden('preview_name', \htmlspecialchars(self::PREVIEW_NAME, \ENT_QUOTES | \ENT_HTML5), \ENT_QUOTES);
+        $preview_hidden = new \XoopsFormHidden('preview_name', \htmlspecialchars($preview_name, \ENT_QUOTES | \ENT_HTML5), \ENT_QUOTES);
 
         $submit_button  = new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit');
         $preview_button = new \XoopsFormButton('', 'preview', \_PREVIEW, 'submit');

@@ -118,7 +118,7 @@ final class Blocksadmin
             86400   => \_DAY,
             259200  => \sprintf(\_DAYS, 3),
             604800  => \_WEEK,
-            2_592_000 => \_MONTH,
+            2592000 => \_MONTH,
         ];
         foreach ($blockArray as $i) {
             $modules = [];
@@ -660,7 +660,7 @@ final class Blocksadmin
                                           86400   => \_DAY,
                                           259200  => \sprintf(\_DAYS, 3),
                                           604800  => \_WEEK,
-                                          2_592_000 => \_MONTH,
+                                          2592000 => \_MONTH,
                                       ]);
         $form->addElement($cache_select);
 

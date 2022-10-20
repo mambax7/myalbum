@@ -14,9 +14,7 @@
  *
  * @copyright       XOOPS Project (https://xoops.org)
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
- * @since           1.0.0
  * @author          Taiwen Jiang <phppp@users.sourceforge.net>
- * @version         $Id: myalbum.php 11905 2013-08-14 05:25:33Z beckmi $
  * @param mixed $items
  */
 
@@ -33,11 +31,10 @@ use XoopsModules\Tag\Utility;
  * uname
  * tags
  *
- * @param mixed      $items
- * @var        array $items associative array of items: [modid][catid][itemid]
- *
+ * @param array $items associative array of items: [modid][catid][itemid]
+ * @return bool|null
  */
-function myalbum_tag_iteminfo(&$items): bool
+function myalbum_tag_iteminfo(&$items)
 {
     if (empty($items)) {
         return false;

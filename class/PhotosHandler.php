@@ -48,8 +48,8 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
     //    }
 
     /**
-     * @param     $ids
-     * @param int $status
+     * @param array $ids
+     * @param int   $status
      *
      * @return bool
      */
