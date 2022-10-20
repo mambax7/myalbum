@@ -8,9 +8,18 @@ if (!\class_exists('TextSanitizer')) {
     /**
      * Class MyAlbumTextSanitizer
      */
-    class TextSanitizer extends \MyTextSanitizer
+    final class TextSanitizer extends \MyTextSanitizer
     {
         public int $nbsp = 0;
+        /**
+         * @var string[]
+         */
+        private const REMOVAL_TAGS = ['[summary]', '[/summary]', '[pagebreak]'];
+
+        /**
+         * @var string[]
+         */
+        private const REPLACES = [' &nbsp;', '"'];
         /*
         * MyAlbumTextSanitizer constructor.
         *
@@ -35,11 +44,11 @@ if (!\class_exists('TextSanitizer')) {
          *
          * @return \XoopsModules\Myalbum\TextSanitizer
          */
-        public static function getInstance(): TextSanitizer
+        public static function getInstance(): self
         {
             static $instance;
             if (null === $instance) {
-                $instance = new static();
+                $instance = new self();
             }
 
             return $instance;
@@ -54,12 +63,10 @@ if (!\class_exists('TextSanitizer')) {
          * @param bool|int $xcode  allow xoopscode?
          * @param bool|int $image  allow inline images?
          * @param bool|int $br     convert linebreaks?
-         *
          * @param int      $nbsp
-         *
          * @return string
          */
-        public function &displayTarea($text, $html = 0, $smiley = 1, $xcode = 1, $image = 1, $br = 1, int $nbsp = 0): string
+        public function &displayTarea(string $text, $html = 0, $smiley = 1, $xcode = 1, $image = 1, $br = 1, int $nbsp = 0): string
         {
             $this->nbsp = $nbsp;
             $text       = parent::displayTarea($text, $html, $smiley, $xcode, $image, $br);
@@ -95,13 +102,11 @@ if (!\class_exists('TextSanitizer')) {
          * Replace some appendix codes with their equivalent HTML formatting
          *
          * @param string $text
-         *
-         * @return string
-         **/
-        public function postCodeDecode(string $text): string
+         * @return string|null
+         */
+        public function postCodeDecode(string $text): ?string
         {
-            $removal_tags = ['[summary]', '[/summary]', '[pagebreak]'];
-            $text         = \str_replace($removal_tags, '', $text);
+            $text         = \str_replace(self::REMOVAL_TAGS, '', $text);
 
             $patterns     = [];
             $replacements = [];
@@ -124,10 +129,9 @@ if (!\class_exists('TextSanitizer')) {
          * get inside of tags [summary] and [/summary]
          *
          * @param string $text
-         *
-         * @return string
-         **/
-        public function extractSummary(string $text): string
+         * @return string|null
+         */
+        public function extractSummary(string $text): ?string
         {
             $patterns[]     = '/^(.*)\[summary\](.*)\[\/summary\](.*)$/sU';
             $replacements[] = '$2';
@@ -138,23 +142,19 @@ if (!\class_exists('TextSanitizer')) {
         /**
          * Convert linebreaks to <br> tags
          *
-         * @param string $text
          *
+         * @param string $text
          * @return string
          */
-        public function nl2Br($text): string
+        public function nl2Br(string $text): string
         {
             $text = \preg_replace("/(\015\012)|(\015)|(\012)/", '<br>', $text);
-            if ($this->nbsp) {
-                $patterns = ['  ', '\"'];
-                $replaces = [' &nbsp;', '"'];
+            if ($this->nbsp !== 0) {
                 //              $text     = substr(preg_replace('/\>.*\</esU', "str_replace(\$patterns,\$replaces,'\\0')", ">$text<"), 1, -1);
-                $text = mb_substr(
+                return mb_substr(
                     \preg_replace_callback(
                         '/\>.*\</sU',
-                        static function ($m) {
-                            return \str_replace($patterns, $replaces, $m[0]);
-                        },
+                        static fn($m): string => \str_replace($patterns, self::REPLACES, $m[0]),
                         ">$text<"
                     ),
                     1,
@@ -166,26 +166,25 @@ if (!\class_exists('TextSanitizer')) {
         }
 
         /*
-        * if magic_quotes_gpc is on, stirip back slashes
-        *
-        * @param    string  $text
-        *
-        * @return   string
-        */
+         * if magic_quotes_gpc is on, stirip back slashes
+         *
+         * @param    string  $text
+         *
+         * @return   string
+         */
 
         /**
          * @param string $text
-         *
          * @return string
          */
-        public function stripSlashesGPC($text): string
+        public function stripSlashesGPC(string $text): string
         {
             if (@\get_magic_quotes_gpc()) {
                 $text = \stripslashes($text);
             }
 
             if (\function_exists('myalbum_callback_after_stripslashes_local')) {
-                $text = \myalbum_callback_after_stripslashes_local($text);
+                return \myalbum_callback_after_stripslashes_local($text);
             }
 
             return $text;

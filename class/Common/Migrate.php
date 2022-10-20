@@ -23,9 +23,18 @@ use XoopsModules\Myalbum\Common;
  * @license   GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  * @link      https://xoops.org
  */
-class Migrate extends \Xmf\Database\Migrate
+final class Migrate extends \Xmf\Database\Migrate
 {
-    private $renameTables;
+    public $tableHandler;
+    private ?array $renameTables = null;
+    /**
+     * @var string
+     */
+    private const TABLE_NAME = 'newbb_posts_text';
+    /**
+     * @var string
+     */
+    private const SRC_TABLE_NAME = 'newbb_posts';
 
     /**
      * Migrate constructor.
@@ -47,9 +56,13 @@ class Migrate extends \Xmf\Database\Migrate
     private function changePrefix(): void
     {
         foreach ($this->renameTables as $oldName => $newName) {
-            if ($this->tableHandler->useTable($oldName) && !$this->tableHandler->useTable($newName)) {
-                $this->tableHandler->renameTable($oldName, $newName);
+            if (!$this->tableHandler->useTable($oldName)) {
+                continue;
             }
+            if ($this->tableHandler->useTable($newName)) {
+                continue;
+            }
+            $this->tableHandler->renameTable($oldName, $newName);
         }
     }
 
@@ -79,15 +92,13 @@ class Migrate extends \Xmf\Database\Migrate
      */
     private function moveDoColumns(): void
     {
-        $tableName    = 'newbb_posts_text';
-        $srcTableName = 'newbb_posts';
-        if ($this->tableHandler->useTable($tableName)
-            && $this->tableHandler->useTable($srcTableName)) {
-            $attributes = $this->tableHandler->getColumnAttributes($tableName, 'dohtml');
+        if ($this->tableHandler->useTable(self::TABLE_NAME)
+            && $this->tableHandler->useTable(self::SRC_TABLE_NAME)) {
+            $attributes = $this->tableHandler->getColumnAttributes(self::TABLE_NAME, 'dohtml');
             if (false === $attributes) {
-                $this->synchronizeTable($tableName);
-                $updateTable = $GLOBALS['xoopsDB']->prefix($tableName);
-                $joinTable   = $GLOBALS['xoopsDB']->prefix($srcTableName);
+                $this->synchronizeTable(self::TABLE_NAME);
+                $updateTable = $GLOBALS['xoopsDB']->prefix(self::TABLE_NAME);
+                $joinTable   = $GLOBALS['xoopsDB']->prefix(self::SRC_TABLE_NAME);
                 $sql         = "UPDATE `$updateTable` t1 INNER JOIN `$joinTable` t2 ON t1.post_id = t2.post_id \n" . "SET t1.dohtml = t2.dohtml,  t1.dosmiley = t2.dosmiley, t1.doxcode = t2.doxcode\n" . '  , t1.doimage = t2.doimage, t1.dobr = t2.dobr';
                 $this->tableHandler->addToQueue($sql);
             }

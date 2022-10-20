@@ -40,10 +40,9 @@ function myalbum_footer(): void
 // returns appropriate name from uid
 /**
  * @param $uid
- *
  * @return string
  */
-function myalbum_get_name_from_uid($uid)
+function myalbum_get_name_from_uid($uid): string
 {
     global $myalbum_nameoruname;
 
@@ -75,10 +74,9 @@ function myalbum_get_name_from_uid($uid)
 /**
  * @param      $photo
  * @param bool $summary
- *
  * @return array
  */
-function myalbum_get_array_for_photo_assign($photo, bool $summary = false)
+function myalbum_get_array_for_photo_assign($photo, bool $summary = false): array
 {
     global $my_uid, $isadmin, $global_perms;
     global $photos_url, $thumbs_url, $thumbs_dir, $mod_url, $mod_path;
@@ -122,11 +120,7 @@ function myalbum_get_array_for_photo_assign($photo, bool $summary = false)
 
     // Voting stats
     if ($rating > 0) {
-        if (1 == $votes) {
-            $votestring = _ALBM_ONEVOTE;
-        } else {
-            $votestring = sprintf(_ALBM_NUMVOTES, $votes);
-        }
+        $votestring = 1 == $votes ? _ALBM_ONEVOTE : sprintf(_ALBM_NUMVOTES, $votes);
         $info_votes = number_format($rating, 2) . " ($votestring)";
     } else {
         $info_votes = '0.00 (' . sprintf(_ALBM_NUMVOTES, 0) . ')';
@@ -136,7 +130,7 @@ function myalbum_get_array_for_photo_assign($photo, bool $summary = false)
     $submitter_name = myalbum_get_name_from_uid($submitter);
 
     // Category's title
-    $cat_title = !is_object($cat) ? '' : $cat->getVar('title');
+    $cat_title = is_object($cat) ? $cat->getVar('title') : '';
 
     // Summarize description
     if (is_object($text)) {
@@ -201,10 +195,9 @@ function myalbum_get_array_for_photo_assign($photo, bool $summary = false)
 /**
  * @param      $photo
  * @param bool $summary
- *
  * @return array
  */
-function myalbum_get_array_for_photo_assign_light($photo, bool $summary = false)
+function myalbum_get_array_for_photo_assign_light($photo, bool $summary = false): array
 {
     global $my_uid, $isadmin, $global_perms;
     global $photos_url, $thumbs_url, $thumbs_dir;
@@ -274,10 +267,9 @@ function myalbum_get_array_for_photo_assign_light($photo, bool $summary = false)
 /**
  * @param $parent_id
  * @param $cattree
- *
  * @return array
  */
-function myalbum_get_sub_categories($parent_id, $cattree)
+function myalbum_get_sub_categories($parent_id, $cattree): array
 {
     $ret      = [];
     $criteria = new \Criteria('status', '0', '>');
@@ -337,10 +329,9 @@ function myalbum_get_sub_categories($parent_id, $cattree)
 // get attributes of <img> for preview image
 /**
  * @param $preview_name
- *
  * @return array
  */
-function myalbum_get_img_attribs_for_preview($preview_name)
+function myalbum_get_img_attribs_for_preview($preview_name): array
 {
     global $photos_url, $mod_url, $mod_path, $myalbum_normal_exts, $myalbum_thumbsize;
 

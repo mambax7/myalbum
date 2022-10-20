@@ -7,7 +7,7 @@ require \dirname(__DIR__) . '/include/read_configs.php';
 /**
  * Class Myalbum1CommentsHandler
  */
-class Myalbum1CommentsHandler extends CommentsHandler
+final class Myalbum1CommentsHandler extends CommentsHandler
 {
     /**
      * Myalbum1CommentsHandler constructor.

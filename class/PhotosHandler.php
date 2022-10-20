@@ -13,6 +13,10 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 class PhotosHandler extends \XoopsPersistableObjectHandler
 {
+    /**
+     * @var \XoopsDatabase|null|mixed
+     */
+    public $db;
     public $_table;
     public $_dirname;
 
@@ -55,50 +59,44 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
             return false;
         }
 
-        if (\is_array($ids)) {
-            $where = "`lid` IN ('" . \implode("','", $ids) . "')";
-        } else {
-            $where = "`lid` = '$ids'";
-        }
+        $where = \is_array($ids) ? "`lid` IN ('" . \implode("','", $ids) . "')" : "`lid` = '$ids'";
 
         $sql = 'UPDATE ' . $this->db->prefix($this->_table) . " SET `status`='$status' WHERE $where";
         $this->db->query($sql);
 
-        switch ($status) {
-            case 1:
-                $helper = Helper::getInstance();
-                /** @var CategoryHandler $catHandler */
-                $catHandler = $helper->getHandler('Category');
-                $cats       = $catHandler->getObjects(null, true);
-                // Trigger Notification
-                /** @var \XoopsNotificationHandler $notificationHandler */
-                $notificationHandler = \xoops_getHandler('notification');
-                $criteria            = new \Criteria('lid', "('" . \implode("','", $ids) . "')", 'IN');
-                $photos              = $this->getObjects($criteria, true);
-                foreach ($photos as $lid => $photo) {
+        if ($status === 1) {
+            $helper = Helper::getInstance();
+            /** @var CategoryHandler $catHandler */
+            $catHandler = $helper->getHandler('Category');
+            $cats       = $catHandler->getObjects(null, true);
+            // Trigger Notification
+            /** @var \XoopsNotificationHandler $notificationHandler */
+            $notificationHandler = \xoops_getHandler('notification');
+            $criteria            = new \Criteria('lid', "('" . \implode("','", $ids) . "')", 'IN');
+            $photos              = $this->getObjects($criteria, true);
+            foreach ($photos as $lid => $photo) {
+                $notificationHandler->triggerEvent(
+                    'global',
+                    0,
+                    'new_photo',
+                    [
+                        'PHOTO_TITLE' => $photo->getVar('title'),
+                        'PHOTO_URI'   => $photo->getURL(),
+                    ]
+                );
+                if ($photo->getVar('title') > 0 && \is_object($cats[$photo->getVar('cid')])) {
                     $notificationHandler->triggerEvent(
-                        'global',
-                        0,
+                        'category',
+                        $photo->getVar('cid'),
                         'new_photo',
                         [
-                            'PHOTO_TITLE' => $photo->getVar('title'),
-                            'PHOTO_URI'   => $photo->getURL(),
+                            'PHOTO_TITLE'    => $photo->getVar('title'),
+                            'CATEGORY_TITLE' => $cats[$photo->getVar('cid')]->getVar('title'),
+                            'PHOTO_URI'      => $photo->getURL(),
                         ]
                     );
-                    if ($photo->getVar('title') > 0 && \is_object($cats[$photo->getVar('cid')])) {
-                        $notificationHandler->triggerEvent(
-                            'category',
-                            $photo->getVar('cid'),
-                            'new_photo',
-                            [
-                                'PHOTO_TITLE'    => $photo->getVar('title'),
-                                'CATEGORY_TITLE' => $cats[$photo->getVar('cid')]->getVar('title'),
-                                'PHOTO_URI'      => $photo->getURL(),
-                            ]
-                        );
-                    }
                 }
-                break;
+            }
         }
 
         return true;
@@ -121,7 +119,6 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
     /**
      * @param \XoopsObject|int $photo
      * @param bool             $force
-     *
      * @return bool
      */
     public function delete(\XoopsObject $photo, $force = true): bool
@@ -130,7 +127,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
             $photo = $this->get($photo);
         }
 
-        if (!\is_a($photo, Photos::class)) {
+        if (!$photo instanceof \XoopsModules\Myalbum\Photos) {
             return false;
         }
 

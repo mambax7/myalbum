@@ -23,7 +23,7 @@ use XoopsModules\Myalbum\{
  *
  * @return bool true if ready to uninstall, false if not
  */
-function xoops_module_pre_uninstall_myalbum(\XoopsModule $module)
+function xoops_module_pre_uninstall_myalbum(\XoopsModule $module): bool
 {
     // Do some synchronization
     return true;
@@ -35,7 +35,7 @@ function xoops_module_pre_uninstall_myalbum(\XoopsModule $module)
  *
  * @return bool true if uninstallation successful, false if not
  */
-function xoops_module_uninstall_myalbum(\XoopsModule $module)
+function xoops_module_uninstall_myalbum(\XoopsModule $module): bool
 {
     //    return true;
 
@@ -54,12 +54,10 @@ function xoops_module_uninstall_myalbum(\XoopsModule $module)
     $old_directories = [$GLOBALS['xoops']->path("uploads/{$moduleDirName}")];
     foreach ($old_directories as $old_dir) {
         $dirInfo = new \SplFileInfo($old_dir);
-        if ($dirInfo->isDir()) {
-            // The directory exists so delete it
-            if (!$utility::rrmdir($old_dir)) {
-                $module->setErrors(sprintf(constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_DEL_PATH'), $old_dir));
-                $success = false;
-            }
+        // The directory exists so delete it
+        if ($dirInfo->isDir() && !$utility::rrmdir($old_dir)) {
+            $module->setErrors(sprintf(constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_DEL_PATH'), $old_dir));
+            $success = false;
         }
         unset($dirInfo);
     }

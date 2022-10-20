@@ -66,11 +66,13 @@ if (\mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
         for ($i = 1; $i <= $count; ++$i) {
             $sql     = 'SELECT name,options FROM ' . $xoopsDB->prefix('newblocks') . ' WHERE mid=' . $mid . ' AND func_num=' . $i . " AND show_func='" . addslashes($modversion['blocks'][$i]['show_func']) . "' AND func_file='" . addslashes($modversion['blocks'][$i]['file']) . "'";
             $fresult = $xoopsDB->query($sql);
-            $fblock  = $xoopsDB->fetchArray($fresult);
+            /** @var array $fblock */
+            $fblock = $xoopsDB->fetchArray($fresult);
             if (isset($fblock['options'])) {
+                /** @var array $old_vals */
                 $old_vals = explode('|', $fblock['options']);
                 $def_vals = explode('|', $modversion['blocks'][$i]['options']);
-                if (count($old_vals) == count($def_vals)) {
+                if (count($old_vals) === count($def_vals)) {
                     $modversion['blocks'][$i]['options'] = $fblock['options'];
                     $local_msgs[]                        = "Option's values of the block <b>" . $fblock['name'] . '</b> will be kept. (value = <b>' . $fblock['options'] . '</b>)';
                 } elseif (count($old_vals) < count($def_vals)) {

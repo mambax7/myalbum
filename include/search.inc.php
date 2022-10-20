@@ -5,17 +5,15 @@ use XoopsModules\Myalbum\{
 };
 
 /** @var Helper $helper */
-
 /**
  * @param $keywords
  * @param $andor
  * @param $limit
  * @param $offset
  * @param $userid
- *
  * @return array
  */
-function myalbum_search($keywords, $andor, $limit, $offset, $userid)
+function myalbum_search($keywords, $andor, $limit, $offset, $userid): array
 {
     global $xoopsDB;
     $helper        = Helper::getInstance();

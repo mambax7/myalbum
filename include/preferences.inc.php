@@ -109,12 +109,11 @@ if ('show' === $op) {
                 $ele     = ('theme_multi' !== $config[$i]->getVar('conf_formtype')) ? new \XoopsFormSelect($title, $config[$i]->getVar('conf_name'), $config[$i]->getConfValueForOutput()) : new \XoopsFormSelect($title, $config[$i]->getVar('conf_name'), $config[$i]->getConfValueForOutput(), 5, true);
                 $handle  = opendir(XOOPS_THEME_PATH . '/');
                 $dirlist = [];
-                while (false !== ($file = readdir($handle))) {
-                    if (is_dir(XOOPS_THEME_PATH . '/' . $file) && !preg_match('/^[.]{1,2}$/', $file)
-                        && 'cvs' !== \mb_strtolower($file)) {
-                        $dirlist[$file] = $file;
-                    }
+            while (false !== ($file = readdir($handle))) {
+                if (is_dir(XOOPS_THEME_PATH . '/' . $file) && !preg_match('/^[.]{1,2}$/', $file) && 'cvs' !== \mb_strtolower($file)) {
+                    $dirlist[$file] = $file;
                 }
+            }
                 closedir($handle);
                 if (!empty($dirlist)) {
                     asort($dirlist);

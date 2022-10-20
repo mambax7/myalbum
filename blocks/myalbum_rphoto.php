@@ -5,10 +5,9 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
 
     /**
      * @param $options
-     *
      * @return array
      */
-    function b_myalbum_rphoto_show($options)
+    function b_myalbum_rphoto_show($options): array
     {
         global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts, $thumbs_url;
 
@@ -30,7 +29,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         require XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
 
         // Category limitation
-        if ($cat_limitation) {
+        if ($cat_limitation !== 0) {
             if ($cat_limit_recursive) {
                 require_once XOOPS_ROOT_PATH . '/class/xoopstree.php';
                 $cattree  = new \XoopsTree($GLOBALS['xoopsDB']->prefix($table_cat), 'cid', 'pid');
@@ -102,11 +101,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
                 } else {
                     [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
                     if ($width > $box_size || $height > $box_size) {
-                        if ($width > $height) {
-                            $photo['img_attribs'] = "width='$box_size'";
-                        } else {
-                            $photo['img_attribs'] = "height='$box_size'";
-                        }
+                        $photo['img_attribs'] = $width > $height ? "width='$box_size'" : "height='$box_size'";
                     } else {
                         $photo['img_attribs'] = '';
                     }
@@ -126,10 +121,9 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
 
     /**
      * @param $options
-     *
      * @return string
      */
-    function b_myalbum_rphoto_edit($options)
+    function b_myalbum_rphoto_edit($options): string
     {
         global $xoopsDB;
 

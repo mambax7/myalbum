@@ -22,21 +22,21 @@ namespace XoopsModules\Myalbum\Common;
 /**
  * Class Configurator
  */
-class Configurator
+final class Configurator
 {
-    public       $name;
-    public       $paths           = [];
-    public array $uploadFolders   = [];
-    public array $copyBlankFiles  = [];
-    public array $copyTestFolders = [];
-    public array $templateFolders = [];
-    public array $oldFiles        = [];
-    public array $oldFolders      = [];
-    public array $renameTables    = [];
-    public array $renameColumns   = [];
-    public array $moduleStats     = [];
-    public       $modCopyright;
-    public       $icons;
+    public string $name;
+    public array  $paths           = [];
+    public array  $uploadFolders   = [];
+    public array  $copyBlankFiles  = [];
+    public array  $copyTestFolders = [];
+    public array  $templateFolders = [];
+    public array  $oldFiles        = [];
+    public array  $oldFolders      = [];
+    public array  $renameTables    = [];
+    public array  $renameColumns   = [];
+    public array  $moduleStats     = [];
+    public string $modCopyright;
+    public array  $icons;
 
     /**
      * Configurator constructor.

@@ -7,7 +7,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
 /**
  * Class Myalbum0CatHandler
  */
-class Myalbum0CatHandler extends CategoryHandler
+final class Myalbum0CatHandler extends CategoryHandler
 {
     /**
      * @param null|\XoopsDatabase $db

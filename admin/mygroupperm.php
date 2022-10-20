@@ -3,14 +3,11 @@
 use Xmf\Request;
 
 /**
- * @param \XoopsDatabase $db
- * @param int            $gperm_modid
  * @param string|null    $gperm_name
  * @param int|null       $gperm_itemid
  *
- * @return bool
  */
-function myDeleteByModule(\XoopsDatabase $db, $gperm_modid, $gperm_name = null, $gperm_itemid = null)
+function myDeleteByModule(\XoopsDatabase $db, int $gperm_modid, string $gperm_name = null, int $gperm_itemid = null): bool
 {
     $criteria = new \CriteriaCompo(new \Criteria('gperm_modid', (int)$gperm_modid));
     if (isset($gperm_name)) {
@@ -20,11 +17,7 @@ function myDeleteByModule(\XoopsDatabase $db, $gperm_modid, $gperm_name = null, 
         }
     }
     $sql = 'DELETE FROM ' . $db->prefix('group_permission') . ' ' . $criteria->renderWhere();
-    if (!$result = $db->query($sql)) {
-        return false;
-    }
-
-    return true;
+    return (bool) ($result = $db->query($sql));
 }
 
 // require_once  \dirname(__DIR__, 3) . '/include/cp_header.php'; GIJ
@@ -47,7 +40,7 @@ if (is_array($_POST['perms']) && !empty($_POST['perms'])) {
     $grouppermHandler = xoops_getHandler('groupperm');
     foreach ($_POST['perms'] as $perm_name => $perm_data) {
         foreach ($perm_data['itemname'] as $item_id => $item_name) {
-            if (false !== myDeleteByModule($grouppermHandler->db, $modid, $perm_name, $item_id)) {
+            if (myDeleteByModule($grouppermHandler->db, $modid, $perm_name, $item_id)) {
                 if (empty($perm_data['groups'])) {
                     continue;
                 }

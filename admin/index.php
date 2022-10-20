@@ -78,19 +78,19 @@ $adminObject->addInfoBox($title);
 //$adminObject->addInfoBoxLine(sprintf( "<label>'safe_mode' (" . _AM_MB_BOTHOK . '): %s</label>', (!$safe_mode_flag ? _AM_LABEL_OFF : _AM_LABEL_ON), (!$safe_mode_flag ? 'Red' : 'Green'));
 // File Uploads
 $rs = ini_get('file_uploads');
-$adminObject->addInfoBoxLine(sprintf("<label>'file_uploads' (" . _AM_MB_NEEDON . '): %s</label>', (!$rs ? _AM_LABEL_OFF : _AM_LABEL_ON)), '', (!$rs ? 'Red' : 'Green'));
+$adminObject->addInfoBoxLine(sprintf("<label>'file_uploads' (" . _AM_MB_NEEDON . '): %s</label>', ($rs ? _AM_LABEL_ON : _AM_LABEL_OFF)), '', ($rs ? 'Green' : 'Red'));
 // Register Globals
 //$rs = ini_get('register_globals');
 //$adminObject->addInfoBoxLine(sprintf( "<label>'register_globals' (" . _AM_MB_BOTHOK . '): %s</label>', (!$rs ? _AM_LABEL_OFF : _AM_LABEL_ON)), '', (!$rs ? 'Red' : 'Green'));
 // File Uploads
 $rs = ini_get('upload_max_filesize');
-$adminObject->addInfoBoxLine(sprintf("<label>'upload_max_filesize': %s bytes</label>", $rs), '', (!$rs ? 'Red' : 'Green'));
+$adminObject->addInfoBoxLine(sprintf("<label>'upload_max_filesize': %s bytes</label>", $rs), '', ($rs ? 'Green' : 'Red'));
 // File Uploads
 $rs = ini_get('post_max_size');
-$adminObject->addInfoBoxLine(sprintf("<label>'post_max_size': %s bytes</label>", $rs), '', (!$rs ? 'Red' : 'Green'));
+$adminObject->addInfoBoxLine(sprintf("<label>'post_max_size': %s bytes</label>", $rs), '', ($rs ? 'Green' : 'Red'));
 // File Uploads
 $rs = ini_get('open_basedir');
-$adminObject->addInfoBoxLine(sprintf("<label>'open_basedir': %s</label>", (!$rs ? _AM_LABEL_NOTHING : $rs)), '', (!$rs ? 'Red' : 'Green'));
+$adminObject->addInfoBoxLine(sprintf("<label>'open_basedir': %s</label>", ($rs ?: _AM_LABEL_NOTHING)), '', ($rs ? 'Green' : 'Red'));
 // File Uploads
 $rs                   = ini_get('file_uploads');
 $tmp_dirs             = explode(PATH_SEPARATOR, ini_get('upload_tmp_dir'));

@@ -119,11 +119,7 @@ if (!empty($_POST['submit'])) {
         if (is_readable("$thumbs_dir/$lid.$ext")) {
             [$thumbs_w, $thumbs_h] = getimagesize("$thumbs_dir/$lid.$ext");
             echo "{$thumbs_w}x{$thumbs_h} ... ";
-            if ($forceredo) {
-                $retcode = Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
-            } else {
-                $retcode = 3;
-            }
+            $retcode = $forceredo ? Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext) : 3;
         } elseif ($myalbum_makethumb) {
             $retcode = Utility::createThumb("$photos_dir/$lid.$ext", $lid, $ext);
         } else {

@@ -26,7 +26,7 @@ namespace XoopsModules\Myalbum\Common;
 /**
  * Class Object ModuleFeedback
  */
-class ModuleFeedback extends \XoopsObject
+final class ModuleFeedback extends \XoopsObject
 {
     public string $name    = '';
     public string $email   = '';

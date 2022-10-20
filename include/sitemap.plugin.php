@@ -6,15 +6,12 @@ if (!preg_match('/^(\D+)(\d*)$/', $moduleDirName, $regs)) {
 }
 $mydirnumber = '' === $regs[2] ? '' : (int)$regs[2];
 
-eval(
-    'function b_sitemap_' . $moduleDirName . '(){
+eval('function b_sitemap_' . $moduleDirName . '(){
     $xoopsDB = \XoopsDatabaseFactory::getDatabaseConnection();
 
     $block = sitemap_get_categories_map($xoopsDB->prefix(\'myalbum' . $mydirnumber . '_cat\'), \'cid\', \'pid\', \'title\', \'viewcat.php?cid=\', \'title\');
 
     return $block;
 }
-
-'
-);
+');
 ?>

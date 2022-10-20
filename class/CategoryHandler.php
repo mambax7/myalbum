@@ -11,8 +11,9 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
  */
-class CategoryHandler extends \XoopsPersistableObjectHandler
+final class CategoryHandler extends \XoopsPersistableObjectHandler
 {
+    public $db;
     /**
      * @param null|\XoopsDatabase $db
      */
@@ -23,12 +24,12 @@ class CategoryHandler extends \XoopsPersistableObjectHandler
     }
 
     /**
+     *
      * @param int $cid
      * @param int $depth
-     *
      * @return int
      */
-    public function prefixDepth($cid, int $depth = 0): int
+    public function prefixDepth(int $cid, int $depth = 0): int
     {
         $cat = $this->get($cid);
         ++$depth;

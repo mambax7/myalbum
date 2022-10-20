@@ -46,10 +46,8 @@ trait ServerStats
 
         $gdlib = \function_exists('gd_info') ? '<span style="color: green;">' . \constant('CO_' . $moduleDirNameUpper . '_GDON') . '</span>' : '<span style="color: red;">' . \constant('CO_' . $moduleDirNameUpper . '_GDOFF') . '</span>';
         $html  .= '<li>' . \constant('CO_' . $moduleDirNameUpper . '_GDLIBSTATUS') . $gdlib;
-        if (\function_exists('gd_info')) {
-            if (true === ($gdlib = gd_info())) {
-                $html .= '<li>' . \constant('CO_' . $moduleDirNameUpper . '_GDLIBVERSION') . '<b>' . $gdlib['GD Version'] . '</b>';
-            }
+        if (\function_exists('gd_info') && true === ($gdlib = gd_info())) {
+            $html .= '<li>' . \constant('CO_' . $moduleDirNameUpper . '_GDLIBVERSION') . '<b>' . $gdlib['GD Version'] . '</b>';
         }
         //
         //    $safemode = ini_get('safe_mode') ? constant('CO_' . $moduleDirNameUpper . '_ON') . constant('CO_' . $moduleDirNameUpper . '_SAFEMODEPROBLEMS : constant('CO_' . $moduleDirNameUpper . '_OFF');
@@ -71,8 +69,7 @@ trait ServerStats
         $html .= "<br>\n";
         $html .= \constant('CO_' . $moduleDirNameUpper . '_UPLOADPATHDSC') . "\n";
         $html .= '</div>';
-        $html .= '</fieldset><br>';
 
-        return $html;
+        return $html . '</fieldset><br>';
     }
 }

@@ -7,7 +7,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
 /**
  * Class Myalbum2TextHandler
  */
-class Myalbum2TextHandler extends TextHandler
+final class Myalbum2TextHandler extends TextHandler
 {
     /**
      * Myalbum2TextHandler constructor.

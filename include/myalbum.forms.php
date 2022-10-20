@@ -8,10 +8,7 @@ use XoopsModules\Myalbum\{
 };
 use XoopsModules\Tag\FormTag;
 
-/**
- * @return string
- */
-function myalbum_admin_form_admission()
+function myalbum_admin_form_admission(): string
 {
     $helper = Helper::getInstance();
     // Make form objects
@@ -50,10 +47,7 @@ function myalbum_admin_form_admission()
     return $form->render();
 }
 
-/**
- * @return string
- */
-function myalbum_admin_form_export()
+function myalbum_admin_form_export(): string
 {
     $irs            = $GLOBALS['xoopsDB']->query(
         'SELECT c.imgcat_id,c.imgcat_name,c.imgcat_storetype,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight'
@@ -66,7 +60,7 @@ function myalbum_admin_form_export()
     // Options for Selecting a category in myAlbum-P
     $myalbum_cat_options = Utility::getCategoryOptions('title', 0, '--', '----');
 
-    $form = '<h4>' . _AM_FMT_EXPORTTOIMAGEMANAGER . "</h4>
+    return '<h4>' . _AM_FMT_EXPORTTOIMAGEMANAGER . "</h4>
 <form name='ImageManager' action='export.php' method='POST'>
 <select name='cid'>
     $myalbum_cat_options
@@ -84,14 +78,9 @@ function myalbum_admin_form_export()
 <br>
 <input type='submit' name='imagemanager_export' value='" . _GO . "' onclick='return confirm(\"" . _AM_MB_EXPORTCONFIRM . "\");'>
 </form>\n";
-
-    return $form;
 }
 
-/**
- * @return string
- */
-function myalbum_admin_form_groups()
+function myalbum_admin_form_groups(): string
 {
     global $xoopsModule;
 
@@ -114,10 +103,7 @@ function myalbum_admin_form_groups()
     return $form->render();
 }
 
-/**
- * @return string
- */
-function myalbum_admin_form_import_myalbum()
+function myalbum_admin_form_import_myalbum(): string
 {
     /** @var \XoopsModuleHandler $moduleHandler */
     $moduleHandler = xoops_getHandler('module');
@@ -160,10 +146,7 @@ function myalbum_admin_form_import_myalbum()
     return $frm;
 }
 
-/**
- * @return string
- */
-function myalbum_admin_form_import_imagemanager()
+function myalbum_admin_form_import_imagemanager(): string
 {
     /** @var \XoopsGroupPermHandler $grouppermHandler */
     $grouppermHandler = xoops_getHandler('groupperm');
@@ -194,10 +177,9 @@ function myalbum_admin_form_import_imagemanager()
  * @param $cat_array
  * @param $form_title
  * @param $action
- *
  * @return string
  */
-function myalbum_admin_form_display_edit($cat_array, $form_title, $action)
+function myalbum_admin_form_display_edit($cat_array, $form_title, $action): string
 {
     global $cattree;
 
@@ -237,20 +219,17 @@ function myalbum_admin_form_display_edit($cat_array, $form_title, $action)
  * @param string $caller
  * @param        $photo
  * @param        $lid
- *
  * @return string
  */
-function myalbum_user_form_submit(string $caller, $photo, $lid)
+function myalbum_user_form_submit(string $caller, $photo, $lid): string
 {
     $helper = Helper::getInstance();
     // Show the form
     extract($GLOBALS['myalbumModuleConfig']);
     $form        = new \XoopsThemeForm(_ALBM_PHOTOUPLOAD, 'uploadphoto', "submit.php?caller=$caller");
     $pixels_text = "$myalbum_width x $myalbum_height";
-    if (isset($myalbum_canresize)) {
-        if ($myalbum_canresize) {
-            $pixels_text .= ' (auto resize)';
-        }
+    if (isset($myalbum_canresize) && $myalbum_canresize) {
+        $pixels_text .= ' (auto resize)';
     }
     $pixels_label = new \XoopsFormLabel(_ALBM_MAXPIXEL, $pixels_text);
     $size_label   = new \XoopsFormLabel(_ALBM_MAXSIZE, $myalbum_fsize . (empty($file_uploads_off) ? '' : ' &nbsp; <strong>"file_uploads" off</strong>'));
@@ -273,14 +252,12 @@ function myalbum_user_form_submit(string $caller, $photo, $lid)
 
     $file_form = new \XoopsFormFile(_ALBM_SELECTFILE, 'photofile', $myalbum_fsize);
     $file_form->setExtra("size='70'");
-    if (isset($myalbum_canrotate)) {
-        if ($myalbum_canrotate) {
-            $rotate_radio = new \XoopsFormRadio(_ALBM_RADIO_ROTATETITLE, 'rotate', 'rot0');
-            $rotate_radio->addOption('rot0', _ALBM_RADIO_ROTATE0 . ' &nbsp; ');
-            $rotate_radio->addOption('rot90', "<img src='assets/images/icon_rotate90.gif' alt='" . _ALBM_RADIO_ROTATE90 . "' title='" . _ALBM_RADIO_ROTATE90 . "'> &nbsp; ");
-            $rotate_radio->addOption('rot180', "<img src='assets/images/icon_rotate180.gif' alt='" . _ALBM_RADIO_ROTATE180 . "' title='" . _ALBM_RADIO_ROTATE180 . "'> &nbsp; ");
-            $rotate_radio->addOption('rot270', "<img src='assets/images/icon_rotate270.gif' alt='" . _ALBM_RADIO_ROTATE270 . "' title='" . _ALBM_RADIO_ROTATE270 . "'> &nbsp; ");
-        }
+    if (isset($myalbum_canrotate) && $myalbum_canrotate) {
+        $rotate_radio = new \XoopsFormRadio(_ALBM_RADIO_ROTATETITLE, 'rotate', 'rot0');
+        $rotate_radio->addOption('rot0', _ALBM_RADIO_ROTATE0 . ' &nbsp; ');
+        $rotate_radio->addOption('rot90', "<img src='assets/images/icon_rotate90.gif' alt='" . _ALBM_RADIO_ROTATE90 . "' title='" . _ALBM_RADIO_ROTATE90 . "'> &nbsp; ");
+        $rotate_radio->addOption('rot180', "<img src='assets/images/icon_rotate180.gif' alt='" . _ALBM_RADIO_ROTATE180 . "' title='" . _ALBM_RADIO_ROTATE180 . "'> &nbsp; ");
+        $rotate_radio->addOption('rot270', "<img src='assets/images/icon_rotate270.gif' alt='" . _ALBM_RADIO_ROTATE270 . "' title='" . _ALBM_RADIO_ROTATE270 . "'> &nbsp; ");
     }
     $op_hidden      = new \XoopsFormHidden('op', 'submit');
     $counter_hidden = new \XoopsFormHidden('fieldCounter', 1);
@@ -309,10 +286,8 @@ function myalbum_user_form_submit(string $caller, $photo, $lid)
     $form->addElement($cat_select);
     $form->setRequired($cat_select);
     $form->addElement($file_form);
-    if (isset($myalbum_canrotate)) {
-        if ($myalbum_canrotate) {
-            $form->addElement($rotate_radio);
-        }
+    if (isset($myalbum_canrotate) && $myalbum_canrotate) {
+        $form->addElement($rotate_radio);
     }
     $form->addElement($preview_hidden);
     $form->addElement($counter_hidden);

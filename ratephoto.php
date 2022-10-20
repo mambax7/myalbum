@@ -18,7 +18,7 @@ use XoopsModules\Myalbum\{
 /** @var Utility $utility */
 require_once __DIR__ . '/header.php';
 
-if (!($global_perms & GPERM_RATEVOTE)) {
+if (($global_perms & GPERM_RATEVOTE) === 0) {
     $helper->redirect('index.php', 1, _NOPERM);
 }
 

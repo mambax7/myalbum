@@ -33,7 +33,7 @@ require_once XOOPS_ROOT_PATH . '/class/xoopsform/form.php';
  * @author       Kazumi Ono    <onokazu@myweb.ne.jp>
  * @copyright    copyright (c) 2000-2003 XOOPS.org
  */
-class GroupPermForm extends \XoopsForm
+final class GroupPermForm extends \XoopsForm
 {
     /**
      * Module ID
@@ -200,8 +200,7 @@ class GroupPermForm extends \XoopsForm
                 $ret .= $elements[$i]->render();
             }
         }
-        $ret .= '</table></form>';
 
-        return $ret;
+        return $ret . '</table></form>';
     }
 }

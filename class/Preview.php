@@ -7,8 +7,12 @@ use Xmf\Request;
 /**
  * Class MyalbumPreview
  */
-class Preview extends \XoopsObject
+final class Preview extends \XoopsObject
 {
+    /**
+     * @var string
+     */
+    private const IMGURL = '';
     // for older files
     /**
      * @return void
@@ -127,11 +131,7 @@ class Preview extends \XoopsObject
 
         // Voting stats
         if ($rating > 0) {
-            if (1 == $votes) {
-                $votestring = \_ALBM_ONEVOTE;
-            } else {
-                $votestring = \sprintf(\_ALBM_NUMVOTES, $votes);
-            }
+            $votestring = 1 == $votes ? \_ALBM_ONEVOTE : \sprintf(\_ALBM_NUMVOTES, $votes);
             $info_votes = \number_format($rating, 2) . " ($votestring)";
         } else {
             $info_votes = '0.00 (' . \sprintf(\_ALBM_NUMVOTES, 0) . ')';
@@ -141,7 +141,7 @@ class Preview extends \XoopsObject
         $submitter_name = static::getNameFromUid($submitter);
 
         // Category's title
-        $cat_title = !\is_object($cat) ? '' : $cat->getVar('title');
+        $cat_title = \is_object($cat) ? $cat->getVar('title') : '';
 
         // Summarize description
         if (\is_object($text)) {
@@ -321,8 +321,7 @@ class Preview extends \XoopsObject
             }
 
             // Category's banner default
-            if ('https://' === $imgurl) {
-                $imgurl = '';
+            if ('https://' === self::IMGURL) {
             }
 
             // Total sum of photos
@@ -337,7 +336,7 @@ class Preview extends \XoopsObject
 
             $ret[] = [
                 'cid'             => $cid,
-                'imgurl'          => $GLOBALS['myts']->htmlSpecialChars($imgurl),
+                'imgurl'          => $GLOBALS['myts']->htmlSpecialChars(self::IMGURL),
                 'photo_small_sum' => Utility::getCategoryCount($cid, $criteria),
                 'photo_total_sum' => $photo_total_sum,
                 'title'           => $title,

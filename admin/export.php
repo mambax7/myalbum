@@ -72,7 +72,7 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
         $sql           = "INSERT INTO $dst_table_photos SET image_name='{$dst_node}.{$ext}',image_nicename='" . addslashes($title) . "',image_created='$date',image_mimetype='{$mime_types[$ext]}',image_display='$image_display',imgcat_id='$dst_cid'";
         $xoopsDB->query($sql)
         || exit('DB error: INSERT image table');
-        if ($body) {
+        if ($body !== '' && $body !== '0') {
             $image_id = $xoopsDB->getInsertId();
             $sql      = 'INSERT INTO ' . $xoopsDB->prefix('imagebody') . " SET image_id='$image_id',image_body='$body'";
             $xoopsDB->query($sql);

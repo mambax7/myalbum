@@ -35,7 +35,7 @@ if ((!defined('XOOPS_ROOT_PATH')) || !($GLOBALS['xoopsUser'] instanceof \XoopsUs
  *
  * @return bool true if ready to install, false if not
  */
-function xoops_module_pre_update_myalbum(\XoopsModule $module)
+function xoops_module_pre_update_myalbum(\XoopsModule $module): bool
 {
     $moduleDirName = \basename(\dirname(__DIR__));
     $helper        = Helper::getInstance();
@@ -54,7 +54,7 @@ function xoops_module_pre_update_myalbum(\XoopsModule $module)
  *
  * @return bool true if update successful, false if not
  */
-function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = null)
+function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = null): bool
 {
     $moduleDirName      = \basename(\dirname(__DIR__));
     $moduleDirNameUpper = \mb_strtoupper($moduleDirName);
@@ -65,17 +65,15 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
 
     if ($previousVersion < 240) {
         //delete old HTML templates
-        if (count($configurator->templateFolders) > 0) {
+        if ($configurator->templateFolders !== []) {
             foreach ($configurator->templateFolders as $folder) {
                 $templateFolder = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $folder);
                 if (is_dir($templateFolder)) {
                     $templateList = array_diff(scandir($templateFolder, SCANDIR_SORT_NONE), ['..', '.']);
                     foreach ($templateList as $k => $v) {
                         $fileInfo = new \SplFileInfo($templateFolder . $v);
-                        if ('html' === $fileInfo->getExtension() && 'index.html' !== $fileInfo->getFilename()) {
-                            if (is_file($templateFolder . $v)) {
-                                unlink($templateFolder . $v);
-                            }
+                        if ('html' === $fileInfo->getExtension() && 'index.html' !== $fileInfo->getFilename() && is_file($templateFolder . $v)) {
+                            unlink($templateFolder . $v);
                         }
                     }
                 }
@@ -83,7 +81,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
         }
 
         //  ---  DELETE OLD FILES ---------------
-        if (count($configurator->oldFiles) > 0) {
+        if ($configurator->oldFiles !== []) {
             //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
             foreach (array_keys($configurator->oldFiles) as $i) {
                 $tempFile = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $configurator->oldFiles[$i]);
@@ -95,7 +93,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
 
         //  ---  DELETE OLD FOLDERS ---------------
         xoops_load('XoopsFile');
-        if (count($configurator->oldFolders) > 0) {
+        if ($configurator->oldFolders !== []) {
             //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
             foreach (array_keys($configurator->oldFolders) as $i) {
                 $tempFolder = $GLOBALS['xoops']->path('modules/' . $moduleDirName . $configurator->oldFolders[$i]);
@@ -106,7 +104,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
         }
 
         //  ---  CREATE FOLDERS ---------------
-        if (count($configurator->uploadFolders) > 0) {
+        if ($configurator->uploadFolders !== []) {
             //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
             foreach (array_keys($configurator->uploadFolders) as $i) {
                 $utility::createFolder($configurator->uploadFolders[$i]);
@@ -114,7 +112,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
         }
 
         //  ---  COPY blank.png FILES ---------------
-        if (count($configurator->copyBlankFiles) > 0) {
+        if ($configurator->copyBlankFiles !== []) {
             $file = \dirname(__DIR__) . '/assets/images/blank.png';
             foreach (array_keys($configurator->copyBlankFiles) as $i) {
                 $dest = $configurator->copyBlankFiles[$i] . '/blank.png';

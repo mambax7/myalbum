@@ -13,6 +13,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 class VotedataHandler extends \XoopsPersistableObjectHandler
 {
+    public $db;
     /**
      * VotedataHandler constructor.
      * @param null|\XoopsDatabase $db

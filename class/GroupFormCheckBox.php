@@ -30,7 +30,7 @@ require_once XOOPS_ROOT_PATH . '/class/xoopsform/form.php';
  * @author       Kazumi Ono    <onokazu@myweb.ne.jp>
  * @copyright    copyright (c) 2000-2003 XOOPS.org
  */
-class GroupFormCheckBox extends \XoopsFormElement
+final class GroupFormCheckBox extends \XoopsFormElement
 {
     /**
      * Pre-selected value(s)
@@ -103,9 +103,9 @@ class GroupFormCheckBox extends \XoopsFormElement
     /**
      * Sets appendix of checkboxes
      *
-     * @param $appendix
+     * @param mixed[] $appendix
      */
-    public function setAppendix($appendix): void
+    public function setAppendix(array $appendix): void
     {
         $this->_appendix = $appendix;
     }
@@ -119,7 +119,7 @@ class GroupFormCheckBox extends \XoopsFormElement
     {
         $ret = '';
 
-        if (\count($this->_appendix) > 0) {
+        if ($this->_appendix !== []) {
             $ret  .= '<table class="outer"><tr>';
             $cols = 1;
             foreach ($this->_appendix as $append) {
@@ -150,9 +150,8 @@ class GroupFormCheckBox extends \XoopsFormElement
             $ret .= $tree . '</td>';
             ++$cols;
         }
-        $ret .= '</tr></table>';
 
-        return $ret;
+        return $ret . '</tr></table>';
     }
 
     /**

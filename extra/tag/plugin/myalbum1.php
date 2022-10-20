@@ -34,16 +34,17 @@ use XoopsModules\Tag\Utility;
  * tags
  *
  * @param mixed      $items
- * @return    bool
  * @var        array $items associative array of items: [modid][catid][itemid]
  *
  */
-function myalbum1_tag_iteminfo(&$items)
+function myalbum1_tag_iteminfo(&$items): bool
 {
-    if (empty($items) || !is_array($items)) {
+    if (empty($items)) {
         return false;
     }
-
+    if (!is_array($items)) {
+        return false;
+    }
     $items_id = [];
     foreach (array_keys($items) as $cat_id) {
         // Some handling here to build the link upon catid

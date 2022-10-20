@@ -64,7 +64,7 @@ $criteria        = new \Criteria('status', '0', '>');
 $photo_num_total = $photosHandler->getCount($criteria);
 
 $GLOBALS['xoopsTpl']->assign('photo_global_sum', sprintf(_ALBM_THEREARE, $photo_num_total));
-if ($global_perms & GPERM_INSERTABLE) {
+if (($global_perms & GPERM_INSERTABLE) !== 0) {
     $GLOBALS['xoopsTpl']->assign('lang_add_photo', _ALBM_ADDPHOTO);
 }
 

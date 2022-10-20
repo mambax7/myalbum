@@ -10,7 +10,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * @author    Simon Roberts <simon@xoops.org>
  * @copyright copyright (c) 2009-2003 XOOPS.org
  */
-class Text extends \XoopsObject
+final class Text extends \XoopsObject
 {
     /**
      * MyalbumText constructor.

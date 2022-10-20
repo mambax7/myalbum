@@ -18,7 +18,7 @@
 /**
  * Class MyalbumCorePreload
  */
-class MyalbumCorePreload extends \XoopsPreloadItem
+final class MyalbumCorePreload extends \XoopsPreloadItem
 {
     // to add PSR-4 autoloader
     /**

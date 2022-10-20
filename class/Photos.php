@@ -10,7 +10,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  * @author    Simon Roberts <simon@xoops.org>
  * @copyright copyright (c) 2009-2003 XOOPS.org
  */
-class Photos extends \XoopsObject
+final class Photos extends \XoopsObject
 {
     /**
      * MyalbumPhotos constructor.
@@ -58,7 +58,7 @@ class Photos extends \XoopsObject
             /** @var CategoryHandler $catHandler */
             $catHandler = $helper->getHandler('Category');
             $cat        = $catHandler->get($this->getVar('cid'));
-            $url        = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
                     [
                         '_',
                         ' ',
@@ -81,11 +81,9 @@ class Photos extends \XoopsObject
                               '-',
                               $this->getVar('title')
                           ) . '/' . $this->getVar('lid') . ',' . $this->getVar('cid') . $helper->getConfig('endofurl');
-        } else {
-            $url = $GLOBALS['mod_url'] . '/photo.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
         }
 
-        return $url;
+        return $GLOBALS['mod_url'] . '/photo.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
     }
 
     /**
@@ -112,7 +110,7 @@ class Photos extends \XoopsObject
             /** @var CategoryHandler $catHandler */
             $catHandler = $helper->getHandler('Category');
             $cat        = $catHandler->get($this->getVar('cid'));
-            $url        = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
                     [
                         '_',
                         ' ',
@@ -135,11 +133,9 @@ class Photos extends \XoopsObject
                               '-',
                               $this->getVar('title')
                           ) . '/edit,' . $this->getVar('lid') . ',' . $this->getVar('cid') . $helper->getConfig('endofurl');
-        } else {
-            $url = $GLOBALS['mod_url'] . '/editphoto.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
         }
 
-        return $url;
+        return $GLOBALS['mod_url'] . '/editphoto.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
     }
 
     /**
@@ -166,7 +162,7 @@ class Photos extends \XoopsObject
             /** @var CategoryHandler $catHandler */
             $catHandler = $helper->getHandler('Category');
             $cat        = $catHandler->get($this->getVar('cid'));
-            $url        = XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . \str_replace(
                     [
                         '_',
                         ' ',
@@ -189,11 +185,9 @@ class Photos extends \XoopsObject
                               '-',
                               $this->getVar('title')
                           ) . '/rate,' . $this->getVar('lid') . ',' . $this->getVar('cid') . $helper->getConfig('endofurl');
-        } else {
-            $url = $GLOBALS['mod_url'] . '/ratephoto.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
         }
 
-        return $url;
+        return $GLOBALS['mod_url'] . '/ratephoto.php?lid=' . $this->getVar('lid') . '&cid=' . $this->getVar('cid');
     }
 
     /**

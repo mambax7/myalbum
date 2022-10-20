@@ -31,7 +31,7 @@ if (!$photo_obj = $photosHandler->get($lid)) {
 }
 $submitter = $photo_obj->getVar('submitted');
 
-if ($global_perms & GPERM_EDITABLE) {
+if (($global_perms & GPERM_EDITABLE) !== 0) {
     if ($my_uid != $submitter && !$isadmin) {
         redirect_header($mod_url, 3, _NOPERM);
     }
@@ -41,7 +41,7 @@ if ($global_perms & GPERM_EDITABLE) {
 
 // Do Delete
 if (!empty($_POST['do_delete'])) {
-    if (!($global_perms & GPERM_DELETABLE)) {
+    if (($global_perms & GPERM_DELETABLE) === 0) {
         redirect_header($mod_url, 3, _NOPERM);
     }
 
@@ -63,7 +63,7 @@ if (!empty($_POST['do_delete'])) {
 
 // Confirm Delete
 if (!empty($_POST['conf_delete'])) {
-    if (!($global_perms & GPERM_DELETABLE)) {
+    if (($global_perms & GPERM_DELETABLE) === 0) {
         redirect_header($mod_url, 3, _NOPERM);
     }
 
@@ -99,21 +99,13 @@ if (!empty($_POST['submit'])) {
         exit('XOOPS_URL is not included in your REFERER');
     }
 
-    if (empty($_POST['submitter'])) {
-        $submitter = $my_uid;
-    } else {
-        $submitter = Request::getInt('submitter', 0, 'POST');
-    }
+    $submitter = empty($_POST['submitter']) ? $my_uid : Request::getInt('submitter', 0, 'POST');
 
     // status change
     if ($isadmin) {
         $valid = Request::getInt('valid', 0, 'POST');
         if (empty($_POST['old_status'])) {
-            if (0 == $valid) {
-                $valid = null;
-            } else {
-                $valid = 1;
-            }
+            $valid = 0 == $valid ? null : 1;
         } elseif (0 == $valid) {
             $valid = 1;
         } else {
@@ -179,7 +171,7 @@ if (!empty($_POST['submit'])) {
                 $dim = [0, 0];
             }
 
-            if (!Utility::createThumb($GLOBALS['photos_dir'] . "/$lid.$ext", $lid, $ext)) {
+            if (Utility::createThumb($GLOBALS['photos_dir'] . "/$lid.$ext", $lid, $ext) === 0) {
                 redirect_header('editphoto.php?lid=$lid', 10, _ALBM_FILEERROR);
             }
 
@@ -280,7 +272,7 @@ $submitTray     = new \XoopsFormElementTray('');
 $submitTray->addElement($preview_button);
 $submitTray->addElement($submit_button);
 $submitTray->addElement($reset_button);
-if ($global_perms & GPERM_DELETABLE) {
+if (($global_perms & GPERM_DELETABLE) !== 0) {
     $delete_button = new \XoopsFormButton('', 'conf_delete', _DELETE, 'submit');
     $submitTray->addElement($delete_button);
 }

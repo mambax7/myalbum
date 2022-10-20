@@ -74,7 +74,7 @@ if ('delete' === Request::getCmd('action', '', 'POST') && isset($_POST['ids']) &
         }
     }
 
-    if ($set) {
+    if ($set !== '' && $set !== '0') {
         $set = mb_substr($set, 0, -1);
     }
 
@@ -85,7 +85,7 @@ if ('delete' === Request::getCmd('action', '', 'POST') && isset($_POST['ids']) &
     }
     $whr = mb_substr($whr, 0, -1) . ')';
 
-    if ($set) {
+    if ($set !== '' && $set !== '0') {
         $sql = 'UPDATE ' . $xoopsDB->prefix($table_photos) . " SET $set WHERE $whr";
         $xoopsDB->query($sql);
     }

@@ -13,10 +13,9 @@ eval(
 if (!function_exists('b_waiting_myalbum_base')) {
     /**
      * @param $moduleDirName
-     *
      * @return array
      */
-    function b_waiting_myalbum_base($moduleDirName)
+    function b_waiting_myalbum_base($moduleDirName): array
     {
         $xoopsDB = \XoopsDatabaseFactory::getDatabaseConnection();
         $ret     = [];

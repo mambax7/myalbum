@@ -27,7 +27,7 @@ use XoopsModules\Myalbum\{
 /**
  * class Blocksadmin
  */
-class Blocksadmin
+final class Blocksadmin
 {
     /**
      * @var \XoopsMySQLDatabase|null
@@ -118,7 +118,7 @@ class Blocksadmin
             86400   => \_DAY,
             259200  => \sprintf(\_DAYS, 3),
             604800  => \_WEEK,
-            2592000 => \_MONTH,
+            2_592_000 => \_MONTH,
         ];
         foreach ($blockArray as $i) {
             $modules = [];
@@ -173,11 +173,7 @@ class Blocksadmin
             } elseif (\XOOPS_CENTERBLOCK_BOTTOM === $i->getVar('side')) {
                 $ssel7 = ' checked';
             }
-            if ('' === $i->getVar('title')) {
-                $title = '&nbsp;';
-            } else {
-                $title = $i->getVar('title');
-            }
+            $title = '' === $i->getVar('title') ? '&nbsp;' : $i->getVar('title');
             $name = $i->getVar('name');
             echo "<tr valign='top'><td class='$class' align='center'><input type='text' name='title[" . $i->getVar('bid') . "]' value='" . $title . "'></td>
             <td class='$class' align='center' nowrap='nowrap'><div align='center' >
@@ -259,9 +255,9 @@ class Blocksadmin
         $myblock = new \XoopsBlock($bid);
 
         $sql = \sprintf('DELETE FROM %s WHERE bid = %u', $this->db->prefix('newblocks'), $bid);
-        $this->db->queryF($sql) or \trigger_error($GLOBALS['xoopsDB']->error());
+        $this->db->queryF($sql) || \trigger_error($GLOBALS['xoopsDB']->error());
         $sql = \sprintf('DELETE FROM %s WHERE block_id = %u', $this->db->prefix('block_module_link'), $bid);
-        $this->db->queryF($sql) or \trigger_error($GLOBALS['xoopsDB']->error());
+        $this->db->queryF($sql) || \trigger_error($GLOBALS['xoopsDB']->error());
 
         $this->helper->redirect('admin/blocksadmin.php?op=list', 1, _AM_DBUPDATED);
     }
@@ -349,7 +345,7 @@ class Blocksadmin
         //$clone->setVar('content', $_POST['bcontent']);
         $clone->setVar('title', Request::getString('btitle', '', 'POST'));
         $clone->setVar('bcachetime', $bcachetime);
-        if (\is_array($options) && (\count($options) > 0)) {
+        if (\is_array($options) && ($options !== [])) {
             $optionsImploded = \implode('|', $options);
             $clone->setVar('options', $optionsImploded);
         }
@@ -501,7 +497,7 @@ class Blocksadmin
         //        $blockHandler = \xoops_getHandler('block');
         //        $blockHandler->insert($myblock);
 
-        if (!empty($bmodule) && \count($bmodule) > 0) {
+        if (!empty($bmodule) && $bmodule !== []) {
             $sql = \sprintf('DELETE FROM `%s` WHERE block_id = %u', $this->db->prefix('block_module_link'), $bid);
             $this->db->query($sql);
             if (\in_array(0, $bmodule)) {
@@ -664,7 +660,7 @@ class Blocksadmin
                                           86400   => \_DAY,
                                           259200  => \sprintf(\_DAYS, 3),
                                           604800  => \_WEEK,
-                                          2592000 => \_MONTH,
+                                          2_592_000 => \_MONTH,
                                       ]);
         $form->addElement($cache_select);
 

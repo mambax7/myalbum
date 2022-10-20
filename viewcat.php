@@ -77,7 +77,7 @@ foreach ($GLOBALS['myalbum_assign_globals'] as $key => $value) {
     $GLOBALS['xoopsTpl']->assign($key, $value);
 }
 
-if ($global_perms & GPERM_INSERTABLE) {
+if (($global_perms & GPERM_INSERTABLE) !== 0) {
     $GLOBALS['xoopsTpl']->assign('lang_add_photo', _ALBM_ADDPHOTO);
 }
 

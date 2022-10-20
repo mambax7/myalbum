@@ -64,7 +64,7 @@ switch ($op) {
             clearSampleData();
         } else {
             xoops_cp_header();
-            xoops_confirm(['ok' => 1, 'op' => 'clear'], 'index.php', sprintf(constant('CO_' . $moduleDirNameUpper . '_' . 'CLEAR_SAMPLEDATA')), constant('CO_' . $moduleDirNameUpper . '_' . 'CONFIRM'), true);
+            xoops_confirm(['ok' => 1, 'op' => 'clear'], 'index.php', constant('CO_' . $moduleDirNameUpper . '_' . 'CLEAR_SAMPLEDATA'), constant('CO_' . $moduleDirNameUpper . '_' . 'CONFIRM'), true);
             xoops_cp_footer();
         }
         break;
@@ -106,7 +106,7 @@ function loadSampleData(): void
     loadTableFromArrayWithReplace($table, $tabledata, 'gperm_modid', $mid);
 
     //  ---  COPY test folder files ---------------
-    if (is_array($configurator->copyTestFolders) && count($configurator->copyTestFolders) > 0) {
+    if (is_array($configurator->copyTestFolders) && $configurator->copyTestFolders !== []) {
         //        $file =  \dirname(__DIR__) . '/testdata/images/';
         foreach (array_keys($configurator->copyTestFolders) as $i) {
             $src  = $configurator->copyTestFolders[$i][0];
@@ -181,7 +181,7 @@ function exportSchema(): void
  * @param        $replace
  * @return int number of rows inserted
  */
-function loadTableFromArrayWithReplace(string $table, array $data, string $search, $replace)
+function loadTableFromArrayWithReplace(string $table, array $data, string $search, $replace): int
 {
     /** @var \XoopsMySQLDatabase $db */
     $db = \XoopsDatabaseFactory::getDatabaseConnection();

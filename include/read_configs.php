@@ -54,11 +54,7 @@ if (empty($GLOBALS['xoopsUser'])) {
 }
 
 // Value Check
-if (isset($GLOBALS['myalbum_addposts'])) {
-    $GLOBALS['myalbum_addposts'] = (int)$GLOBALS['myalbum_addposts'];
-} else {
-    $GLOBALS['myalbum_addposts'] = 0;
-}
+$GLOBALS['myalbum_addposts'] = isset($GLOBALS['myalbum_addposts']) ? (int)$GLOBALS['myalbum_addposts'] : 0;
 if ($GLOBALS['myalbum_addposts'] < 0) {
     $GLOBALS['myalbum_addposts'] = 0;
 }
@@ -104,18 +100,10 @@ $GLOBALS['table_comments'] = 'xoopscomments';
 
 // Pipe environment check
 if (isset($GLOBALS['myalbum_imagingpipe'])) {
-    if ($GLOBALS['myalbum_imagingpipe'] || function_exists('imagerotate')) {
-        $GLOBALS['myalbum_canrotate'] = true;
-    } else {
-        $GLOBALS['myalbum_canrotate'] = false;
-    }
+    $GLOBALS['myalbum_canrotate'] = $GLOBALS['myalbum_imagingpipe'] || function_exists('imagerotate');
 }
 if (isset($GLOBALS['myalbum_imagingpipe'])) {
-    if ($GLOBALS['myalbum_imagingpipe'] || $GLOBALS['myalbum_forcegd2']) {
-        $GLOBALS['myalbum_canresize'] = true;
-    } else {
-        $GLOBALS['myalbum_canresize'] = false;
-    }
+    $GLOBALS['myalbum_canresize'] = $GLOBALS['myalbum_imagingpipe'] || $GLOBALS['myalbum_forcegd2'];
 }
 // Normal Extensions of Image
 $GLOBALS['myalbum_normal_exts'] = ['jpg', 'jpeg', 'gif', 'png'];

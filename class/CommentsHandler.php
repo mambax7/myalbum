@@ -11,8 +11,9 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
  */
-class CommentsHandler extends \XoopsPersistableObjectHandler
+final class CommentsHandler extends \XoopsPersistableObjectHandler
 {
+    public $db;
     /**
      * MyalbumCommentsHandler constructor.
      * @param null|\XoopsDatabase $db

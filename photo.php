@@ -26,11 +26,7 @@ require_once __DIR__ . '/header.php';
 $lid = Request::getInt('lid', 0, 'GET');
 $cid = Request::getInt('cid', 0, 'GET');
 
-if (Request::hasVar('op', 'GET')) {
-    $op = $_GET['op'];
-} else {
-    $op = 'default';
-}
+$op = Request::hasVar('op', 'GET') ? $_GET['op'] : 'default';
 
 // Switch operations
 
@@ -45,7 +41,7 @@ function deleteImage($lid, $cid)
     $photosHandler = $helper->getHandler('Photos');
     $photo_obj     = $photosHandler->get($lid);
 
-    if (!($global_perms & GPERM_DELETABLE)) {
+    if (($global_perms & GPERM_DELETABLE) === 0) {
         redirect_header('photo.php', 3, _NOPERM);
     }
 
@@ -93,7 +89,7 @@ switch ($op) {
 
         require_once $GLOBALS['xoops']->path('header.php');
 
-        if ($global_perms & GPERM_INSERTABLE) {
+        if (($global_perms & GPERM_INSERTABLE) !== 0) {
             $GLOBALS['xoopsTpl']->assign('lang_add_photo', _ALBM_ADDPHOTO);
         }
         $GLOBALS['xoopsTpl']->assign('lang_album_main', _ALBM_MAIN);
@@ -181,11 +177,7 @@ switch ($op) {
             $nwin = 7;
             if ($numrows > $nwin) { // window
                 if ($pos > $nwin / 2) {
-                    if ($pos > round($numrows - ($nwin / 2) - 1)) {
-                        $start = $numrows - $nwin + 1;
-                    } else {
-                        $start = round($pos - ($nwin / 2)) + 1;
-                    }
+                    $start = $pos > round($numrows - ($nwin / 2) - 1) ? $numrows - $nwin + 1 : round($pos - ($nwin / 2)) + 1;
                 } else {
                     $start = 1;
                 }

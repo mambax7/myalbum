@@ -33,14 +33,14 @@ use XoopsModules\Myalbum\{
  *
  * @return bool true if ready to install, false if not
  */
-function xoops_module_pre_install_myalbum(\XoopsModule $module)
+function xoops_module_pre_install_myalbum(\XoopsModule $module): bool
 {
     require_once \dirname(__DIR__) . '/preloads/autoloader.php';
     $utility      = new Utility();
     $xoopsSuccess = $utility::checkVerXoops($module);
     $phpSuccess   = $utility::checkVerPhp($module);
 
-    if (false !== $xoopsSuccess && false !== $phpSuccess) {
+    if ($xoopsSuccess && $phpSuccess) {
         $moduleTables = &$module->getInfo('tables');
         foreach ($moduleTables as $table) {
             $GLOBALS['xoopsDB']->queryF('DROP TABLE IF EXISTS ' . $GLOBALS['xoopsDB']->prefix($table) . ';');
@@ -56,7 +56,7 @@ function xoops_module_pre_install_myalbum(\XoopsModule $module)
  *
  * @return bool true if installation successful, false if not
  */
-function xoops_module_install_myalbum(\XoopsModule $module)
+function xoops_module_install_myalbum(\XoopsModule $module): bool
 {
     require_once \dirname(__DIR__, 3) . '/mainfile.php';
 
@@ -83,7 +83,7 @@ function xoops_module_install_myalbum(\XoopsModule $module)
     $grouppermHandler->addRight($moduleDirName . '_view', 1,  (int)XOOPS_GROUP_ANONYMOUS, $moduleId);
 
     //  ---  CREATE FOLDERS ---------------
-    if (count($configurator->uploadFolders) > 0) {
+    if ($configurator->uploadFolders !== []) {
         //    foreach (array_keys($GLOBALS['uploadFolders']) as $i) {
         foreach (array_keys($configurator->uploadFolders) as $i) {
             $utility::createFolder($configurator->uploadFolders[$i]);
@@ -91,7 +91,7 @@ function xoops_module_install_myalbum(\XoopsModule $module)
     }
 
     //  ---  COPY blank.png FILES ---------------
-    if (count($configurator->copyBlankFiles) > 0) {
+    if ($configurator->copyBlankFiles !== []) {
         $file = \dirname(__DIR__) . '/assets/images/blank.png';
         foreach (array_keys($configurator->copyBlankFiles) as $i) {
             $dest = $configurator->copyBlankFiles[$i] . '/blank.png';

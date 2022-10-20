@@ -27,7 +27,7 @@ use XoopsModules\Myalbum\Helper;
 /**
  * Class TestdataButtons
  */
-class TestdataButtons
+final class TestdataButtons
 {
     /** Button status constants */
     private const SHOW_BUTTONS = 1;

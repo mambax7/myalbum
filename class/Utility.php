@@ -24,11 +24,78 @@ use Xmf\Request;
  */
 class Utility extends Common\SysUtility
 {
+    /**
+     * @var string[]
+     */
+    private const REPLACEMENT_CHARS = [
+        ' ',
+        '|',
+        '=',
+        '\\',
+        '/',
+        '+',
+        '-',
+        '_',
+        '{',
+        '}',
+        ']',
+        '[',
+        '\'',
+        '"',
+        ';',
+        ':',
+        '?',
+        '>',
+        '<',
+        '.',
+        ',',
+        ')',
+        '(',
+        '*',
+        '&',
+        '^',
+        '%',
+        '$',
+        '#',
+        '@',
+        '!',
+        '`',
+        '~',
+        ' ',
+        '',
+        '¡',
+        '¦',
+        '§',
+        '¨',
+        '©',
+        'ª',
+        '«',
+        '¬',
+        '®',
+        '­',
+        '¯',
+        '°',
+        '±',
+        '²',
+        '³',
+        '´',
+        'µ',
+        '¶',
+        '·',
+        '¸',
+        '¹',
+        'º',
+        '»',
+        '¼',
+        '½',
+        '¾',
+        '¿',
+    ];
     //--------------- Custom module methods -----------------------------
     /**
      * @param $cols
      *
-     * @return string|null
+     * @return string
      */
     public static function mysqliGetSqlSet($cols): string
     {
@@ -661,7 +728,7 @@ class Utility extends Common\SysUtility
         }
 
         // Do Modify and check success
-        if ($pipe1) {
+        if ($pipe1 !== '' && $pipe1 !== '0') {
             $pipe1 = mb_substr($pipe1, 0, -1);
             \exec("$pipe0 < $src_path | $pipe1 | $pipe2 > $dst_path");
         }
@@ -695,11 +762,13 @@ class Utility extends Common\SysUtility
         $ret        = 0;
         $prefix_len = mb_strlen($prefix);
         while (false !== ($file = \readdir($dir))) {
-            if (0 === \mb_strpos($file, $prefix)) {
-                if (@\unlink("$dir_path/$file")) {
-                    ++$ret;
-                }
+            if (0 !== \mb_strpos($file, $prefix)) {
+                continue;
             }
+            if (!@\unlink("$dir_path/$file")) {
+                continue;
+            }
+            ++$ret;
         }
         \closedir($dir);
 
@@ -767,9 +836,8 @@ class Utility extends Common\SysUtility
     // Returns the number of whole photos included in a Category
 
     /**
-     * @param array                           $cids
-     * @param \CriteriaElement|\CriteriaCompo $criteria
-     *
+     * @param array                              $cids
+     * @param CriteriaElement|CriteriaCompo|null $criteria
      * @return int
      */
     public static function getTotalCount(array $cids, CriteriaElement $criteria = null): int
@@ -788,18 +856,10 @@ class Utility extends Common\SysUtility
     }
 
     // Update a photo
-
     /**
-     * @param int           $lid
-     * @param int           $cid
-     * @param string        $title
-     * @param string        $desc
      * @param bool|int|null $valid
-     * @param string        $ext
-     * @param string        $x
-     * @param string        $y
      */
-    public static function updatePhoto($lid, $cid, $title, $desc, $valid = null, string $ext = '', string $x = '', string $y = ''): void
+    public static function updatePhoto(int $lid, int $cid, string $title, string $desc, $valid = null, string $ext = '', string $x = '', string $y = ''): void
     {
         /** @var CategoryHandler $catHandler */
         //        $catHandler = xoops_getModuleHandler('cat', $GLOBALS[$moduleDirName.'_dirname']);
@@ -950,7 +1010,7 @@ class Utility extends Common\SysUtility
         if (empty($table_name_photos)) {
             $table_name_photos = $GLOBALS['xoopsDB']->prefix($GLOBALS['table_photos']);
         }
-
+        $cats    = [];
         $cats[0] = [
             'cid'      => 0,
             'pid'      => -1,
@@ -987,7 +1047,7 @@ class Utility extends Common\SysUtility
             }
 
             while (1) {
-                if ($cat['pid'] == $target['cid']) {
+                if ($cat['pid'] === $target['cid']) {
                     $cat['depth']       = $target['depth'] + 1;
                     $cat['next_key']    = $target['next_key'];
                     $target['next_key'] = $key;
@@ -1020,7 +1080,7 @@ class Utility extends Common\SysUtility
         for ($weight = 1; $weight < $sizeofcats; ++$weight) {
             $cat      = &$cats[$cat['next_key']];
             $pref     = \str_repeat($prefix, $cat['depth'] - 1);
-            $selected = $preset == $cat['cid'] ? 'selected' : '';
+            $selected = $preset === $cat['cid'] ? 'selected' : '';
             $ret      .= "<option value='{$cat['cid']}' $selected>$pref {$cat['title']} ({$cat['num']})</option>\n";
         }
 
@@ -1077,78 +1137,14 @@ class Utility extends Common\SysUtility
      * @param string $char
      * @return string
      */
-    public static function xoops_sef($datab, $char = '-'): ?string
+    public static function xoops_sef($datab, string $char = '-'): string
     {
         $datab             = urldecode(\mb_strtolower($datab));
         $datab             = urlencode($datab);
         $datab             = str_replace(urlencode('æ'), 'ae', $datab);
         $datab             = str_replace(urlencode('ø'), 'oe', $datab);
         $datab             = str_replace(urlencode('å'), 'aa', $datab);
-        $replacement_chars = [
-            ' ',
-            '|',
-            '=',
-            '\\',
-            '/',
-            '+',
-            '-',
-            '_',
-            '{',
-            '}',
-            ']',
-            '[',
-            '\'',
-            '"',
-            ';',
-            ':',
-            '?',
-            '>',
-            '<',
-            '.',
-            ',',
-            ')',
-            '(',
-            '*',
-            '&',
-            '^',
-            '%',
-            '$',
-            '#',
-            '@',
-            '!',
-            '`',
-            '~',
-            ' ',
-            '',
-            '¡',
-            '¦',
-            '§',
-            '¨',
-            '©',
-            'ª',
-            '«',
-            '¬',
-            '®',
-            '­',
-            '¯',
-            '°',
-            '±',
-            '²',
-            '³',
-            '´',
-            'µ',
-            '¶',
-            '·',
-            '¸',
-            '¹',
-            'º',
-            '»',
-            '¼',
-            '½',
-            '¾',
-            '¿',
-        ];
-        $return_data       = str_replace($replacement_chars, $char, urldecode($datab));
+        $return_data       = str_replace(self::REPLACEMENT_CHARS, $char, urldecode($datab));
         #print $return_data."<BR><BR>";
         switch ($char) {
             default:

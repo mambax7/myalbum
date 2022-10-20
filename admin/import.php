@@ -58,11 +58,7 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
     $src_table_text     = $GLOBALS['xoopsDB']->prefix("{$src_dirname}_text");
     $src_table_votedata = $GLOBALS['xoopsDB']->prefix("{$src_dirname}_votedata");
 
-    if (Request::hasVar('copyormove', 'POST') && 'move' === $_POST['copyormove']) {
-        $move_mode = true;
-    } else {
-        $move_mode = false;
-    }
+    $move_mode = Request::hasVar('copyormove', 'POST') && 'move' === $_POST['copyormove'];
 
     // create category
     $sql = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "(pid, title, imgurl) SELECT '0',title,imgurl FROM $src_table_cat WHERE cid='$src_cid'";
@@ -107,31 +103,26 @@ if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
             // moving comments
             $sql = 'UPDATE  ' . $GLOBALS['xoopsDB']->prefix('xoopscomments') . " SET com_modid='$myalbum_mid',com_itemid='$lid' WHERE com_modid='$src_mid' AND com_itemid='$src_lid'";
             $GLOBALS['xoopsDB']->query($sql);
-
             // delete source photos
-            [$photos_dir, $thumbs_dir, $myalbum_mid, $table_photos, $table_text, $table_votedata, $saved_photos_dir, $saved_thumbs_dir, $saved_myalbum_mid, $saved_table_photos, $saved_table_text, $saved_table_votedata] = [
-                $src_photos_dir,
-                $src_thumbs_dir,
-                $src_mid,
-                $src_table_photos,
-                $src_table_text,
-                $src_table_votedata,
-                $photos_dir,
-                $thumbs_dir,
-                $myalbum_mid,
-                $GLOBALS['xoopsDB']->prefix($table_photos),
-                $GLOBALS['xoopsDB']->prefix($table_text),
-                $GLOBALS['xoopsDB']->prefix($table_votedata),
-            ];
+            $photos_dir = $src_photos_dir;
+            $thumbs_dir = $src_thumbs_dir;
+            $myalbum_mid = $src_mid;
+            $table_photos = $src_table_photos;
+            $table_text = $src_table_text;
+            $table_votedata = $src_table_votedata;
+            $saved_photos_dir = $photos_dir;
+            $saved_thumbs_dir = $thumbs_dir;
+            $saved_myalbum_mid = $myalbum_mid;
+            $saved_table_photos = $GLOBALS['xoopsDB']->prefix($table_photos);
+            $saved_table_text = $GLOBALS['xoopsDB']->prefix($table_text);
+            $saved_table_votedata = $GLOBALS['xoopsDB']->prefix($table_votedata);
             Utility::deletePhotos("lid='$src_lid'");
-            [$photos_dir, $thumbs_dir, $myalbum_mid, $table_photos, $table_text, $table_votedata] = [
-                $saved_photos_dir,
-                $saved_thumbs_dir,
-                $saved_myalbum_mid,
-                $saved_table_photos,
-                $saved_table_text,
-                $saved_table_votedata,
-            ];
+            $photos_dir = $saved_photos_dir;
+            $thumbs_dir = $saved_thumbs_dir;
+            $myalbum_mid = $saved_myalbum_mid;
+            $table_photos = $saved_table_photos;
+            $table_text = $saved_table_text;
+            $table_votedata = $saved_table_votedata;
         }
 
         ++$import_count;

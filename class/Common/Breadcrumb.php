@@ -29,7 +29,7 @@ namespace XoopsModules\Myalbum\Common;
 /**
  * Class Breadcrumb
  */
-class Breadcrumb
+final class Breadcrumb
 {
     public string $dirname;
     private array $bread = [];

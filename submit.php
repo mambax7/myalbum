@@ -38,7 +38,7 @@ $caller = Request::getString('caller', '', 'GET');
 // POST variables
 $preview_name = Request::getString('preview_name', '', 'POST');
 // check INSERTABLE
-if (!($global_perms & GPERM_INSERTABLE)) {
+if (($global_perms & GPERM_INSERTABLE) === 0) {
     redirect_header(XOOPS_URL . '/user.php', 2, _ALBM_MUSTREGFIRST);
 }
 
@@ -191,7 +191,7 @@ if (!empty($_POST['submit'])) {
     /** @var array $fileparts */
     $fileparts = explode('.', $tmp_name);
     $ext       = $fileparts[count($fileparts) - 1];
-    $status    = ($global_perms & GPERM_SUPERINSERT) ? 1 : 0;
+    $status    = (($global_perms & GPERM_SUPERINSERT) !== 0) ? 1 : 0;
 
     $photo_obj->setVar('cid', $cid);
     $photo_obj->setVar('title', $title);
@@ -221,7 +221,7 @@ if (!empty($_POST['submit'])) {
     $photo_obj->setVar('res_y', $dim[1]);
     @$photosHandler->insert($photo_obj, true);
 
-    if (!Utility::createThumb($GLOBALS['photos_dir'] . "/$newid.$ext", $newid, $ext)) {
+    if (Utility::createThumb($GLOBALS['photos_dir'] . "/$newid.$ext", $newid, $ext) === 0) {
         $sql = "DELETE FROM $table_photos WHERE lid=$newid";
         $xoopsDB->query($sql);
         redirect_header('submit.php', 2, _ALBM_FILEREADERROR);

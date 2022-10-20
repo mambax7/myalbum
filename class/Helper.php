@@ -21,8 +21,9 @@ namespace XoopsModules\Myalbum;
 /**
  * Class Helper
  */
-class Helper extends \Xmf\Module\Helper
+final class Helper extends \Xmf\Module\Helper
 {
+    public $dirname;
     public $debug;
 
     /**
@@ -44,7 +45,7 @@ class Helper extends \Xmf\Module\Helper
     {
         static $instance;
         if (null === $instance) {
-            $instance = new static($debug);
+            $instance = new self($debug);
         }
 
         return $instance;
@@ -65,7 +66,7 @@ class Helper extends \Xmf\Module\Helper
      *
      * @return bool|\XoopsObjectHandler|\XoopsPersistableObjectHandler
      */
-    public function getHandler($name)
+    public function getHandler($name): object
     {
         $ret = false;
 

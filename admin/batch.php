@@ -97,11 +97,7 @@ if (Request::hasVar('submit', 'POST') && '' !== $_POST['submit']) {
         $title = empty($_POST['title']) ? addslashes($node) : "$title4save $filecount";
 
         if (is_readable($file_path) && \in_array(\mb_strtolower($ext), $array_allowed_exts, true)) {
-            if (!\in_array(\mb_strtolower($ext), $myalbum_normal_exts, true)) {
-                [$w, $h] = getimagesize($file_path);
-            } else {
-                [$w, $h] = [0, 0];
-            }
+            [$w, $h] = \in_array(\mb_strtolower($ext), $myalbum_normal_exts, true) ? [0, 0] : getimagesize($file_path);
             $photo = $photosHandler->create();
             $photo->setVar('cid', $cid);
             $photo->setVar('title', $title);

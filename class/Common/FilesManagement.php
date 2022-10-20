@@ -61,12 +61,16 @@ trait FilesManagement
             throw new \RuntimeException('The directory ' . $dst . ' could not be created.');
         }
         while (false !== ($file = \readdir($dir))) {
-            if (('.' !== $file) && ('..' !== $file)) {
-                if (\is_dir($src . '/' . $file)) {
-                    self::recurseCopy($src . '/' . $file, $dst . '/' . $file);
-                } else {
-                    \copy($src . '/' . $file, $dst . '/' . $file);
-                }
+            if ('.' === $file) {
+                continue;
+            }
+            if ('..' === $file) {
+                continue;
+            }
+            if (\is_dir($src . '/' . $file)) {
+                self::recurseCopy($src . '/' . $file, $dst . '/' . $file);
+            } else {
+                \copy($src . '/' . $file, $dst . '/' . $file);
             }
         }
         \closedir($dir);
@@ -85,10 +89,12 @@ trait FilesManagement
     public static function deleteDirectory(string $src): bool
     {
         // Only continue if user is a 'global' Admin
-        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser) || !$GLOBALS['xoopsUser']->isAdmin()) {
+        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser)) {
             return false;
         }
-
+        if (!$GLOBALS['xoopsUser']->isAdmin()) {
+            return false;
+        }
         $success = true;
         // remove old files
         $dirInfo = new \SplFileInfo($src);
@@ -130,10 +136,12 @@ trait FilesManagement
     public static function rrmdir(string $src): bool
     {
         // Only continue if user is a 'global' Admin
-        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser) || !$GLOBALS['xoopsUser']->isAdmin()) {
+        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser)) {
             return false;
         }
-
+        if (!$GLOBALS['xoopsUser']->isAdmin()) {
+            return false;
+        }
         // If source is not a directory stop processing
         if (!\is_dir($src)) {
             return false;
@@ -171,10 +179,12 @@ trait FilesManagement
     public static function rmove(string $src, string $dest): bool
     {
         // Only continue if user is a 'global' Admin
-        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser) || !$GLOBALS['xoopsUser']->isAdmin()) {
+        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser)) {
             return false;
         }
-
+        if (!$GLOBALS['xoopsUser']->isAdmin()) {
+            return false;
+        }
         // If source is not a directory stop processing
         if (!\is_dir($src)) {
             return false;
@@ -215,10 +225,12 @@ trait FilesManagement
     public static function rcopy(string $src, string $dest): bool
     {
         // Only continue if user is a 'global' Admin
-        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser) || !$GLOBALS['xoopsUser']->isAdmin()) {
+        if (!($GLOBALS['xoopsUser'] instanceof \XoopsUser)) {
             return false;
         }
-
+        if (!$GLOBALS['xoopsUser']->isAdmin()) {
+            return false;
+        }
         // If source is not a directory stop processing
         if (!\is_dir($src)) {
             return false;

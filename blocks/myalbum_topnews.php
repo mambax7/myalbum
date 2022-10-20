@@ -5,10 +5,9 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
 
     /**
      * @param $options
-     *
      * @return array
      */
-    function b_myalbum_topnews_show($options)
+    function b_myalbum_topnews_show($options): array
     {
         global $xoopsDB, $mod_url, $table_photos, $myalbum_normal_exts, $myalbum_thumbsize, $myalbum_makethumb, $thumbs_url;
 
@@ -29,7 +28,7 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
         require XOOPS_ROOT_PATH . "/modules/$moduleDirName/include/read_configs.php";
 
         // Category limitation
-        if ($cat_limitation) {
+        if ($cat_limitation !== 0) {
             if ($cat_limit_recursive) {
                 require_once XOOPS_ROOT_PATH . '/class/xoopstree.php';
                 $cattree  = new \XoopsTree($GLOBALS['xoopsDB']->prefix($table_cat), 'cid', 'pid');
@@ -89,10 +88,9 @@ if (!defined('MYALBUM_BLOCK_TOPNEWS_INCLUDED')) {
 
     /**
      * @param $options
-     *
      * @return string
      */
-    function b_myalbum_topnews_edit($options)
+    function b_myalbum_topnews_edit($options): string
     {
         global $xoopsDB;
 

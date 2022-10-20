@@ -7,7 +7,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
 /**
  * Class Myalbum2VotedataHandler
  */
-class Myalbum2VotedataHandler extends VotedataHandler
+final class Myalbum2VotedataHandler extends VotedataHandler
 {
     /**
      * Myalbum2VotedataHandler constructor.

@@ -8,7 +8,7 @@ use XoopsModules\Tag\FormTag;
 /**
  * Class Forms
  */
-class Forms extends \XoopsObject
+final class Forms extends \XoopsObject
 {
     /**
      * @return string
@@ -67,7 +67,7 @@ class Forms extends \XoopsObject
         // Options for Selecting a category in myAlbum-P
         $myalbum_cat_options = Utility::getCategoryOptions('title', 0, '--', '----');
 
-        $form = '<h4>' . \_AM_FMT_EXPORTTOIMAGEMANAGER . "</h4>
+        return '<h4>' . \_AM_FMT_EXPORTTOIMAGEMANAGER . "</h4>
 <form name='ImageManager' action='export.php' method='POST'>
 <select name='cid'>
     $myalbum_cat_options
@@ -85,8 +85,6 @@ class Forms extends \XoopsObject
 <br>
 <input type='submit' name='imagemanager_export' value='" . \_GO . "' onclick='return confirm(\"" . \_AM_MB_EXPORTCONFIRM . "\");' >
 </form>\n";
-
-        return $form;
     }
 
     /**
@@ -244,10 +242,8 @@ class Forms extends \XoopsObject
         \extract($GLOBALS['myalbumModuleConfig']);
         $form        = new \XoopsThemeForm(\_ALBM_PHOTOUPLOAD, 'uploadphoto', "submit.php?caller=$caller");
         $pixels_text = "$myalbum_width x $myalbum_height";
-        if (isset($myalbum_canresize)) {
-            if ($myalbum_canresize) {
-                $pixels_text .= ' (auto resize)';
-            }
+        if (isset($myalbum_canresize) && $myalbum_canresize) {
+            $pixels_text .= ' (auto resize)';
         }
         $pixels_label = new \XoopsFormLabel(\_ALBM_MAXPIXEL, $pixels_text);
         $size_label   = new \XoopsFormLabel(\_ALBM_MAXSIZE, $myalbum_fsize . (empty($file_uploads_off) ? '' : ' &nbsp; <strong>"file_uploads" off</strong>'));
@@ -270,21 +266,19 @@ class Forms extends \XoopsObject
 
         $file_form = new \XoopsFormFile(\_ALBM_SELECTFILE, 'photofile', $myalbum_fsize);
         $file_form->setExtra("size='70'");
-        if (isset($myalbum_canrotate)) {
-            if ($myalbum_canrotate) {
-                $rotate_radio = new \XoopsFormRadio(\_ALBM_RADIO_ROTATETITLE, 'rotate', 'rot0');
-                $rotate_radio->addOption('rot0', \_ALBM_RADIO_ROTATE0 . ' &nbsp; ');
-                $rotate_radio->addOption('rot90', "<img src='assets/images/icon_rotate90.gif' alt='" . \_ALBM_RADIO_ROTATE90 . "' title='" . \_ALBM_RADIO_ROTATE90 . "' > &nbsp; ");
-                $rotate_radio->addOption('rot180', "<img src='assets/images/icon_rotate180.gif' alt='" . \_ALBM_RADIO_ROTATE180 . "' title='" . \_ALBM_RADIO_ROTATE180 . "' > &nbsp; ");
-                $rotate_radio->addOption('rot270', "<img src='assets/images/icon_rotate270.gif' alt='" . \_ALBM_RADIO_ROTATE270 . "' title='" . \_ALBM_RADIO_ROTATE270 . "' > &nbsp; ");
-            }
+        if (isset($myalbum_canrotate) && $myalbum_canrotate) {
+            $rotate_radio = new \XoopsFormRadio(\_ALBM_RADIO_ROTATETITLE, 'rotate', 'rot0');
+            $rotate_radio->addOption('rot0', \_ALBM_RADIO_ROTATE0 . ' &nbsp; ');
+            $rotate_radio->addOption('rot90', "<img src='assets/images/icon_rotate90.gif' alt='" . \_ALBM_RADIO_ROTATE90 . "' title='" . \_ALBM_RADIO_ROTATE90 . "' > &nbsp; ");
+            $rotate_radio->addOption('rot180', "<img src='assets/images/icon_rotate180.gif' alt='" . \_ALBM_RADIO_ROTATE180 . "' title='" . \_ALBM_RADIO_ROTATE180 . "' > &nbsp; ");
+            $rotate_radio->addOption('rot270', "<img src='assets/images/icon_rotate270.gif' alt='" . \_ALBM_RADIO_ROTATE270 . "' title='" . \_ALBM_RADIO_ROTATE270 . "' > &nbsp; ");
         }
         $op_hidden      = new \XoopsFormHidden('op', 'submit');
         $counter_hidden = new \XoopsFormHidden('fieldCounter', 1);
         if (!isset($preview_name)) {
             $preview_name = '';
         }
-        $preview_hidden = new \XoopsFormHidden('preview_name', \htmlspecialchars($preview_name, \ENT_QUOTES | \ENT_HTML5), \ENT_QUOTES);
+        $preview_hidden = new \XoopsFormHidden('preview_name', \htmlspecialchars(self::PREVIEW_NAME, \ENT_QUOTES | \ENT_HTML5), \ENT_QUOTES);
 
         $submit_button  = new \XoopsFormButton('', 'submit', \_SUBMIT, 'submit');
         $preview_button = new \XoopsFormButton('', 'preview', \_PREVIEW, 'submit');
@@ -306,10 +300,8 @@ class Forms extends \XoopsObject
         $form->addElement($cat_select);
         $form->setRequired($cat_select);
         $form->addElement($file_form);
-        if (isset($myalbum_canrotate)) {
-            if ($myalbum_canrotate) {
-                $form->addElement($rotate_radio);
-            }
+        if (isset($myalbum_canrotate) && $myalbum_canrotate) {
+            $form->addElement($rotate_radio);
         }
         $form->addElement($preview_hidden);
         $form->addElement($counter_hidden);

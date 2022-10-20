@@ -58,11 +58,11 @@ class SysUtility
     {
         if ($considerHtml) {
             // if the plain text is shorter than the maximum length, return the whole text
-            if (\mb_strlen(\preg_replace('/<.*?' . '>/', '', $text)) <= $length) {
+            if (\mb_strlen(\preg_replace('/<.*?>/', '', $text)) <= $length) {
                 return $text;
             }
             // splits all html-tags to scanable lines
-            \preg_match_all('/(<.+?' . '>)?([^<>]*)/s', $text, $lines, \PREG_SET_ORDER);
+            \preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, \PREG_SET_ORDER);
             $total_length = mb_strlen($ending);
             $open_tags    = [];
             $truncate     = '';
@@ -80,7 +80,7 @@ class SysUtility
                             unset($open_tags[$pos]);
                         }
                         // if tag is an opening tag
-                    } elseif (\preg_match('/^<\s*([^\s>!]+).*?' . '>$/s', $line_matchings[1], $tag_matchings)) {
+                    } elseif (\preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                         // add tag to the beginning of $open_tags list
                         \array_unshift($open_tags, \mb_strtolower($tag_matchings[1]));
                     }
@@ -253,7 +253,7 @@ class SysUtility
         $result = $GLOBALS['xoopsDB']->queryF($sql);
 
         if ($GLOBALS['xoopsDB']->isResultSet($result)) {
-            $ret = $GLOBALS['xoopsDB']->getRowsNum($result) > 0;
+            return $GLOBALS['xoopsDB']->getRowsNum($result) > 0;
         }
 
         return $ret;
