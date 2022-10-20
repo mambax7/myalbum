@@ -18,7 +18,7 @@ function myalbum2_tag_block_cloud_show($options)
 
 /**
  * @param $options
- * @return array|false
+ * @return array|string|false
  */
 function myalbum2_tag_block_cloud_edit($options)
 {

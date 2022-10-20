@@ -59,7 +59,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
             return false;
         }
 
-        $where = \is_array($ids) ? "`lid` IN ('" . \implode("','", $ids) . "')" : "`lid` = '$ids'";
+        $where = !\is_array($ids) ? "`lid` IN ('" . \implode("','", $ids) . "')" : "`lid` = '$ids'";
 
         $sql = 'UPDATE ' . $this->db->prefix($this->_table) . " SET `status`='$status' WHERE $where";
         $this->db->query($sql);
