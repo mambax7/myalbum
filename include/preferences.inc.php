@@ -413,24 +413,24 @@ if ('save' === $op) {
                         // need to do this to pass to xoops_template_touch function
                         $GLOBALS['xoopsConfig']['template_set'] = $newtplset;
 
-                        for ($i = 0; $i < $dcount; ++$i) {
-                            $found = $tplfileHandler->find($newtplset, 'block', $dtemplates[$i]->getVar('tpl_refid'), null);
+                        for ($j = 0; $j < $dcount; ++$j) {
+                            $found = $tplfileHandler->find($newtplset, 'block', $dtemplates[$j]->getVar('tpl_refid'), null);
                             if (count($found) > 0) {
                                 // template for the new theme found, compile it
                                 xoops_template_touch($found[0]->getVar('tpl_id'));
                             } else {
                                 // not found, so compile 'default' template file
-                                xoops_template_touch($dtemplates[$i]->getVar('tpl_id'));
+                                xoops_template_touch($dtemplates[$j]->getVar('tpl_id'));
                             }
                         }
 
                         // generate image cache files from image binary data, save them under cache/
                         $imageHandler = xoops_getHandler('imagesetimg');
                         $imagefiles   = $imageHandler->getObjects(new \Criteria('tplset_name', $newtplset), true);
-                        foreach (array_keys($imagefiles) as $i) {
-                            if (!$fp = fopen(XOOPS_CACHE_PATH . '/' . $newtplset . '_' . $imagefiles[$i]->getVar('imgsetimg_file'), 'wb')) {
+                        foreach (array_keys($imagefiles) as $k) {
+                            if (!$fp = fopen(XOOPS_CACHE_PATH . '/' . $newtplset . '_' . $imagefiles[$k]->getVar('imgsetimg_file'), 'wb')) {
                             } else {
-                                fwrite($fp, $imagefiles[$i]->getVar('imgsetimg_body'));
+                                fwrite($fp, $imagefiles[$k]->getVar('imgsetimg_body'));
                                 fclose($fp);
                             }
                         }
