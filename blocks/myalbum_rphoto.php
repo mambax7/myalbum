@@ -69,7 +69,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
             $result   = $xoopsDB->query($sql);
             $lids     = [];
             $sel_lids = [];
-            while (false !== ($lid = $xoopsDB->fetchRow($result))) {
+            while (false !== ([$lid] = $xoopsDB->fetchRow($result))) {
                 $lids[] = $lid;
             }
             $sel_lids = array_rand($lids, $photos_num);
