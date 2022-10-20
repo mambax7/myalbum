@@ -35,7 +35,7 @@ use XoopsModules\Myalbum\Helper as MyalbumHelper;
  * @param array $items associative array of items: [modid][catid][itemid]
  * @return bool|null
  */
-function myalbum_tag_iteminfo(&$items)
+function myalbum_tag_iteminfo(array &$items)
 {
     if (empty($items)) {
         return false;

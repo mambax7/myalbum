@@ -53,7 +53,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
      *
      * @return bool
      */
-    public function setStatus($ids, int $status = 1): bool
+    public function setStatus(array $ids, int $status = 1): bool
     {
         if (empty($ids)) {
             return false;

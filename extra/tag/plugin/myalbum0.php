@@ -36,7 +36,7 @@ use XoopsModules\Myalbum\Helper as MyalbumHelper;
  * @return bool|null
  *
  */
-function myalbum0_tag_iteminfo(&$items): bool
+function myalbum0_tag_iteminfo(array &$items): bool
 {
     if (empty($items)) {
         return false;
