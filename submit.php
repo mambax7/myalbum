@@ -14,6 +14,7 @@ use XoopsModules\Myalbum\{
     TextHandler,
     Utility
 };
+use XoopsModules\Tag\TagHandler;
 
 /** @var Helper $helper */
 /** @var CategoryHandler $catHandler */
@@ -208,7 +209,7 @@ if (!empty($_POST['submit'])) {
     $photo_obj = $photosHandler->get($newid);
 
     $helper = Helper::getInstance();
-    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\TagHandler::class) && xoops_isActiveModule('tag')) {
+    if (1 == $helper->getConfig('tag') && \class_exists(TagHandler::class) && xoops_isActiveModule('tag')) {
         /** @var \XoopsModules\Tag\TagHandler $tagHandler */
         $tagHandler = \XoopsModules\Tag\Helper::getInstance()
                                               ->getHandler('Tag');

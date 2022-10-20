@@ -11,6 +11,7 @@ use XoopsModules\Myalbum\{
     VotedataHandler,
     Utility
 };
+use XoopsModules\Tag\Tagbar;
 
 /** @var Helper $helper */
 /** @var CategoryHandler $catHandler */
@@ -150,8 +151,8 @@ function myalbum_get_array_for_photo_assign($photo, bool $summary = false): arra
 
     $helper = Helper::getInstance();
     $tagbar = [];
-    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
-        $tagbarObj = new \XoopsModules\Tag\Tagbar();
+    if (1 == $helper->getConfig('tag') && \class_exists(Tagbar::class) && \xoops_isActiveModule('tag')) {
+        $tagbarObj = new Tagbar();
         $tagbar    = $tagbarObj->getTagbar($lid, $cid);
     }
 
@@ -234,8 +235,8 @@ function myalbum_get_array_for_photo_assign_light($photo, bool $summary = false)
 
     $helper = Helper::getInstance();
     $tagbar = [];
-    if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
-        $tagbarObj = new \XoopsModules\Tag\Tagbar();
+    if (1 == $helper->getConfig('tag') && \class_exists(Tagbar::class) && \xoops_isActiveModule('tag')) {
+        $tagbarObj = new Tagbar();
         $tagbar    = $tagbarObj->getTagbar($lid, $cid);
     }
 

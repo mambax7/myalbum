@@ -47,6 +47,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $oldversion = null): 
     //    require_once $GLOBALS['xoops']->path('modules/' . $moduleDirName . '/config/config.php');
     //    require_once $GLOBALS['xoops']->path('modules/' . $moduleDirName . '/class/Utility.php');
 
+    //TODO Undefined variable '$uploadFolders'
     foreach (array_keys($uploadFolders) as $i) {
         Utility::createFolder($uploadFolders[$i]);
     }

@@ -20,6 +20,7 @@
 
 use XoopsModules\Tag\Helper;
 use XoopsModules\Tag\Utility;
+use XoopsModules\Myalbum\Helper as MyalbumHelper;
 
 /**
  * Get item fields:
@@ -51,8 +52,10 @@ function myalbum_tag_iteminfo(&$items)
             $items_id[] = (int)$item_id;
         }
     }
-    $itemHandler = $helper->getHandler('Photos');
-    $textHandler = $helper->getHandler('Text');
+
+    $myalbumHelper = MyalbumHelper::getInstance();
+    $itemHandler = $myalbumHelper->getHandler('Photos');
+    $textHandler = $myalbumHelper->getHandler('Text');
     $items_obj   = $itemHandler->getObjects(new \Criteria('lid', '(' . implode(', ', $items_id) . ')', 'IN'), true);
 
     foreach (array_keys($items) as $cat_id) {
@@ -79,7 +82,8 @@ function myalbum_tag_iteminfo(&$items)
  */
 function myalbum_tag_synchronization($mid): void
 {
-    $itemHandler = $helper->getHandler('Photos');
+    $myalbumHelper = MyalbumHelper::getInstance();
+    $itemHandler = $myalbumHelper->getHandler('Photos');
     $linkHandler = Helper::getInstance()
                          ->getHandler('Link'); //@var \XoopsModules\Tag\Handler $tagHandler
 

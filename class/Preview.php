@@ -3,6 +3,7 @@
 namespace XoopsModules\Myalbum;
 
 use Xmf\Request;
+use XoopsModules\Tag\Tagbar;
 
 /**
  * Class MyalbumPreview
@@ -161,8 +162,8 @@ final class Preview extends \XoopsObject
 
         $helper = Helper::getInstance();
         $tagbar = [];
-        if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
-            $tagbarObj = new \XoopsModules\Tag\Tagbar();
+        if (1 == $helper->getConfig('tag') && \class_exists(Tagbar::class) && \xoops_isActiveModule('tag')) {
+            $tagbarObj = new Tagbar();
             $tagbar    = $tagbarObj->getTagbar($lid, $cid);
         }
 
@@ -252,8 +253,8 @@ final class Preview extends \XoopsObject
 
         $helper = Helper::getInstance();
         $tagbar = [];
-        if (1 == $helper->getConfig('tag') && \class_exists(\XoopsModules\Tag\Tagbar::class) && \xoops_isActiveModule('tag')) {
-            $tagbarObj = new \XoopsModules\Tag\Tagbar();
+        if (1 == $helper->getConfig('tag') && \class_exists(Tagbar::class) && \xoops_isActiveModule('tag')) {
+            $tagbarObj = new Tagbar();
             $tagbar    = $tagbarObj->getTagbar($lid, $cid);
         }
 

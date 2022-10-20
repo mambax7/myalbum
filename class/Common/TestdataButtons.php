@@ -19,6 +19,7 @@ namespace XoopsModules\Myalbum\Common;
  * @license         GNU GPL 2.0 or later (https://www.gnu.org/licenses/gpl-2.0.html)
  */
 
+use Xmf\Module\Admin;
 use Xmf\Yaml;
 use XoopsModules\Myalbum\Helper;
 
@@ -40,7 +41,7 @@ final class TestdataButtons
      *
      * @return void
      */
-    public static function loadButtonConfig(\Xmf\Module\Admin $adminObject): void
+    public static function loadButtonConfig(Admin $adminObject): void
     {
         $moduleDirName      = \basename(\dirname(__DIR__, 2));
         $moduleDirNameUpper = \mb_strtoupper($moduleDirName);
