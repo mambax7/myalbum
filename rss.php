@@ -91,7 +91,8 @@ if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')
     if ($cid > 0) {
         $cat = $catHandler->get($cid);
         foreach ($GLOBALS['cattree']->getAllChild($cid) as $index => $child) {
-            $cids[$child->getVar('cid')] = $child->getVar('cid');
+            $childCid        = $child->getVar('cid');
+            $cids[$childCid] = $childCid;
         }
         $cids[]          = $cid;
         $criteria        = new \CriteriaCompo(new \Criteria('status', '0', '>'));

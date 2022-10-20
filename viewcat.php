@@ -93,7 +93,8 @@ if ($cid > 0) {
     $GLOBALS['xoopsTpl']->assign('category_options', Utility::getCategoryOptions());
 
     foreach ($GLOBALS['cattree']->getAllChild($cid) as $child) {
-        $cids[$child->getVar('cid')] = $child->getVar('cid');
+        $childCid        = $child->getVar('cid');
+        $cids[$childCid] = $childCid;
     }
     $cids[]          = $cid;
     $criteria        = new \CriteriaCompo(new \Criteria('status', '0', '>'));

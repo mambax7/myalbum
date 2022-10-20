@@ -69,7 +69,8 @@ if ('insert' === $action) {
     // Check if new pid was a child of cid
     if (0 !== $pid) {
         foreach ($cattree->getAllChild($cid) as $child) {
-            $children[$child->getVar('cid')] = $child->getVar('cid');
+            $childCid            = $child->getVar('cid');
+            $children[$childCid] = $childCid;
         }
         foreach ($children as $child) {
             if ($child == $pid) {
@@ -100,7 +101,8 @@ if ('insert' === $action) {
     $children[0] = 0;
     //get all categories under the specified category
     foreach ($GLOBALS['cattree']->getAllChild($cid) as $child) {
-        $children[$child->getVar('cid')] = $child->getVar('cid');
+        $childCid            = $child->getVar('cid');
+        $children[$childCid] = $childCid;
     }
     $whr = 'cid IN (';
     foreach ($children as $child) {
@@ -146,8 +148,9 @@ if ('edit' === $disp && $cid > 0) {
     // Listing
     $live_cids = [0 => '0'];
     foreach ($cattree->getAllChild($cid, []) as $child) {
-        $cat_tree_array[$child->getVar('cid')] = $child->toArray();
-        $live_cids[$child->getVar('cid')]      = $child->getVar('cid');
+        $childCid                  = $child->getVar('cid');
+        $cat_tree_array[$childCid] = $child->toArray();
+        $live_cids[$childCid]      = $childCid;
     }
     $criteria = new \CriteriaCompo(new \Criteria('pid', '(' . implode(',', $live_cids) . ')', 'NOT IN'));
     if ($catHandler->getCount($criteria) > 0) {

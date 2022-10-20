@@ -77,7 +77,8 @@ foreach ($catHandler->getObjects($criteria, true) as $cid => $cat) {
     $whr_cid = [$cid => $cid];
     // get all child cat ids for a given cat id
     foreach ($GLOBALS['cattree']->getAllChild($cid) as $children) {
-        $whr_cid[$children->getVar('cid')] = $children->getVar('cid');
+        $childCid           = $children->getVar('cid');
+        $whr_cid[$childCid] = $childCid;
     }
     $criteria = new \CriteriaCompo(new \Criteria('status', '0', '>'));
     $criteria->add(new \Criteria('cid', '(' . implode(',', $whr_cid) . ')', 'IN'));
