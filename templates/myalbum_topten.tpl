@@ -26,7 +26,7 @@
                                     <td colspan='3' width='8%' class="head" align='center'><{$lang_hits}></td>
                                 <{/if}>
                                 <{if $xoConfig.tag}>
-                                    <td colspan='3' width='8%' class="head" align='center'><{$lang_tags}></td>
+                                    <td colspan='3' width='8%' class="head" align='center'><{$lang_tags|default:''}></td>
                                 <{/if}>
                             </tr>
 
@@ -45,7 +45,7 @@
                                         <td colspan='3' class="odd" align='center'><{$photo.hits}></td>
                                     <{/if}>
                                     <{if $xoConfig.tag}>
-                                        <td class='even'><{include file="db:tag_bar.tpl" tagbar=$photo.tagbar}></td>
+                                        <td class='even'><{include file="db:tag_bar.tpl" tagbar=$photo.tagbar|default:''}></td>
                                     <{/if}>
                                 </tr>
                             <{/foreach}>

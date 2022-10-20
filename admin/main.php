@@ -83,7 +83,7 @@ if ('insert' === $action) {
     $cols   = ['pid' => 'I:N:0', 'title' => '50:E:1', 'imgurl' => '150:E:0', 'weight' => 'I:N:0'];
     $sql    .= Utility::mysqliGetSqlSet($cols) . " WHERE cid='$cid'";
     $result = $GLOBALS['xoopsDB']->query($sql);
-    if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+    if (!$result) {
         throw new \RuntimeException("DB Error: update category! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error());
     }
     redirect_header('main.php', 1, _AM_CAT_UPDATED);

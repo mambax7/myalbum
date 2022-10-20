@@ -98,7 +98,7 @@ class Category extends \XoopsObject
         //            $GLOBALS['myalbumModuleConfig'] = $configHandler->getConfigList($GLOBALS['myalbumModule']->getVar('mid'));
         //        }
         if ($helper->getConfig('htaccess')) {
-            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . Utility::xoops_sef($this->getVar('title')) . '/rss,' . $cid . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $helper->getConfig('endofrss');
+            return XOOPS_URL . '/' . $helper->getConfig('baseurl') . '/' . Utility::xoops_sef($this->getVar('title')) . '/rss,' .  $this->getVar('cid') . ',' . $uid . ',' . $num . ',' . $pos . ',' . $view . $helper->getConfig('endofrss');
         }
 
         return Helper::getInstance()
