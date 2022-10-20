@@ -13,7 +13,7 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class CommentsHandler extends \XoopsPersistableObjectHandler
 {
-    public $db;
+
     /**
      * MyalbumCommentsHandler constructor.
      * @param null|\XoopsDatabase $db

@@ -13,7 +13,7 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 class TextHandler extends \XoopsPersistableObjectHandler
 {
-    public $db;
+
     /**
      * MyalbumTextHandler constructor.
      * @param null|\XoopsDatabase $db

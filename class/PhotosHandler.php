@@ -16,7 +16,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
     /**
      * @var \XoopsDatabase|null|mixed
      */
-    public $db;
+
     public $_table;
     public $_dirname;
 

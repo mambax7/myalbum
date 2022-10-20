@@ -13,7 +13,7 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class CategoryHandler extends \XoopsPersistableObjectHandler
 {
-    public $db;
+
     /**
      * @param null|\XoopsDatabase $db
      */
