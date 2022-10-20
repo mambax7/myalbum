@@ -134,23 +134,22 @@ if (!empty($_POST['submit'])) {
 
     // Check if file uploaded
     if ('' != $_FILES[$field]['tmp_name'] && 'none' !== $_FILES[$field]['tmp_name']) {
+        xoops_load('xoopsmediauploader');
         if ($GLOBALS['myalbumModuleConfig']['myalbum_canresize']) {
-            $uploader = new MediaUploader(
+            $uploader = new \XoopsMediaUploader(
                 $GLOBALS['photos_dir'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']),
-                $GLOBALS['myalbumModuleConfig']['myalbum_fsize'],
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
                 null,
-                null,
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts'])
+                null
             );
         } else {
-            $uploader = new MediaUploader(
+            $uploader = new \XoopsMediaUploader(
                 $GLOBALS['photos_dir'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']),
-                $GLOBALS['myalbumModuleConfig']['myalbum_fsize'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_width'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_height'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts'])
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
+                $helper->getConfig('myalbum_width'),
+                $helper->getConfig('myalbum_height')
             );
         }
 
@@ -176,7 +175,7 @@ if (!empty($_POST['submit'])) {
             Utility::editPhoto($GLOBALS['photos_dir'] . "/$tmp_name", $GLOBALS['photos_dir'] . "/$lid.$ext");
             /** @var array $dim */
             $dim = getimagesize($GLOBALS['photos_dir'] . "/$lid.$ext");
-            if (!$dim) {
+            if (empty($dim)) {
                 $dim = [0, 0];
             }
 

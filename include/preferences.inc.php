@@ -131,8 +131,9 @@ if ('show' === $op) {
                 break;
             case 'tplset':
                 $ele           = new \XoopsFormSelect($title, $config[$i]->getVar('conf_name'), $config[$i]->getConfValueForOutput());
+                /** @var \XoopsTplsetHandler $tplsetHandler */
                 $tplsetHandler = xoops_getHandler('tplset');
-                $tplsetlist    = &$tplsetHandler->getList();
+                $tplsetlist    = $tplsetHandler->getList();
                 asort($tplsetlist);
                 foreach ($tplsetlist as $key => $name) {
                     $ele->addOption($key, $name);

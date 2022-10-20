@@ -126,12 +126,12 @@ class Blocksadmin
             $result            = $this->db->query($sql);
             if (!$this->db->isResultSet($result)) {
                 \trigger_error("Query Failed! SQL: $sql Error: " . $this->db->error(), \E_USER_ERROR);
+            } else {
+                $modules = [];
+                while (false !== ($row = $this->db->fetchArray($result))) {
+                    $modules[] = (int)$row['module_id'];
+                }
             }
-            $modules = [];
-            while (false !== ($row = $this->db->fetchArray($result))) {
-                $modules[] = (int)$row['module_id'];
-            }
-
             $cachetimeOptions = '';
             foreach ($cachetimes as $cachetime => $cachetimeName) {
                 if ($i->getVar('bcachetime') == $cachetime) {
@@ -283,10 +283,11 @@ class Blocksadmin
         $result  = $this->db->query($sql);
         if (!$this->db->isResultSet($result)) {
             \trigger_error("Query Failed! SQL: $sql Error: " . $this->db->error(), \E_USER_ERROR);
-        }
-        $modules = [];
-        while (false !== ($row = $this->db->fetchArray($result))) {
-            $modules[] = (int)$row['module_id'];
+        } else {
+            $modules = [];
+            while (false !== ($row = $this->db->fetchArray($result))) {
+                $modules[] = (int)$row['module_id'];
+            }
         }
 
         $isCustom = \in_array($myblock->getVar('block_type'), ['C', 'E']);

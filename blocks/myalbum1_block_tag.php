@@ -49,7 +49,7 @@ function myalbum1_tag_block_top_show($options)
 /**
  * @param $options
  *
- * @return string
+ * @return string|false
  */
 function myalbum1_tag_block_top_edit($options)
 {

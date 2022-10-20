@@ -28,7 +28,7 @@ class Utility extends Common\SysUtility
     /**
      * @param $cols
      *
-     * @return string
+     * @return string|null
      */
     public static function mysqliGetSqlSet($cols): string
     {
@@ -78,7 +78,7 @@ class Utility extends Common\SysUtility
                         $field = 255;
                     }
                     if (\function_exists('mb_strcut')) {
-                        $data = mb_strcut($data, 0, $field);
+                        $data = mb_strcut($data, 0, (int)$field);
                     }
                     $data = \addslashes($data);
                     $ret  .= "$col='$data',";
@@ -790,35 +790,38 @@ class Utility extends Common\SysUtility
     // Update a photo
 
     /**
-     * @param int       $lid
-     * @param int       $cid
-     * @param string    $title
-     * @param string    $desc
-     * @param bool|null $valid
-     * @param string    $ext
-     * @param string    $x
-     * @param string    $y
+     * @param int           $lid
+     * @param int           $cid
+     * @param string        $title
+     * @param string        $desc
+     * @param bool|int|null $valid
+     * @param string        $ext
+     * @param string        $x
+     * @param string        $y
      */
     public static function updatePhoto($lid, $cid, $title, $desc, $valid = null, string $ext = '', string $x = '', string $y = ''): void
     {
-        /** @var CategoryHandler $catHandler */ //        $catHandler = xoops_getModuleHandler('cat', $GLOBALS[$moduleDirName.'_dirname']);
+        /** @var CategoryHandler $catHandler */
+        //        $catHandler = xoops_getModuleHandler('cat', $GLOBALS[$moduleDirName.'_dirname']);
         //        require_once __DIR__ . '/Category.php';
         //        $catHandler = CategoryHandler::getInstance();
         $catHandler = Helper::getInstance()
                             ->getHandler('Category');
-        /** @var PhotosHandler $photosHandler */ //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
+        /** @var PhotosHandler $photosHandler */
+        //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
         //        require_once __DIR__ . '/photos.php';
         //        $photosHandler = PhotosHandler::getInstance();
         $photosHandler = Helper::getInstance()
                                ->getHandler('Photos');
 
-        /** @var TextHandler $textHandler */ //        $textHandler   = xoops_getModuleHandler('text', $GLOBALS[$moduleDirName.'_dirname']);
+        /** @var TextHandler $textHandler */
+        //        $textHandler   = xoops_getModuleHandler('text', $GLOBALS[$moduleDirName.'_dirname']);
         //        require_once __DIR__ . '/text.php';
         //        $textHandler = TextHandler::getInstance();
         $textHandler = Helper::getInstance()
                              ->getHandler('Text');
 
-        /** @varPhotos $photo */
+        /** @var Photos $photo */
         $photo = $photosHandler->get($lid);
         $text  = $textHandler->get($lid);
         $cat   = $catHandler->get($cid);

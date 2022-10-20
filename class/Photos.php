@@ -266,12 +266,12 @@ class Photos extends \XoopsObject
 
         $cat = $catHandler->get($this->getVar('cid'));
 
-        if ($cat instanceof \Category) {
+        if ($cat instanceof Category) {
             $ret['cat'] = $cat->toArray();
         }
 
         $text = $textHandler->get($this->getVar('lid'));
-        if ($text instanceof \Text) {
+        if ($text instanceof Text) {
             $ret['text'] = $text->toArray();
         }
 

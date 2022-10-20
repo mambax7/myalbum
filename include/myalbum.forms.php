@@ -129,6 +129,7 @@ function myalbum_admin_form_import_myalbum()
             continue;
         }
 
+        /** @var \XoopsModule $module */
         $module = $moduleHandler->getByDirname($src_dirname);
         if (!is_object($module)) {
             continue;
@@ -141,7 +142,7 @@ function myalbum_admin_form_import_myalbum()
         $myalbum_cat_options = Utility::getCategoryOptions('title', 0, '--', '----', $GLOBALS['xoopsDB']->prefix("{$src_dirname}_cat"), $GLOBALS['xoopsDB']->prefix("{$src_dirname}_photos"));
 
         $frm .= '<p>
-                <h4>' . sprintf(_AM_FMT_IMPORTFROMMYALBUMP, $module->name()) . "</h4>
+                <h4>' . sprintf(_AM_FMT_IMPORTFROMMYALBUMP, (string)$module->name()) . "</h4>
                 <form name='$src_dirname' action='import.php' method='POST'>
                 <input type='hidden' name='src_dirname' value='$src_dirname'>
                 <input type='radio' name='copyormove' value='copy' checked>" . _AM_RADIO_IMPORTCOPY . " &nbsp;

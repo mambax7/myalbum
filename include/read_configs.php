@@ -32,7 +32,7 @@ xoops_loadLanguage('myalbum_constants', $GLOBALS['mydirname']);
 
 // read from xoops_config
 // get my mid
-///** @var \XoopsModuleHandler $moduleHandler */
+/** @var \XoopsModuleHandler $moduleHandler */
 $moduleHandler            = xoops_getHandler('module');
 $GLOBALS['myalbumModule'] = $moduleHandler->getByDirname($GLOBALS['mydirname']);
 if (is_object($GLOBALS['myalbumModule'])) {

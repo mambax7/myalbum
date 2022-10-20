@@ -74,7 +74,7 @@ trait VersionChecks
         $verNum = \PHP_VERSION;
         $reqVer = &$module->getInfo('min_php');
 
-        if (false !== $reqVer && '' !== $reqVer) {
+        if (false !== $reqVer && '' !== $reqVer && !is_array($reqVer)) {
             if (\version_compare($verNum, $reqVer, '<')) {
                 $module->setErrors(\sprintf(\constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_PHP'), $reqVer, $verNum));
                 $success = false;
@@ -114,7 +114,7 @@ trait VersionChecks
                 \curl_setopt($curlHandle, \CURLOPT_SSL_VERIFYPEER, true); //TODO: how to avoid an error when 'Peer's Certificate issuer is not recognized'
                 \curl_setopt($curlHandle, \CURLOPT_HTTPHEADER, ["User-Agent:Publisher\r\n"]);
                 $curlReturn = \curl_exec($curlHandle);
-                if (false === $curlReturn) {
+                if (is_bool($curlReturn)) {
                     \trigger_error(\curl_error($curlHandle));
                 } elseif (false !== \mb_strpos($curlReturn, 'Not Found')) {
                     \trigger_error('Repository Not Found: ' . $infoReleasesUrl);

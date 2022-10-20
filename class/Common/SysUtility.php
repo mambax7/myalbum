@@ -208,6 +208,7 @@ class SysUtility
     public static function cloneRecord($tableName, string $id_field, int $id)
     {
         $new_id = false;
+        $tempTable = false;
         $table  = $GLOBALS['xoopsDB']->prefix($tableName);
         // copy content of the record you wish to clone
         $sql    = "SELECT * FROM $table WHERE $id_field='" . $id . "' ";
@@ -220,6 +221,7 @@ class SysUtility
         }
 
         // set the auto-incremented id's value to blank.
+        /** @var array $tempTable */
         unset($tempTable[$id_field]);
         // insert cloned copy of the original  record
         $sql    = "INSERT INTO $table (" . \implode(', ', \array_keys($tempTable)) . ") VALUES ('" . \implode("', '", $tempTable) . "')";

@@ -55,7 +55,7 @@ function myalbum_tag_block_top_show($options)
 /**
  * @param $options
  *
- * @return null|string
+ * @return false|string
  */
 function myalbum_tag_block_top_edit($options)
 {
@@ -65,5 +65,5 @@ function myalbum_tag_block_top_edit($options)
         return tag_block_top_edit($options);
     }
 
-    return null;
+    return false;
 }
