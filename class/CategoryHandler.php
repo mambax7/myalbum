@@ -33,7 +33,7 @@ final class CategoryHandler extends \XoopsPersistableObjectHandler
     {
         $cat = $this->get($cid);
         ++$depth;
-        if (0 != $cat->getVar('pid')) {
+        if ($cat && (0 != $cat->getVar('pid'))) {
             $depth = $this->prefixDepth($cat->getVar('pid'), $depth);
         } else {
             $depth--;
