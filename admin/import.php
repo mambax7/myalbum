@@ -12,6 +12,7 @@ use XoopsModules\Myalbum\{
 };
 
 require_once __DIR__ . '/admin_header.php';
+include_once XOOPS_ROOT_PATH . '/modules/system/constants.php';
 
 // From myalbum*
 if (!empty($_POST['myalbum_import']) && !empty($_POST['cid'])) {
@@ -162,7 +163,7 @@ elseif (!empty($_POST['imagemanager_import']) && !empty($_POST['imgcat_id'])) {
     $crs = $GLOBALS['xoopsDB']->query($sql);
     [$imgcat_name, $imgcat_storetype] = $GLOBALS['xoopsDB']->fetchRow($crs);
 
-    $sql = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . "SET pid=0,title='" . addslashes($imgcat_name) . "'";
+    $sql = 'INSERT INTO ' . $GLOBALS['xoopsDB']->prefix($table_cat) . " SET pid=0,title='" . addslashes($imgcat_name) . "'";
     $GLOBALS['xoopsDB']->query($sql)
     || exit('DB error: INSERT cat table');
     $cid = $GLOBALS['xoopsDB']->getInsertId();
@@ -176,9 +177,9 @@ elseif (!empty($_POST['imagemanager_import']) && !empty($_POST['imgcat_id'])) {
         $ext      = mb_substr(\mb_strrchr($image_name, '.'), 1);
 
         // photos table
-        $sql    = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET cid='$cid',title='" . addslashes($image_nicename) . "',ext='$ext',submitter='$my_uid',`status`='$image_display',date='$image_created'";
+        $sql    = 'INSERT INTO  ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " SET cid='$cid',title='" . addslashes($image_nicename) . "',ext='$ext',submitter='$my_uid',`status`='$image_display',date='$image_created'";
         $result = $GLOBALS['xoopsDB']->query($sql);
-        if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+        if (!$result) {
             throw new \RuntimeException("DB error: INSERT photo table! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error());
         }
         $lid = $GLOBALS['xoopsDB']->getInsertId();
@@ -205,7 +206,7 @@ elseif (!empty($_POST['imagemanager_import']) && !empty($_POST['imgcat_id'])) {
         }
 
         [$width, $height, $type] = getimagesize($dst_file);
-        $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . "SET res_x='$width',res_y='$height' WHERE lid='$lid'";
+        $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " SET res_x='$width',res_y='$height' WHERE lid='$lid'";
         $GLOBALS['xoopsDB']->query($sql);
 
         ++$import_count;
