@@ -21,7 +21,8 @@ class Forms extends \XoopsObject
         $titleTray  = new \XoopsFormElementTray(\_AM_TH_TITLE, '<br><br>');
         $titleTray->addElement($title_text);
         $titleTray->addElement(new \XoopsFormLabel('', \_ALBM_BATCHBLANK));
-        $cat_select       = new \XoopsFormLabel(\_AM_TH_CATEGORIES, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', null, false));
+//        $cat_select       = new \XoopsFormLabel(\_AM_TH_CATEGORIES, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', null, false));
+        $cat_select       = $GLOBALS['cattree']->makeSelectElement('cid', 'title', '--', null, false, 0, '', \_AM_TH_CATEGORIES);
         $submitter_select = new \XoopsFormSelectUser(\_AM_TH_SUBMITTER, 'submitter', false, $GLOBALS['submitter']);
         $date_text        = new \XoopsFormText(\_AM_TH_DATE, 'post_date', 20, 20, \formatTimestamp(\time(), \_ALBM_DTFMT_YMDHI));
         $dirTray          = new \XoopsFormElementTray(\_ALBM_TEXT_DIRECTORY, '<br><br>');
@@ -217,7 +218,8 @@ class Forms extends \XoopsObject
         $form->addElement(new \XoopsFormText(\_AM_CAT_TH_IMGURL, 'imgurl', 50, 150, $GLOBALS['myts']->htmlSpecialChars($imgurl)));
 
         // Parent Category
-        $form->addElement(new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('pid', 'title', '--', $pid, true)));
+//        $form->addElement(new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('pid', 'title', '--', $pid, true)));
+        $form->addElement($GLOBALS['cattree']->makeSelectElement('pid', 'title', '--', $pid, true, 0, '', \_ALBM_PHOTOCAT));
 
         // Buttons
         $buttonTray = new \XoopsFormElementTray('', '&nbsp;');
@@ -253,7 +255,8 @@ class Forms extends \XoopsObject
 
         $title_text = new \XoopsFormText(\_ALBM_PHOTOTITLE, 'title', 50, 255, $photo['title']);
 
-        $cat_select = new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', Request::getInt('cid', null, 'REQUEST'), false));
+//        $cat_select = new \XoopsFormLabel(\_ALBM_PHOTOCAT, $GLOBALS['cattree']->makeSelBox('cid', 'title', '--', Request::getInt('cid', null, 'REQUEST'), false));
+        $cat_select = $GLOBALS['cattree']->makeSelectElement('cid', 'title', '--', \Xmf\Request::getInt('cid', null, 'REQUEST'), false, 0, '', \_ALBM_PHOTOCAT);
 
         $html_configs           = [];
         $html_configs['name']   = 'desc_text';

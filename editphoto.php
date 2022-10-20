@@ -236,7 +236,8 @@ $form->setExtra("enctype='multipart/form-data'");
 
 $title_text = new \XoopsFormText(_ALBM_PHOTOTITLE, 'title', 50, 255, $photo_obj->getVar('title'));
 
-$cat_select = new \XoopsFormLabel('', $GLOBALS['cattree']->makeSelBox('cid', 'title', '-', $photo_obj->getVar('cid')));
+//$cat_select = new \XoopsFormLabel('', $GLOBALS['cattree']->makeSelBox('cid', 'title', '-', $photo_obj->getVar('cid')));
+$cat_select       = $GLOBALS['cattree']->makeSelectElement('cid', 'title', '-', null, false, 0, '', '');
 
 $cat_link = new \XoopsFormLabel("<a href='javascript:location.href=\"" . XOOPS_URL . '/modules/' . $moduleDirName . "/viewcat.php?cid=\"+document.uploadphoto.cid.value;'>" . _GO . '</a>');
 $catTray  = new \XoopsFormElementTray(_ALBM_PHOTOCAT, '&nbsp;');
