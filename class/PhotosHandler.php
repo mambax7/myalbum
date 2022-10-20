@@ -130,7 +130,7 @@ class PhotosHandler extends \XoopsPersistableObjectHandler
             $photo = $this->get($photo);
         }
 
-        if (!\is_a($photo, 'Photos')) {
+        if (!\is_a($photo, Photos::class)) {
             return false;
         }
 
