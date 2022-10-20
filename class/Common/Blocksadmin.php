@@ -121,14 +121,14 @@ class Blocksadmin
             2592000 => \_MONTH,
         ];
         foreach ($blockArray as $i) {
+            $modules = [];
             $groupsPermissions = $grouppermHandler->getGroupIds('block_read', $i->getVar('bid'));
             $sql               = 'SELECT module_id FROM ' . $this->db->prefix('block_module_link') . ' WHERE block_id=' . $i->getVar('bid');
             $result            = $this->db->query($sql);
             if (!$this->db->isResultSet($result)) {
                 \trigger_error("Query Failed! SQL: $sql Error: " . $this->db->error(), \E_USER_ERROR);
             } else {
-                $modules = [];
-                while (false !== ($row = $this->db->fetchArray($result))) {
+                  while (false !== ($row = $this->db->fetchArray($result))) {
                     $modules[] = (int)$row['module_id'];
                 }
             }
@@ -278,13 +278,13 @@ class Blocksadmin
         \xoops_loadLanguage('admin/blocksadmin', 'system');
         \xoops_loadLanguage('admin/groups', 'system');
 
+        $modules = [];
         $myblock = new \XoopsBlock($bid);
         $sql     = 'SELECT module_id FROM ' . $this->db->prefix('block_module_link') . ' WHERE block_id=' . $bid;
         $result  = $this->db->query($sql);
         if (!$this->db->isResultSet($result)) {
             \trigger_error("Query Failed! SQL: $sql Error: " . $this->db->error(), \E_USER_ERROR);
         } else {
-            $modules = [];
             while (false !== ($row = $this->db->fetchArray($result))) {
                 $modules[] = (int)$row['module_id'];
             }

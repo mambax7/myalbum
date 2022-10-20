@@ -9,7 +9,6 @@ use XoopsModules\Myalbum\{
     CategoryHandler,
     Forms,
     Helper,
-    MediaUploader,
     PhotosHandler,
     Preview,
     TextHandler,
@@ -23,8 +22,12 @@ use XoopsModules\Myalbum\{
 
 //use XoopsModules\Tag\Helper; //TODO
 
+global $global_perms;
+
 $lid = '';
 require_once __DIR__ . '/header.php';
+require_once __DIR__ . '/include/get_perms.php';
+xoops_load('xoopsmediauploader');
 
 $catHandler    = $helper->getHandler('Category');
 $photosHandler = $helper->getHandler('Photos');
@@ -142,15 +145,19 @@ if (!empty($_POST['submit'])) {
     } else {
         if (isset($GLOBALS['myalbumModuleConfig']['myalbum_canresize'])
             && $GLOBALS['myalbumModuleConfig']['myalbum_canresize']) {
-            $uploader = new MediaUploader($GLOBALS['photos_dir'], explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']), $GLOBALS['myalbumModuleConfig']['myalbum_fsize'], null, null, explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts']));
-        } else {
-            $uploader = new MediaUploader(
+            $uploader = new \XoopsMediaUploader(
                 $GLOBALS['photos_dir'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']),
-                $GLOBALS['myalbumModuleConfig']['myalbum_fsize'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_width'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_height'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts'])
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
+                null,
+                null);
+        } else {
+            $uploader = new \XoopsMediaUploader(
+                $GLOBALS['photos_dir'],
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
+                $helper->getConfig('myalbum_width'),
+                $helper->getConfig('myalbum_height')
             );
         }
 
@@ -215,8 +222,8 @@ if (!empty($_POST['submit'])) {
     @$photosHandler->insert($photo_obj, true);
 
     if (!Utility::createThumb($GLOBALS['photos_dir'] . "/$newid.$ext", $newid, $ext)) {
-        $sql =
-            $xoopsDB->query("DELETE FROM $table_photos WHERE lid=$newid");
+        $sql = "DELETE FROM $table_photos WHERE lid=$newid";
+        $xoopsDB->query($sql);
         redirect_header('submit.php', 2, _ALBM_FILEREADERROR);
     }
 
@@ -226,8 +233,8 @@ if (!empty($_POST['submit'])) {
     @$textHandler->insert($text, true);
 
     // Update User's Posts (Should be modified when need admission.)
-    $sql =
-        $xoopsDB->query('UPDATE ' . $xoopsDB->prefix('users') . " SET posts=posts+'$myalbum_addposts' WHERE uid='$submitter'");
+    $sql = 'UPDATE ' . $xoopsDB->prefix('users') . " SET posts=posts+'$myalbum_addposts' WHERE uid='$submitter'";
+    $xoopsDB->query($sql);
 
     // Trigger Notification
     if ($status) {
@@ -287,15 +294,20 @@ if ('imagemanager' !== $caller && !empty($_POST['preview'])) {
     if (is_readable($_FILES[$field]['tmp_name'])) {
         // new preview
         if ($GLOBALS['myalbumModuleConfig']['myalbum_canresize']) {
-            $uploader = new MediaUploader($GLOBALS['photos_dir'], explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']), $GLOBALS['myalbumModuleConfig']['myalbum_fsize'], null, null, explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts']));
-        } else {
-            $uploader = new MediaUploader(
+            $uploader = new \XoopsMediaUploader(
                 $GLOBALS['photos_dir'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedmime']),
-                $GLOBALS['myalbumModuleConfig']['myalbum_fsize'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_width'],
-                $GLOBALS['myalbumModuleConfig']['myalbum_height'],
-                explode('|', $GLOBALS['myalbumModuleConfig']['myalbum_allowedexts'])
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
+                null,
+                null
+            );
+        } else {
+            $uploader = new \XoopsMediaUploader(
+                $GLOBALS['photos_dir'],
+                explode('|', $helper->getConfig('myalbum_allowedmime')),
+                $helper->getConfig('myalbum_fsize'),
+                $helper->getConfig('myalbum_width'),
+                $helper->getConfig('myalbum_height')
             );
         }
         $uploader->setPrefix('tmp_');
