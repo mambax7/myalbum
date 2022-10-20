@@ -19,9 +19,9 @@ if (defined('FOR_XOOPS_LANG_CHECKER') || !defined('MYALBUM_MB_LOADED')) {
     define('_ALBM_AM_BUTTON_EXTRACT', 'extract');
     define('_ALBM_AM_PHOTOMANAGER', 'Photo Manager');
     define('_ALBM_AM_PHOTONAVINFO', 'Photo No. %s-%s (out of %s photos hit)');
-    define('_ALBM_AM_LABEL_REMOVE', 'Remove the photos checked');
-    define('_ALBM_AM_BUTTON_REMOVE', 'Remove!');
-    define('_ALBM_AM_JS_REMOVECONFIRM', 'OK to Remove pictures?');
+    define('_ALBM_AM_LABEL_REMOVE', 'Delete the photos checked');
+    define('_ALBM_AM_BUTTON_REMOVE', 'Delete!');
+    define('_ALBM_AM_JS_REMOVECONFIRM', 'OK to Delete pictures?');
     define('_ALBM_AM_LABEL_MOVE', 'Change category for the photos checked');
     define('_ALBM_AM_BUTTON_MOVE', 'Move');
     define('_ALBM_AM_BUTTON_UPDATE', 'Modify');
