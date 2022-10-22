@@ -32,7 +32,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         if ($cat_limitation !== 0) {
             if ($cat_limit_recursive) {
                 require_once XOOPS_ROOT_PATH . '/class/xoopstree.php';
-                $cattree  = new \XoopsTree($GLOBALS['xoopsDB']->prefix($table_cat), 'cid', 'pid');
+                $cattree  = new \XoopsTree($xoopsDB->prefix($table_cat), 'cid', 'pid');
                 $children = $cattree->getAllChildId($cat_limitation);
                 $whr_cat  = 'cid IN (';
                 foreach ($children as $child) {
