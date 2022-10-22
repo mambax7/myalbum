@@ -118,6 +118,15 @@ $modversion['tables'][1] = "{$moduleDirName }_photos";
 $modversion['tables'][2] = "{$moduleDirName }_text";
 $modversion['tables'][3] = "{$moduleDirName }_votedata";
 
+// ------------------- Help files ------------------- //
+$modversion['help']        = 'page=help';
+$modversion['helpsection'] = [
+    ['name' => _MI_MYALBUM_OVERVIEW, 'link' => 'page=help'],
+    ['name' => _MI_MYALBUM_DISCLAIMER, 'link' => 'page=disclaimer'],
+    ['name' => _MI_MYALBUM_LICENSE, 'link' => 'page=license'],
+    ['name' => _MI_MYALBUM_SUPPORT, 'link' => 'page=support'],
+];
+
 // ------------------- Blocks ------------------- //
 $modversion['blocks'][] = [
     'file'        => $moduleDirName . '_rphoto.php',

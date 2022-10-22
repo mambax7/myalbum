@@ -5,6 +5,7 @@ if (defined('FOR_XOOPS_LANG_CHECKER') || !defined('MYALBUM_MI_LOADED')) {
     define('MYALBUM_MI_LOADED', 1);
     // The name of this module
     define('_ALBM_MYALBUM_NAME', 'MyAlbum');
+    define('_MI_MYALBUM_NAME', _ALBM_MYALBUM_NAME);
     // A brief description of this module
     define('_ALBM_MYALBUM_DESC', 'Creates a photos section where users can search/submit/rate various photos.');
     // Names of blocks for this module (Not all module has blocks)
@@ -118,4 +119,17 @@ if (defined('FOR_XOOPS_LANG_CHECKER') || !defined('MYALBUM_MI_LOADED')) {
     define('_ALBM_CFG_ENDOFRSS', 'End of URL for .htaccess SEO (RSS output)');
     define('_ALBM_CFG_DESCENDOFRSS', 'If you change this you will have to modify .htaccess SEO (see /docs)');
     define('_ALBM_ACTION', 'Actions');
+
+    //Help
+    define('_MI_MYALBUM_DIRNAME', basename(dirname(__DIR__, 2)));
+    define('_MI_MYALBUM_HELP_HEADER', __DIR__ . '/help/helpheader.tpl');
+    define('_MI_MYALBUM_BACK_2_ADMIN', 'Back to Administration of ');
+    define('_MI_MYALBUM_OVERVIEW', 'Overview');
+
+    //define('_MI_MYALBUM_HELP_DIR', __DIR__);
+
+    //help multipage
+    define('_MI_MYALBUM_DISCLAIMER', 'Disclaimer');
+    define('_MI_MYALBUM_LICENSE', 'License');
+    define('_MI_MYALBUM_SUPPORT', 'Support');
 }
