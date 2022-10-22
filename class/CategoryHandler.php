@@ -11,7 +11,7 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  *
  * @author  Simon Roberts <simon@chronolabs.coop>
  */
-final class CategoryHandler extends \XoopsPersistableObjectHandler
+class CategoryHandler extends \XoopsPersistableObjectHandler
 {
 
     /**
