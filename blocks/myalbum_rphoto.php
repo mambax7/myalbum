@@ -62,7 +62,6 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
 
         if ($numrows <= $photos_num) {
             $sql    = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
-            $result = $xoopsDB->query($sql);
         } else {
             $sql      = 'SELECT lid FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
             $result   = $xoopsDB->query($sql);
@@ -82,8 +81,8 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
                 $whr_lid = $lids[$sel_lids];
             }
             $sql    = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND lid IN ($whr_lid)";
-            $result = $xoopsDB->query($sql);
         }
+        $result = $xoopsDB->query($sql);
 
         $count = 1;
 
