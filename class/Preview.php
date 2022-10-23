@@ -139,7 +139,7 @@ final class Preview extends \XoopsObject
         }
 
         // Submitter's name
-        $submitter_name = static::getNameFromUid($submitter);
+        $submitter_name = Preview::getNameFromUid($submitter);
 
         // Category's title
         $cat_title = \is_object($cat) ? $cat->getVar('title') : '';

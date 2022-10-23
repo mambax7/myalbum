@@ -103,7 +103,7 @@ final class GroupFormCheckBox extends \XoopsFormElement
     /**
      * Sets appendix of checkboxes
      *
-     * @param mixed[] $appendix
+     * @param array $appendix
      */
     public function setAppendix(array $appendix): void
     {

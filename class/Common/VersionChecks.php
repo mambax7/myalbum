@@ -89,7 +89,7 @@ trait VersionChecks
      * @param string|null        $source
      * @param string|null        $default
      *
-     * @return string|mixed[]|null info about the latest module version, if newer
+     * @return string|array|null info about the latest module version, if newer
      */
     public static function checkVerModule(
         \Xmf\Module\Helper $helper,
