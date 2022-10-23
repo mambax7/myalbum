@@ -56,12 +56,16 @@ final class Forms extends \XoopsObject
      */
     public static function getAdminFormExport(): string
     {
-        $irs            = $GLOBALS['xoopsDB']->query(
-            'SELECT c.imgcat_id,c.imgcat_name,c.imgcat_storetype,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight'
-        );
-        $imgcat_options = '';
-        while ([$imgcat_id, $imgcat_name, $imgcat_storetype, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
-            $imgcat_options .= "<option value='$imgcat_id'>$imgcat_storetype : $imgcat_name ($imgcat_sum)</option>\n";
+        $sql = 'SELECT c.imgcat_id,c.imgcat_name,c.imgcat_storetype,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight';
+        $irs = $GLOBALS['xoopsDB']->query($sql);
+
+        if ($GLOBALS['xoopsDB']->isResultSet($irs)) {
+            $imgcat_options = '';
+            while ([$imgcat_id, $imgcat_name, $imgcat_storetype, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
+                $imgcat_options .= "<option value='$imgcat_id'>$imgcat_storetype : $imgcat_name ($imgcat_sum)</option>\n";
+            }
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
         }
 
         // Options for Selecting a category in myAlbum-P
@@ -121,24 +125,25 @@ final class Forms extends \XoopsObject
         $moduleHandler = \xoops_getHandler('module');
         $sql           = 'SELECT dirname FROM ' . $GLOBALS['xoopsDB']->prefix('modules') . " WHERE dirname like 'myalbum%'";
         $mrs           = $GLOBALS['xoopsDB']->query($sql);
-        $frm           = '';
-        while ([$src_dirname] = $GLOBALS['xoopsDB']->fetchRow($mrs)) {
-            if ($GLOBALS['mydirname'] == $src_dirname) {
-                continue;
-            }
+        if ($GLOBALS['xoopsDB']->isResultSet($mrs)) {
+            $frm = '';
+            while ([$src_dirname] = $GLOBALS['xoopsDB']->fetchRow($mrs)) {
+                if ($GLOBALS['mydirname'] == $src_dirname) {
+                    continue;
+                }
 
-            $module = $moduleHandler->getByDirname($src_dirname);
-            if (!\is_object($module)) {
-                continue;
-            }
+                $module = $moduleHandler->getByDirname($src_dirname);
+                if (!\is_object($module)) {
+                    continue;
+                }
 
-            if (!$GLOBALS['xoopsUser']->isAdmin($module->getVar('mid'))) {
-                continue;
-            }
+                if (!$GLOBALS['xoopsUser']->isAdmin($module->getVar('mid'))) {
+                    continue;
+                }
 
-            $myalbum_cat_options = Utility::getCategoryOptions('title', 0, '--', '----', $GLOBALS['xoopsDB']->prefix("{$src_dirname}_cat"), $GLOBALS['xoopsDB']->prefix("{$src_dirname}_photos"));
+                $myalbum_cat_options = Utility::getCategoryOptions('title', 0, '--', '----', $GLOBALS['xoopsDB']->prefix("{$src_dirname}_cat"), $GLOBALS['xoopsDB']->prefix("{$src_dirname}_photos"));
 
-            $frm .= '<p>
+                $frm .= '<p>
                 <h4>' . \sprintf(\_AM_FMT_IMPORTFROMMYALBUMP, $module->name()) . "</h4>
                 <form name='$src_dirname' action='import.php' method='POST'>
                 <input type='hidden' name='src_dirname' value='$src_dirname' >
@@ -151,7 +156,10 @@ final class Forms extends \XoopsObject
                 <input type='submit' name='myalbum_import' value='" . \_GO . "' onclick='return confirm(\"" . \_AM_MB_IMPORTCONFIRM . "\");' >
                 </form>\n";
 
-            $frm .= '<br></p>';
+                $frm .= '<br></p>';
+            }
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
         }
 
         return $frm;
@@ -169,8 +177,12 @@ final class Forms extends \XoopsObject
             $sql            = 'SELECT c.imgcat_id,c.imgcat_name,COUNT(i.image_id) AS imgcat_sum FROM ' . $GLOBALS['xoopsDB']->prefix('imagecategory') . ' c NATURAL LEFT JOIN ' . $GLOBALS['xoopsDB']->prefix('image') . ' i GROUP BY c.imgcat_id ORDER BY c.imgcat_weight';
             $irs            = $GLOBALS['xoopsDB']->query($sql);
             $imgcat_options = '';
-            while ([$imgcat_id, $imgcat_name, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
-                $imgcat_options .= "<option value='$imgcat_id'>$imgcat_name ($imgcat_sum)</option>\n";
+            if ($GLOBALS['xoopsDB']->isResultSet($irs)) {
+                while ([$imgcat_id, $imgcat_name, $imgcat_sum] = $GLOBALS['xoopsDB']->fetchRow($irs)) {
+                    $imgcat_options .= "<option value='$imgcat_id'>$imgcat_name ($imgcat_sum)</option>\n";
+                }
+            } else {
+                \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
             }
             $frm .= '<p>
                 <h4>' . \_AM_FMT_IMPORTFROMIMAGEMANAGER . "</h4>

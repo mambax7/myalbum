@@ -50,38 +50,41 @@ if (!defined('MYALBUM_BLOCK_TOPHITS_INCLUDED')) {
         $GLOBALS['myts'] = \MyTextSanitizer::getInstance();
         $sql             = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($GLOBALS['table_photos']) . " WHERE status>0 AND $whr_cat ORDER BY hits DESC";
         $result          = $xoopsDB->query($sql, $photos_num, 0);
-
-        $count = 1;
-        /** @var array $photo */
-        while (false !== ($photo = $xoopsDB->fetchArray($result))) {
-            $photo['title'] = htmlspecialchars($photo['title'], ENT_QUOTES | ENT_HTML5);
-            if (\mb_strlen($photo['title']) >= $title_max_length) {
-                if (!XOOPS_USE_MULTIBYTES) {
-                    $photo['title'] = mb_substr($photo['title'], 0, $title_max_length - 1) . '...';
-                } elseif (function_exists('mb_strcut')) {
-                    $photo['title'] = mb_strcut($photo['title'], 0, $title_max_length - 1) . '...';
-                }
-            }
-            $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
-            $photo['date']       = formatTimestamp($photo['unixtime'], 's');
-            $photo['thumbs_url'] = $GLOBALS['thumbs_url'];
-
-            if (\in_array(\mb_strtolower($photo['ext']), $GLOBALS['myalbum_normal_exts'], true)) {
-                $width_spec = "width= '" . $GLOBALS['myalbumModuleConfig']['myalbum_thumbsize'] . "'";
-                if ($GLOBALS['myalbumModuleConfig']['myalbum_makethumb']) {
-                    //                    $thumbs_dir = $GLOBALS['thumbs_dir'];
-                    [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
-                    if ($width <= $GLOBALS['myalbumModuleConfig']['myalbum_thumbsize']) { // if thumb images was made, 'width' and 'height' will not set.
-                        $width_spec = '';
+        if (!$xoopsDB->isResultSet($result)) {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+        } else {
+            $count = 1;
+            /** @var array $photo */
+            while (false !== ($photo = $xoopsDB->fetchArray($result))) {
+                $photo['title'] = htmlspecialchars($photo['title'], ENT_QUOTES | ENT_HTML5);
+                if (\mb_strlen($photo['title']) >= $title_max_length) {
+                    if (!XOOPS_USE_MULTIBYTES) {
+                        $photo['title'] = mb_substr($photo['title'], 0, $title_max_length - 1) . '...';
+                    } elseif (function_exists('mb_strcut')) {
+                        $photo['title'] = mb_strcut($photo['title'], 0, $title_max_length - 1) . '...';
                     }
                 }
-                $photo['width_spec'] = $width_spec;
-            } else {
-                $photo['ext']        = 'gif';
-                $photo['width_spec'] = '';
-            }
+                $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
+                $photo['date']       = formatTimestamp($photo['unixtime'], 's');
+                $photo['thumbs_url'] = $GLOBALS['thumbs_url'];
 
-            $block['photo'][$count++] = $photo;
+                if (\in_array(\mb_strtolower($photo['ext']), $GLOBALS['myalbum_normal_exts'], true)) {
+                    $width_spec = "width= '" . $GLOBALS['myalbumModuleConfig']['myalbum_thumbsize'] . "'";
+                    if ($GLOBALS['myalbumModuleConfig']['myalbum_makethumb']) {
+                        //                    $thumbs_dir = $GLOBALS['thumbs_dir'];
+                        [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
+                        if ($width <= $GLOBALS['myalbumModuleConfig']['myalbum_thumbsize']) { // if thumb images was made, 'width' and 'height' will not set.
+                            $width_spec = '';
+                        }
+                    }
+                    $photo['width_spec'] = $width_spec;
+                } else {
+                    $photo['ext']        = 'gif';
+                    $photo['width_spec'] = '';
+                }
+
+                $block['photo'][$count++] = $photo;
+            }
         }
         $block['mod_url'] = $mod_url;
         $block['cols']    = $cols;

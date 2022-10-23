@@ -51,8 +51,12 @@ if (count($cats) > 0) {
     $sql          = "SELECT cid,COUNT(lid) FROM $table_photos WHERE status>0 AND $whr_ext GROUP BY cid";
     $prs          = $xoopsDB->query($sql);
     $photo_counts = [];
-    while ([$c, $p] = $xoopsDB->fetchRow($prs)) {
-        $photo_counts[$c] = $p;
+    if ($xoopsDB->isResultSet($prs)) {
+        while ([$c, $p] = $xoopsDB->fetchRow($prs)) {
+            $photo_counts[$c] = $p;
+        }
+    } else {
+        \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
     }
     foreach ($cats as $cat) {
         $prefix      = str_replace('.', '--', mb_substr($cat['prefix'], 1));
@@ -70,11 +74,18 @@ if (count($cats) > 0) {
 
         $sql = "SELECT COUNT(*) FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext";
         $rs  = $xoopsDB->query($sql);
-        [$total] = $xoopsDB->fetchRow($rs);
+        if ($xoopsDB->isResultSet($rs)) {
+            [$total] = $xoopsDB->fetchRow($rs);
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+        }
         if ($total > 0) {
             $start = Request::getInt('start', 0, 'GET');
             $sql   = "SELECT lid,cid,title,ext,submitter,res_x,res_y,$select_is_normal AS is_normal FROM $table_photos WHERE cid='$cid' AND status>0 AND $whr_ext ORDER BY date DESC LIMIT $start,$num";
             $prs   = $xoopsDB->query($sql);
+            if (!$xoopsDB->isResultSet($prs)) {
+                \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+            }
             $xoopsTpl->assign('image_total', $total);
             $xoopsTpl->assign('lang_image', _IMAGE);
             $xoopsTpl->assign('lang_imagename', _IMAGENAME);

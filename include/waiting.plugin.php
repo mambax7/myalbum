@@ -27,9 +27,9 @@ if (!function_exists('b_waiting_myalbum_base')) {
         }
         $mydirnumber = '' === $regs[2] ? '' : (int)$regs[2];
 
-        $sql =
-        $result = $xoopsDB->query('SELECT COUNT(*) FROM ' . $xoopsDB->prefix("myalbum{$mydirnumber}_photos") . ' WHERE status=0');
-        if ($result) {
+        $sql = 'SELECT COUNT(*) FROM ' . $xoopsDB->prefix("myalbum{$mydirnumber}_photos") . ' WHERE status=0';
+        $result = $xoopsDB->query($sql);
+        if ($xoopsDB->isResultSet($result)) {
             $block['adminlink'] = XOOPS_URL . "/modules/myalbum{$mydirnumber}/admin/admission.php";
             [$block['pendingnum']] = $xoopsDB->fetchRow($result);
             $block['lang_linkname'] = _PI_WAITING_WAITINGS;

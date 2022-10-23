@@ -44,7 +44,7 @@ if ('insert' === $action) {
     $cols   = ['pid' => 'I:N:0', 'title' => '50:E:1', 'imgurl' => '150:E:0', 'weight' => 'I:N:0'];
     $sql    .= Utility::mysqliGetSqlSet($cols);
     $result = $GLOBALS['xoopsDB']->query($sql);
-    if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+    if (!$result) {
         throw new \RuntimeException("DB Error: insert category! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error());
     }
 
@@ -99,20 +99,26 @@ if ('insert' === $action) {
     $cid = Request::getInt('delcat', 0, 'POST');
 
     $children[0] = 0;
-    //get all categories under the specified category
+    //get all child categories under the specified category
     foreach ($GLOBALS['cattree']->getAllChild($cid) as $child) {
         $childCid            = $child->getVar('cid');
         $children[$childCid] = $childCid;
     }
     $whr = 'cid IN (';
+    //Delete all subscriptions for all children
     foreach ($children as $child) {
         $whr .= "$child,";
         xoops_notification_deletebyitem($myalbum_mid, 'category', $child);
     }
     $whr .= "$cid)";
+    //Delete all subscriptions for this category
     xoops_notification_deletebyitem($myalbum_mid, 'category', $cid);
+    //include selected category together with children
+    $children[] = $cid;
+    //delete photos from the category
     $criteria = new \Criteria('cid', '(' . implode(',', $children) . ')', 'IN');
     Utility::deletePhotos($criteria);
+    //delete category
     $sql = 'DELETE FROM ' . $GLOBALS['xoopsDB']->prefix($table_cat) . " WHERE $whr";
     $GLOBALS['xoopsDB']->query($sql)
     || exit('DB error: DELETE cat table');
@@ -138,7 +144,11 @@ if ('edit' === $disp && $cid > 0) {
     // Editing
     $sql       = 'SELECT cid,pid,weight,title,imgurl FROM ' . $GLOBALS['xoopsDB']->prefix($table_cat) . " WHERE cid='$cid'";
     $crs       = $GLOBALS['xoopsDB']->query($sql);
-    $cat_array = $GLOBALS['xoopsDB']->fetchArray($crs);
+    if ($GLOBALS['xoopsDB']->isResultSet($crs)) {
+        $cat_array = $GLOBALS['xoopsDB']->fetchArray($crs);
+    } else {
+        \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
+    }
     echo Forms::getAdminFormDisplayEdit($cat_array, _AM_CAT_MENU_EDIT, 'update');
 } elseif ('new' === $disp) {
     // New

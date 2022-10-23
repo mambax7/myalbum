@@ -39,7 +39,11 @@ if (!empty($_POST['imagemanager_export']) && !empty($_POST['imgcat_id']) && !emp
     $sql = "SELECT imgcat_storetype,imgcat_maxsize FROM $dst_table_cat WHERE imgcat_id='$dst_cid'";
     $crs = $xoopsDB->query($sql)
            || exit('Invalid imgcat_id.');
-    [$imgcat_storetype, $imgcat_maxsize] = $xoopsDB->fetchRow($crs);
+    if ($xoopsDB->isResultSet($crs)) {
+        [$imgcat_storetype, $imgcat_maxsize] = $xoopsDB->fetchRow($crs);
+    } else {
+        \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+    }
 
     // mime type look up
     $mime_types = ['gif' => 'image/gif', 'png' => 'image/png', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg'];

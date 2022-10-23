@@ -6,7 +6,12 @@ if (\mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
     global $xoopsDB;
     $query  = 'SELECT mid FROM ' . $xoopsDB->prefix('modules') . " WHERE dirname='" . $modversion['dirname'] . "' ";
     $result = $xoopsDB->query($query);
-    $record = $xoopsDB->fetchArray($result);
+    if ($xoopsDB->isResultSet($result)) {
+        $record = $xoopsDB->fetchArray($result);
+    } else {
+        \trigger_error("Query Failed! SQL: $sql Error: " . $xoopsDB->error(), \E_USER_ERROR);
+    }
+
     if ($record) {
         $mid   = $record['mid'];
         $count = count($modversion['blocks']);
@@ -56,19 +61,28 @@ if (\mb_substr(XOOPS_VERSION, 6, 3) < 2.1) {
 
         $sql     = 'SELECT * FROM ' . $xoopsDB->prefix('newblocks') . ' WHERE mid=' . $mid . " AND block_type <>'D' AND func_num > $count";
         $fresult = $xoopsDB->query($sql);
-        /** @var array $fblock */
-        while (false !== ($fblock = $xoopsDB->fetchArray($fresult))) {
-            $local_msgs[] = 'Non Defined Block <b>' . $fblock['name'] . '</b> will be deleted';
-            $sql          = 'DELETE FROM ' . $xoopsDB->prefix('newblocks') . " WHERE bid='" . $fblock['bid'] . "'";
-            $iret         = $xoopsDB->query($sql);
-        }
 
+        if (!$xoopsDB->isResultSet($fresult)) {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+        } else {
+            /** @var array $fblock */
+            while (false !== ($fblock = $xoopsDB->fetchArray($fresult))) {
+                $local_msgs[] = 'Non Defined Block <b>' . $fblock['name'] . '</b> will be deleted';
+                $sql          = 'DELETE FROM ' . $xoopsDB->prefix('newblocks') . " WHERE bid='" . $fblock['bid'] . "'";
+                $iret         = $xoopsDB->query($sql);
+            }
+        }
+  
         for ($i = 1; $i <= $count; ++$i) {
             $sql     = 'SELECT name,options FROM ' . $xoopsDB->prefix('newblocks') . ' WHERE mid=' . $mid . ' AND func_num=' . $i . " AND show_func='" . addslashes($modversion['blocks'][$i]['show_func']) . "' AND func_file='" . addslashes($modversion['blocks'][$i]['file']) . "'";
             $fresult = $xoopsDB->query($sql);
-            /** @var array $fblock */
-            $fblock = $xoopsDB->fetchArray($fresult);
-            if (isset($fblock['options'])) {
+            if ($xoopsDB->isResultSet($fresult)) {
+                /** @var array $fblock */
+                $fblock = $xoopsDB->fetchArray($fresult);
+            } else {
+                \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+            }
+              if (isset($fblock['options'])) {
                 /** @var array $old_vals */
                 $old_vals = explode('|', $fblock['options']);
                 $def_vals = explode('|', $modversion['blocks'][$i]['options']);

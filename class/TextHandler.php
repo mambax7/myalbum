@@ -27,14 +27,15 @@ class TextHandler extends \XoopsPersistableObjectHandler
     /**
      * @return string
      */
-    public function getBytes(): string
+    public function getBytes(): ?string
     {
         $bytes  = '';
         $sql    = 'SELECT SUM(LENGTH(`description`)) AS `bytes` FROM ' . $GLOBALS['xoopsDB']->prefix($GLOBALS['table_text']);
         $result = $GLOBALS['xoopsDB']->queryF($sql);
         if ($GLOBALS['xoopsDB']->isResultSet($result)) {
-            //            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
             [$bytes] = $GLOBALS['xoopsDB']->fetchRow($result);
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
         }
 
         return $bytes;

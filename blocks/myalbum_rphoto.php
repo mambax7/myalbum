@@ -55,7 +55,12 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         // Get number of photo
         $sql    = 'SELECT count(lid) FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
         $result = $xoopsDB->query($sql);
-        [$numrows] = $xoopsDB->fetchRow($result);
+        if ($xoopsDB->isResultSet($result)) {
+            [$numrows] = $xoopsDB->fetchRow($result);
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+        }
+
         if ($numrows < 1) {
             return $block;
         }
@@ -66,10 +71,15 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
             $sql      = 'SELECT lid FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND $whr_cat AND $whr_ext";
             $result   = $xoopsDB->query($sql);
             $lids     = [];
-            $sel_lids = [];
-            while (false !== ([$lid] = $xoopsDB->fetchRow($result))) {
-                $lids[] = $lid;
+            if ($xoopsDB->isResultSet($result)) {
+                while (false !== ([$lid] = $xoopsDB->fetchRow($result))) {
+                    $lids[] = $lid;
+                }
+            } else {
+                \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
             }
+
+            /** @var array $sel_lids */
             $sel_lids = array_rand($lids, $photos_num);
             if (is_array($sel_lids)) {
                 $whr_lid = '';
@@ -83,34 +93,37 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
             $sql    = 'SELECT lid , cid , title , ext , res_x , res_y , submitter , `status` , date AS unixtime , hits , rating , votes , comments FROM ' . $xoopsDB->prefix($table_photos) . " WHERE status>0 AND lid IN ($whr_lid)";
         }
         $result = $xoopsDB->query($sql);
+        if (!$xoopsDB->isResultSet($result)) {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+        } else {
+            $count = 1;
 
-        $count = 1;
+            /** @var array $photo */
+            while (false !== ($photo = $xoopsDB->fetchArray($result))) {
+                $photo['title']      = $GLOBALS['myts']->displayTarea($photo['title']);
+                $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
+                $photo['date']       = formatTimestamp($photo['unixtime'], 's');
+                $photo['thumbs_url'] = $thumbs_url;
 
-        /** @var array $photo */
-        while (false !== ($photo = $xoopsDB->fetchArray($result))) {
-            $photo['title']      = $GLOBALS['myts']->displayTarea($photo['title']);
-            $photo['suffix']     = $photo['hits'] > 1 ? 'hits' : 'hit';
-            $photo['date']       = formatTimestamp($photo['unixtime'], 's');
-            $photo['thumbs_url'] = $thumbs_url;
-
-            if (\in_array(\mb_strtolower($photo['ext']), $myalbum_normal_exts, true)) {
-                // width&height attirbs for <img>
-                if ($box_size <= 0) {
-                    $photo['img_attribs'] = '';
-                } else {
-                    [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
-                    if ($width > $box_size || $height > $box_size) {
-                        $photo['img_attribs'] = $width > $height ? "width='$box_size'" : "height='$box_size'";
-                    } else {
+                if (\in_array(\mb_strtolower($photo['ext']), $myalbum_normal_exts, true)) {
+                    // width&height attirbs for <img>
+                    if ($box_size <= 0) {
                         $photo['img_attribs'] = '';
+                    } else {
+                        [$width, $height, $type] = getimagesize("$thumbs_dir/{$photo['lid']}.{$photo['ext']}");
+                        if ($width > $box_size || $height > $box_size) {
+                            $photo['img_attribs'] = $width > $height ? "width='$box_size'" : "height='$box_size'";
+                        } else {
+                            $photo['img_attribs'] = '';
+                        }
                     }
+                } else {
+                    $photo['ext']         = 'gif';
+                    $photo['img_attribs'] = '';
                 }
-            } else {
-                $photo['ext']         = 'gif';
-                $photo['img_attribs'] = '';
-            }
 
-            $block['photo'][$count++] = $photo;
+                $block['photo'][$count++] = $photo;
+            }
         }
         $block['mod_url'] = $mod_url;
         $block['cols']    = $cols;

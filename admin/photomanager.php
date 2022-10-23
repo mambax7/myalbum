@@ -29,7 +29,8 @@ if ('delete' === Request::getCmd('action', '', 'POST') && isset($_POST['ids']) &
         exit('XOOPS_URL is not included in your REFERER');
     }
 
-    foreach ($_POST['ids'] as $lid) {
+    $deleteIds = Request::getArray('ids', [], 'POST');
+    foreach ($deleteIds as $lid) {
         $criteria = new \Criteria('lid', (int)$lid);
         Utility::deletePhotos($criteria);
     }
@@ -117,11 +118,13 @@ if ('' !== $txt) {
 $sql = 'SELECT count(l.lid) FROM ' . $xoopsDB->prefix($table_photos) . ' l LEFT JOIN ' . $xoopsDB->prefix($table_cat) . " c ON l.cid=c.cid WHERE $whr";
 $rs  = $xoopsDB->query($sql);
 
-if (!$xoopsDB->isResultSet($rs)) {
+if ($xoopsDB->isResultSet($rs)) {
+    [$numrows] = $xoopsDB->fetchRow($rs);
+} else {
     \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
 }
 
-[$numrows] = $xoopsDB->fetchRow($rs);
+
 
 $sql = 'SELECT l.lid, l.title, l.submitter, l.ext, l.res_x, l.res_y, l.status FROM ' . $xoopsDB->prefix($table_photos) . ' l LEFT JOIN ' . $xoopsDB->prefix($table_cat) . " c ON l.cid=c.cid WHERE $whr ORDER BY l.lid DESC LIMIT $pos,$num";
 $prs = $xoopsDB->query($sql);
@@ -162,8 +165,12 @@ $cat_options_for_update = Utility::getCategoryOptions('title', 0, '--', _AM_OPT_
 $user_options = "<option value='0'>" . _AM_OPT_NOCHANGE . "</option>\n";
 $sql          = 'SELECT uid,uname FROM ' . $xoopsDB->prefix('users') . ' ORDER BY uname';
 $urs          = $xoopsDB->query($sql);
-while ([$uid, $uname] = $xoopsDB->fetchRow($urs)) {
-    $user_options .= "<option value='$uid'>" . htmlspecialchars($uname, ENT_QUOTES) . "</option>\n";
+if ($xoopsDB->isResultSet($urs)) {
+    while ([$uid, $uname] = $xoopsDB->fetchRow($urs)) {
+        $user_options .= "<option value='$uid'>" . htmlspecialchars($uname, ENT_QUOTES) . "</option>\n";
+    }
+} else {
+    \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
 }
 
 // Start of outputting

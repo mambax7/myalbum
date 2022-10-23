@@ -60,7 +60,7 @@ if (!empty($_POST['submit'])) {
     $sql    = 'SELECT lid , ext , res_x , res_y FROM ' . $GLOBALS['xoopsDB']->prefix($table_photos) . " ORDER BY lid LIMIT $start , $size";
     $result = $xoopsDB->query($sql);
     if (!$xoopsDB->isResultSet($result)) {
-        throw new \RuntimeException("Query Failed! SQL: $sql- Error: " . $xoopsDB->error());
+        \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
     }
 
     $record_counter = 0;

@@ -13,11 +13,16 @@ if (is_object($GLOBALS['xoopsDB'])) {
         $whr_groupid = mb_substr($whr_groupid, 0, -1) . ')';
     }
     if (isset($GLOBALS['myalbum_mid'])) {
-        $GLOBALS['global_perms'] = [];
-        $sql                     =
-        $rs = $GLOBALS['xoopsDB']->query('SELECT gperm_itemid FROM ' . $GLOBALS['xoopsDB']->prefix('group_permission') . " WHERE gperm_modid='" . $GLOBALS['myalbum_mid'] . "' AND gperm_name='myalbum_global' AND ($whr_groupid)");
-        while ([$itemid] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
-            $GLOBALS['global_perms'] |= $itemid;
+        $global_perms = [];
+        $sql                     = 'SELECT gperm_itemid FROM ' . $GLOBALS['xoopsDB']->prefix('group_permission') . " WHERE gperm_modid='" . $GLOBALS['myalbum_mid'] . "' AND gperm_name='myalbum_global' AND ($whr_groupid)";
+        $result                  = $GLOBALS['xoopsDB']->query($sql);
+
+        if ($xoopsDB->isResultSet($result)) {
+            while ([$itemid] = $GLOBALS['xoopsDB']->fetchRow($result)) {
+                $global_perms |= $itemid;
+            }
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
         }
     }
 }

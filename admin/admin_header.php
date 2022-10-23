@@ -90,10 +90,11 @@ if (Request::hasVar('lid', 'GET')) {
     $lid    = Request::getInt('lid', 0, 'GET');
     $sql    = "SELECT submitter FROM $table_photos where lid=$lid";
     $result = $GLOBALS['xoopsDB']->query($sql, 0);
-    if (!$GLOBALS['xoopsDB']->isResultSet($result)) {
+    if ($GLOBALS['xoopsDB']->isResultSet($result)) {
+        [$submitter] = $GLOBALS['xoopsDB']->fetchRow($result);
+    } else {
         \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
     }
-    [$submitter] = $GLOBALS['xoopsDB']->fetchRow($result);
 } else {
     $submitter = $GLOBALS['xoopsUser']->getVar('uid');
 }
