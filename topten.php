@@ -58,7 +58,7 @@ $GLOBALS['xoopsTpl']->assign('lang_rating', _ALBM_RATING);
 $GLOBALS['xoopsTpl']->assign('lang_vote', _ALBM_VOTE);
 
 $criteria = new \Criteria('pid', '0');
-$criteria->setOrder('`title`');
+$criteria->setOrder('title');
 $rankings = [];
 $i        = 0;
 foreach ($catHandler->getObjects($criteria, true) as $cid => $cat) {

@@ -121,7 +121,7 @@ function xoops_module_update_myalbum(\XoopsModule $module, $previousVersion = nu
         }
 
         //delete .html entries from the tpl table
-        $sql = 'DELETE FROM ' . $GLOBALS['xoopsDB']->prefix('tplfile') . " WHERE `tpl_module` = '" . $module->getVar('dirname', 'n') . '\' AND `tpl_file` LIKE \'%.html%\'';
+        $sql = 'DELETE FROM ' . $GLOBALS['xoopsDB']->prefix('tplfile') . " WHERE tpl_module = '" . $module->getVar('dirname', 'n') . '\' AND `tpl_file` LIKE \'%.html%\'';
         $GLOBALS['xoopsDB']->queryF($sql);
 
         /** @var \XoopsGroupPermHandler $grouppermHandler */

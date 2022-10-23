@@ -284,7 +284,7 @@ final class Photos extends \XoopsObject
      */
     public function increaseHits(int $value = 1)
     {
-        $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($GLOBALS['table_photos']) . ' SET hits=hits+' . $value . " WHERE `lid`='" . $this->getVar('lid') . "' AND `status` > 0";
+        $sql = 'UPDATE ' . $GLOBALS['xoopsDB']->prefix($GLOBALS['table_photos']) . ' SET hits=hits+' . $value . " WHERE lid='" . $this->getVar('lid') . "' AND `status` > 0";
         return $GLOBALS['xoopsDB']->queryF($sql);
     }
 }
