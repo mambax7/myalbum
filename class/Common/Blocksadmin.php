@@ -425,12 +425,12 @@ final class Blocksadmin
         \xoops_loadLanguage('admin/groups', 'system');
         //        mpu_adm_menu();
         $myblock = new \XoopsBlock($bid);
+        $modules = [];
         $sql     = 'SELECT module_id FROM ' . $this->db->prefix('block_module_link') . ' WHERE block_id=' . $bid;
         $result  = $this->db->query($sql);
         if (!$this->db->isResultSet($result)) {
             \trigger_error("Query Failed! SQL: $sql Error: " . $this->db->error(), \E_USER_ERROR);
         } else {
-            $modules = [];
             while (false !== ($row = $this->db->fetchArray($result))) {
                 $modules[] = (int)$row['module_id'];
             }

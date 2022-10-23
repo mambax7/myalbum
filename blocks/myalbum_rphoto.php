@@ -49,7 +49,7 @@ if (!defined('MYALBUM_BLOCK_RPHOTO_INCLUDED')) {
         // WHERE clause for ext
         // $whr_ext = "ext IN ('" . implode( "','" , $myalbum_normal_exts ) . "')" ;
         $whr_ext = '1';
-
+        $numrows = [];
         $block           = [];
         $GLOBALS['myts'] = \MyTextSanitizer::getInstance();
         // Get number of photo
