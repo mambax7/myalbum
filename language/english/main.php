@@ -25,7 +25,7 @@ if (defined('FOR_XOOPS_LANG_CHECKER') || !defined('MYALBUM_MB_LOADED')) {
     define('_ALBM_AM_LABEL_MOVE', 'Change category for the photos checked');
     define('_ALBM_AM_BUTTON_MOVE', 'Move');
     define('_ALBM_AM_BUTTON_UPDATE', 'Modify');
-    define('_ALBM_AM_DEADLINKMAINPHOTO', "The main image doesn't exist");
+    define('_ALBM_AM_DEADLINKMAINPHOTO', "The main image is missing");
     define('_ALBM_RADIO_ROTATETITLE', 'Image rotation');
     define('_ALBM_RADIO_ROTATE0', 'no turn');
     define('_ALBM_RADIO_ROTATE90', 'turn right');
