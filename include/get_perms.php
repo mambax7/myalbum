@@ -13,9 +13,8 @@ if (is_object($GLOBALS['xoopsDB'])) {
         $whr_groupid = mb_substr($whr_groupid, 0, -1) . ')';
     }
     if (isset($GLOBALS['myalbum_mid'])) {
-        $global_perms = [];
-        $sql                     = 'SELECT gperm_itemid FROM ' . $GLOBALS['xoopsDB']->prefix('group_permission') . " WHERE gperm_modid='" . $GLOBALS['myalbum_mid'] . "' AND gperm_name='myalbum_global' AND ($whr_groupid)";
-        $result                  = $GLOBALS['xoopsDB']->query($sql);
+        $sql    = 'SELECT gperm_itemid FROM ' . $GLOBALS['xoopsDB']->prefix('group_permission') . " WHERE gperm_modid='" . $GLOBALS['myalbum_mid'] . "' AND gperm_name='myalbum_global' AND ($whr_groupid)";
+        $result = $GLOBALS['xoopsDB']->query($sql);
 
         if ($xoopsDB->isResultSet($result)) {
             while ([$itemid] = $GLOBALS['xoopsDB']->fetchRow($result)) {
