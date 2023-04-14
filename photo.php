@@ -126,7 +126,7 @@ switch ($op) {
             }
         }
 
-        $GLOBALS['xoopsTpl']->assign_by_ref('photo', $photo);
+        $GLOBALS['xoopsTpl']->assignByRef('photo', $photo);
 
         // Category Information
 

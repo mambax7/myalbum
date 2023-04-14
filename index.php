@@ -100,7 +100,7 @@ $criteria->setOrder('DESC');
 // Assign Latest Photos
 foreach ($photosHandler->getObjects($criteria, true) as $lid => $photo) {
     //$temp = Preview::getArrayForPhotoAssign($photo, true);
-    //$GLOBALS['xoopsTpl']->append_by_ref('photos', $temp);
+    //$GLOBALS['xoopsTpl']->appendByRef('photos', $temp);
     $GLOBALS['xoopsTpl']->append('photos', Preview::getArrayForPhotoAssign($photo, true));
 }
 

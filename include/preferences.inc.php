@@ -401,7 +401,7 @@ if ('save' === $op) {
                         $newtplset = ${$config->getVar('conf_name')};
 
                         // clear all compiled and cachedfiles
-                        $xoopsTpl->clear_compiled_tpl();
+                        $xoopsTpl->clearCompiledTemplate();
 
                         // generate compiled files for the new theme
                         // block files only for now..

@@ -53,7 +53,7 @@ require_once $GLOBALS['xoops']->path('class/template.php');
 $GLOBALS['xoopsTpl']                 = new \XoopsTpl();
 $GLOBALS['xoopsTpl']->caching        = 2;
 $GLOBALS['xoopsTpl']->cache_lifetime = 3600;
-if (!$GLOBALS['xoopsTpl']->is_cached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')) {
+if (!$GLOBALS['xoopsTpl']->isCached('db:' . $GLOBALS['mydirname'] . '_rss.tpl')) {
     xoops_load('XoopsLocal');
     $GLOBALS['xoopsTpl']->assign('channel_title', XoopsLocal::convert_encoding(htmlspecialchars($xoopsConfig['sitename'] . (is_object($cat) ? ' : ' . $cat->getVar('title') . ' : ' . $GLOBALS['myalbumModule']->getVar('name') : ' : ' . $GLOBALS['myalbumModule']->getVar('name')), ENT_QUOTES)));
     $GLOBALS['xoopsTpl']->assign('channel_link', XOOPS_URL . '/');

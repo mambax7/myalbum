@@ -128,6 +128,6 @@ foreach ($catHandler->getObjects($criteria, true) as $cid => $cat) {
     ++$i;
 }
 
-$GLOBALS['xoopsTpl']->assign_by_ref('rankings', $rankings);
+$GLOBALS['xoopsTpl']->assignByRef('rankings', $rankings);
 
 require_once XOOPS_ROOT_PATH . '/footer.php';
