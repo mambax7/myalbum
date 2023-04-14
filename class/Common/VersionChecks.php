@@ -45,7 +45,7 @@ trait VersionChecks
 
         if (\version_compare($currentVer, $requiredVer, '<')) {
             $success = false;
-            $module->setErrors(\sprintf(\constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_XOOPS'), $requiredVer, $currentVer));
+            $module->setErrors(\sprintf(\constant('CO_' . $moduleDirNameUpper . '_' . 'ERROR_BAD_XOOPS'), $requiredVer, $currentVer));
         }
 
         return $success;
@@ -75,7 +75,7 @@ trait VersionChecks
         $reqVer = &$module->getInfo('min_php');
 
         if (false !== $reqVer && '' !== $reqVer && !is_array($reqVer) && \version_compare($verNum, $reqVer, '<')) {
-            $module->setErrors(\sprintf(\constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_PHP'), $reqVer, $verNum));
+            $module->setErrors(\sprintf(\constant('CO_' . $moduleDirNameUpper . '_' . 'ERROR_BAD_PHP'), $reqVer, $verNum));
             $success = false;
         }
 

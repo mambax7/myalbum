@@ -56,7 +56,7 @@ function xoops_module_uninstall_myalbum(\XoopsModule $module): bool
         $dirInfo = new \SplFileInfo($old_dir);
         // The directory exists so delete it
         if ($dirInfo->isDir() && !$utility::rrmdir($old_dir)) {
-            $module->setErrors(sprintf(constant('CO_' . $moduleDirNameUpper . '_ERROR_BAD_DEL_PATH'), $old_dir));
+            $module->setErrors(sprintf(constant('CO_' . $moduleDirNameUpper . '_' . 'ERROR_BAD_DEL_PATH'), $old_dir));
             $success = false;
         }
         unset($dirInfo);

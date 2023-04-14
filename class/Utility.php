@@ -789,7 +789,7 @@ class Utility extends Common\SysUtility
         $votedataHandler = Helper::getInstance()
                                  ->getHandler('Votedata');
 
-        $criteria    = new CriteriaCompo(new Criteria('`lid`', $lid));
+        $criteria    = new CriteriaCompo(new Criteria('lid', $lid));
         $votes       = $votedataHandler->getObjects($criteria, true);
         $votesDB     = $votedataHandler->getCount($criteria);
         $totalrating = 0;
@@ -951,9 +951,37 @@ class Utility extends Common\SysUtility
      */
     public static function deletePhotos($criteria = null): void
     {
-        /** @var PhotosHandler $photosHandler */ //        $photosHandler = xoops_getModuleHandler('photos', $GLOBALS[$moduleDirName.'_dirname']);
-        //        require_once __DIR__ . '/photos.php';
-        //        $photosHandler = PhotosHandler::getInstance();
+
+        global $xoopsDB;
+        //mb ===============================
+
+//        $sql = "SELECT lid, ext FROM $table_photos WHERE $whr" ;
+//        $prs = $xoopsDB->query($sql) ;
+//
+//        if ($xoopsDB->isResultSet($result)) {
+//            while( list( $lid , $ext ) = $xoopsDB->fetchRow( $prs ) ) {
+//
+//                xoops_comment_delete( $myalbum_mid , $lid ) ;
+//                xoops_notification_deletebyitem( $myalbum_mid , 'photo' , $lid ) ;
+//
+//                $xoopsDB->query( "DELETE FROM $table_votedata WHERE lid=$lid" ) or die('DB error: DELETE votedata table.') ;
+//                $xoopsDB->query( "DELETE FROM $table_text WHERE lid=$lid" ) or die('DB error: DELETE text table.') ;
+//                $xoopsDB->query( "DELETE FROM $table_photos WHERE lid=$lid" ) or die('DB error: DELETE photo table.') ;
+//
+//                @unlink( "$photos_dir/$lid.$ext" ) ;
+//                @unlink( "$photos_dir/$lid.gif" ) ;
+//                @unlink( "$thumbs_dir/$lid.$ext" ) ;
+//                @unlink( "$thumbs_dir/$lid.gif" ) ;
+//            }
+//        } else {
+//            \trigger_error("Query Failed! SQL: $sql- Error: " . $xoopsDB->error(), E_USER_ERROR);
+//        }
+
+
+
+        //mb ========================================================
+
+        /** @var PhotosHandler $photosHandler */
         $photosHandler = Helper::getInstance()
                                ->getHandler('Photos');
 
@@ -1022,19 +1050,23 @@ class Utility extends Common\SysUtility
 
         $sql = "SELECT c.title,c.cid,c.pid,COUNT(p.lid) AS num FROM $table_name_cat c LEFT JOIN $table_name_photos p ON c.cid=p.cid GROUP BY c.cid ORDER BY pid ASC,$order DESC";
         $rs  = $GLOBALS['xoopsDB']->query($sql);
-
-        $key = 1;
-        while ([$title, $cid, $pid, $num] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
-            $cats[$key] = [
-                'cid'      => (int)$cid,
-                'pid'      => (int)$pid,
-                'next_key' => $key + 1,
-                'depth'    => 0,
-                'title'    => $GLOBALS['myts']->htmlSpecialChars($title),
-                'num'      => (int)$num,
-            ];
-            ++$key;
+        if ($GLOBALS['xoopsDB']->isResultSet($rs)) {
+            $key = 1;
+            while ([$title, $cid, $pid, $num] = $GLOBALS['xoopsDB']->fetchRow($rs)) {
+                $cats[$key] = [
+                    'cid'      => (int)$cid,
+                    'pid'      => (int)$pid,
+                    'next_key' => $key + 1,
+                    'depth'    => 0,
+                    'title'    => $GLOBALS['myts']->htmlSpecialChars($title),
+                    'num'      => (int)$num,
+                ];
+                ++$key;
+            }
+        } else {
+            \trigger_error("Query Failed! SQL: $sql- Error: " . $GLOBALS['xoopsDB']->error(), E_USER_ERROR);
         }
+        
         $sizeofcats = $key;
 
         $loop_check_for_key = 1024;

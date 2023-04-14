@@ -11,6 +11,12 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class Category extends \XoopsObject
 {
+    private $cid;
+    private $pid;
+    private $title;
+    private $imgurl;
+    private $weight;
+
     /**
      * @param null $id
      */

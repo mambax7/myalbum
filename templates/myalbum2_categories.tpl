@@ -8,7 +8,7 @@
                 </a>
             <{else}>
                 <a href="<{$mod_url}>/viewcat.php?cid=<{$cat.cid}>">
-                    <img src="<{xoModuleIcons32 category.png}>" width="32" height="32" border="0" alt="">
+                    <img src="<{xoModuleIcons32 'category.png'}>" width="32" height="32" border="0" alt="">
                 </a>
             <{/if}>
         </td>
@@ -18,13 +18,13 @@
             <br>
             <{foreach from=$cat.subcategories item=subcat}>
                 <{if $subcat.number_of_subcat}>
-                    <a href="<{$mod_url}>/viewcat.php?cid=<{$subcat.cid}>"><img src="<{xoModuleIcons16 topic.png}>"
+                    <a href="<{$mod_url}>/viewcat.php?cid=<{$subcat.cid}>"><img src="<{xoModuleIcons16 'topic.png'}>"
                                                                                 width="16" height="16"
                                                                                 alt=""><{$subcat.title}><img
                                 src='<{$mod_url}>/assets/images/subcat.gif' width='15' height='15'></a>
                     &nbsp;
                 <{else}>
-                    <a href="<{$mod_url}>/viewcat.php?cid=<{$subcat.cid}>"><img src="<{xoModuleIcons16 topic.png}>"
+                    <a href="<{$mod_url}>/viewcat.php?cid=<{$subcat.cid}>"><img src="<{xoModuleIcons16 'topic.png'}>"
                                                                                 width="16" height="16"
                                                                                 alt=""><{$subcat.title}></a>
                     &nbsp;(<{$subcat.photo_small_sum}>)

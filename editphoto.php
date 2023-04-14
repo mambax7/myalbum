@@ -29,9 +29,10 @@ $textHandler   = $helper->getHandler('Text');
 if (!$photo_obj = $photosHandler->get($lid)) {
     $helper->redirect('index.php', 2, _ALBM_NOMATCH);
 }
-$submitter = $photo_obj->getVar('submitted');
+$submitter = $photo_obj->getVar('submitter');
 
-if (($global_perms & GPERM_EDITABLE) !== 0) {
+//if (($global_perms & GPERM_EDITABLE) !== 0) {
+if( $global_perms & GPERM_EDITABLE ) {
     if ($my_uid != $submitter && !$isadmin) {
         redirect_header($mod_url, 3, _NOPERM);
     }

@@ -12,6 +12,9 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class Text extends \XoopsObject
 {
+    private $lid;
+    private $description;
+
     /**
      * MyalbumText constructor.
      * @param null $id

@@ -46,7 +46,7 @@ define('_ALBM_UPLOAD_URL', XOOPS_UPLOAD_URL . '/' . _ALBM_DIRNAME); // WITHOUT T
 define('_ALBM_UPLOAD_PATH', XOOPS_UPLOAD_PATH . '/' . _ALBM_DIRNAME); // WITHOUT Trailing slash
 
 if (!defined($moduleDirNameUpper . '_CONSTANTS_DEFINED')) {
-    define($moduleDirNameUpper . '_DIRNAME', \basename(\dirname(__DIR__)));
+    define($moduleDirNameUpper . '_' . 'DIRNAME', \basename(\dirname(__DIR__)));
     define($moduleDirNameUpper . '_ROOT_PATH', XOOPS_ROOT_PATH . '/modules/' . $moduleDirName . '/');
     define($moduleDirNameUpper . '_PATH', XOOPS_ROOT_PATH . '/modules/' . $moduleDirName . '/');
     define($moduleDirNameUpper . '_URL', XOOPS_URL . '/modules/' . $moduleDirName . '/');

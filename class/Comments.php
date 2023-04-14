@@ -12,6 +12,27 @@ require \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class Comments extends \XoopsObject
 {
+    private $com_id;
+    private $com_pid;
+    private $com_modid;
+    private $com_icon;
+    private $com_title;
+    private $com_text;
+    private $com_created;
+    private $com_modified;
+    private $com_uid;
+    private $com_ip;
+    private $com_sig;
+    private $com_itemid;
+    private $com_rootid;
+    private $com_status;
+    private $com_exparams;
+    private $dohtml;
+    private $dosmiley;
+    private $doxcode;
+    private $doimage;
+    private $dobr;
+
     /**
      * @param null $id
      */

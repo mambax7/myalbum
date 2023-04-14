@@ -36,7 +36,7 @@
                             <td>
                                 <a href='<{$xoops_url}>/modules/<{$mydirname}>/editphoto.php?lid=$photo.photo.lid'
                                    target='_blank'>
-                                    <img src='<{xoModuleIcons16 edit.png}>' border='0'
+                                    <img src="<{xoModuleIcons16 'edit.png'}>"  border='0'
                                          alt='<{$smarty.const._ALBM_EDITTHISPHOTO}>'
                                          title='<{$smarty.const._ALBM_EDITTHISPHOTO}>'>
                                 </a>

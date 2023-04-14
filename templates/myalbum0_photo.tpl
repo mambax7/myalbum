@@ -13,7 +13,7 @@
                         </td>
                         <td align='right'>
                             <{if $lang_add_photo|default:''}>
-                                <a href="submit.php"><{$lang_add_photo}><img src="<{xoModuleIcons16 add.png}>"
+                                <a href="submit.php"><{$lang_add_photo}><img src="<{xoModuleIcons16 'add.png'}>"
                                                                              border="0" alt="<{$lang_add_photo}>"
                                                                              title="<{$lang_add_photo}>"></a>
                             <{/if}>
@@ -47,7 +47,7 @@
                             <{* EDIT ICON *}>
                             <{if $photo.can_edit}>
                                 <a href='<{$mod_url}>/editphoto.php?lid=<{$photo.lid}>'>
-                                    <img src='<{xoModuleIcons16 edit.png}>' border='0' alt='<{$lang_editthisphoto}>'
+                                    <img src="<{xoModuleIcons16 'edit.png'}>"  border='0' alt='<{$lang_editthisphoto}>'
                                          title='<{$lang_editthisphoto}>'>
                                 </a>
                             <{/if}>
@@ -100,7 +100,7 @@
                             <{* CATEGORY *}>
                             <{if $photo.cat_title}>
                                 <a href='<{$mod_url}>/viewcat.php?cid=<{$photo.cid}>'>
-                                    <img src='<{xoModuleIcons16 topic.png}>' width='16' height='16'
+                                    <img src="<{xoModuleIcons16 'topic.png'}>"  width='16' height='16'
                                          alt='<{$lang_category}>' title='<{$lang_category}>'
                                          border='0'><{$photo.cat_title}>
                                 </a>

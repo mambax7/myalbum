@@ -12,6 +12,13 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class Votedata extends \XoopsObject
 {
+    private $ratingid;
+    private $lid;
+    private $ratinguser;
+    private $rating;
+    private $ratinghostname;
+    private $ratingtimestamp;
+
     /**
      * Votedata constructor.
      * @param null $id

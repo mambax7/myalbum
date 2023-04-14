@@ -27,10 +27,10 @@ function myalbum1_tag_block_cloud_edit($options)
 }
 
 /**
- * @param $options
- * @return array|false|null
+ * @param array $options
+ * @return array|false
  */
-function myalbum1_tag_block_top_show($options)
+function myalbum1_tag_block_top_show(array $options)
 {
     if (file_exists(XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php')) {
         //        global $module_dirname;
@@ -40,15 +40,14 @@ function myalbum1_tag_block_top_show($options)
         return tag_block_top_show($options, $module_dirname);
     }
 
-    return null;
+    return false;
 }
 
 /**
- * @param $options
- *
- * @return string|false
+ * @param array $options
+ * @return string|null
  */
-function myalbum1_tag_block_top_edit($options)
+function myalbum1_tag_block_top_edit($options): ?string
 {
     require_once XOOPS_ROOT_PATH . '/modules/tag/blocks/block.php';
 

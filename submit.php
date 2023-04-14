@@ -27,7 +27,7 @@ global $global_perms;
 
 $lid = '';
 require_once __DIR__ . '/header.php';
-require_once __DIR__ . '/include/get_perms.php';
+require __DIR__ . '/include/get_perms.php';
 xoops_load('xoopsmediauploader');
 
 $catHandler    = $helper->getHandler('Category');
@@ -294,7 +294,7 @@ if ('imagemanager' !== $caller && !empty($_POST['preview'])) {
     $field = $_POST['xoops_upload_file'][0];
     if (is_readable($_FILES[$field]['tmp_name'])) {
         // new preview
-        if ($GLOBALS['myalbumModuleConfig']['myalbum_canresize']) {
+        if (isset($GLOBALS['myalbumModuleConfig']['myalbum_canresize'])) {
             $uploader = new \XoopsMediaUploader(
                 $GLOBALS['photos_dir'],
                 explode('|', $helper->getConfig('myalbum_allowedmime')),
@@ -312,8 +312,12 @@ if ('imagemanager' !== $caller && !empty($_POST['preview'])) {
             );
         }
         $uploader->setPrefix('tmp_');
+
         if ($uploader->fetchMedia($field) && $uploader->upload()) {
             $tmp_name     = $uploader->getSavedFileName();
+            /** @var array $fileparts */
+            $fileparts = explode('.', $tmp_name);
+            $ext       = $fileparts[count($fileparts) - 1];
             $preview_name = str_replace('tmp_', 'tmp_prev_', $tmp_name);
             Utility::editPhoto($GLOBALS['photos_dir'] . "/$tmp_name", $GLOBALS['photos_dir'] . "/$lid.$ext");
             [$imgsrc, $width_spec, $ahref] = Preview::getImageAttribsForPreview($preview_name);

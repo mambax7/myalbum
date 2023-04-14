@@ -20,7 +20,7 @@
                     </label> &nbsp; &nbsp;
                     <{$photo_global_sum}> &nbsp; &nbsp;
                     <{if $lang_add_photo|default:''}><a href="submit.php"><{$lang_add_photo}><img
-                        src="<{xoModuleIcons16 add.png}>" border="0" alt="<{$lang_add_photo}>"
+                        src="<{xoModuleIcons16 'add.png'}>" border="0" alt="<{$lang_add_photo}>"
                         title="<{$lang_add_photo}>">
                         </a><{/if}>
                 </form>

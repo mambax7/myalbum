@@ -17,7 +17,7 @@
                         <td align='right'>
                             <{if $lang_add_photo|default:''}>
                                 <a href="submit.php?cid=<{$category_id}>"><{$lang_add_photo}>
-                                    <img src="<{xoModuleIcons16 add.png}>" border="0" alt="<{$lang_add_photo}>"
+                                    <img src="<{xoModuleIcons16 'add.png'}>" border="0" alt="<{$lang_add_photo}>"
                                          title="<{$lang_add_photo}>">
                                 </a>
                             <{/if}>

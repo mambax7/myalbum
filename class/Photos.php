@@ -12,6 +12,21 @@ require_once \dirname(__DIR__) . '/include/read_configs.php';
  */
 final class Photos extends \XoopsObject
 {
+    private $lid;
+    private $cid;
+    private $title;
+    private $ext;
+    private $res_x;
+    private $res_y;
+    private $submitter;
+    private $status;
+    private $date;
+    private $hits;
+    private $rating;
+    private $votes;
+    private $comments;
+    private $tags;
+
     /**
      * MyalbumPhotos constructor.
      * @param null $id

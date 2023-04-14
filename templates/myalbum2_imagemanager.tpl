@@ -156,7 +156,7 @@
                         <input type="hidden" name="photo_id[]" value="<{$photo.lid}>">
                         <{if $photo.can_edit}>
                             <a href='<{$mod_url}>/editphoto.php?lid=<{$photo.lid}>' target='_blank'><img
-                                        src='<{xoModuleIcons16 edit.png}>' border='0' alt=''></a>
+                                        src="<{xoModuleIcons16 'edit.png'}>"  border='0' alt=''></a>
                         <{/if}>
                         <{$photo.nicename}>
                     </td>
