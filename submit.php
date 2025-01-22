@@ -109,6 +109,7 @@ if (!empty($_POST['submit'])) {
         exit('XOOPS_URL is not included in your REFERER');
     }
 
+    $my_uid = is_object($GLOBALS['xoopsUser']) ? $GLOBALS['xoopsUser']->uid() : 0;
     $submitter = $my_uid;
     $photo_obj = $photosHandler->create();
     $cid       = Request::getInt('cid', 0, 'POST');
